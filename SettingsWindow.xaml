@@ -6,31 +6,18 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         mc:Ignorable="d"
         Title="Настройки виджета" 
-        Height="350" 
+        Height="380" 
         Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
         Background="White">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
+    <StackPanel Margin="10">
+        <!-- Прозрачность фона -->
         <TextBlock Text="Прозрачность фона:" 
-                   Grid.Row="0" 
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="BackgroundOpacitySlider" 
-                Grid.Row="1"
                 Minimum="0.1" 
                 Maximum="1.0" 
                 Value="0.9"
@@ -39,17 +26,15 @@
                 ValueChanged="BackgroundOpacitySlider_ValueChanged"/>
         
         <TextBlock x:Name="BackgroundOpacityValueText" 
-                   Grid.Row="2" 
                    Text="90%" 
                    HorizontalAlignment="Center" 
                    Margin="0,0,0,10"/>
 
+        <!-- Прозрачность текста -->
         <TextBlock Text="Прозрачность текста:" 
-                   Grid.Row="3" 
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="TextOpacitySlider" 
-                Grid.Row="4"
                 Minimum="0.1" 
                 Maximum="1.0" 
                 Value="1.0"
@@ -58,17 +43,15 @@
                 ValueChanged="TextOpacitySlider_ValueChanged"/>
         
         <TextBlock x:Name="TextOpacityValueText" 
-                   Grid.Row="5" 
                    Text="100%" 
                    HorizontalAlignment="Center" 
                    Margin="0,0,0,10"/>
 
+        <!-- Размер шрифта -->
         <TextBlock Text="Размер шрифта:" 
-                   Grid.Row="6" 
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="FontSizeSlider" 
-                Grid.Row="7"
                 Minimum="24" 
                 Maximum="96" 
                 Value="48"
@@ -77,16 +60,23 @@
                 ValueChanged="FontSizeSlider_ValueChanged"/>
         
         <TextBlock x:Name="FontSizeValueText" 
-                   Grid.Row="8" 
                    Text="48px" 
                    HorizontalAlignment="Center" 
-                   Margin="0,10,0,0"/>
+                   Margin="0,0,0,10"/>
 
+        <!-- Чекбокс отображения секунд -->
+        <CheckBox x:Name="ShowSecondsCheckBox"
+                  Content="Показывать секунды"
+                  IsChecked="True"
+                  Margin="0,10,0,10"
+                  Checked="ShowSecondsCheckBox_Changed"
+                  Unchecked="ShowSecondsCheckBox_Changed"/>
+
+        <!-- Кнопка закрытия -->
         <Button x:Name="CloseWidgetButton" 
-                Grid.Row="9"
                 Content="Закрыть виджет" 
                 Margin="0,10,0,0"
                 Padding="10,5"
                 Click="CloseWidgetButton_Click"/>
-    </Grid>
+    </StackPanel>
 </Window> 

@@ -22,6 +22,7 @@ public partial class MainWindow : Window
     private Point _dragStartPoint;
     private bool _isDragging;
     private SettingsWindow? _settingsWindow;
+    private bool _showSeconds = true;
     public bool IsSettingsWindowOpen { get; set; }
 
     public MainWindow()
@@ -67,6 +68,12 @@ public partial class MainWindow : Window
         TimeTextBlock.FontSize = size;
     }
 
+    public void SetShowSeconds(bool show)
+    {
+        _showSeconds = show;
+        UpdateTime();
+    }
+
     private void Timer_Tick(object? sender, EventArgs e)
     {
         UpdateTime();
@@ -74,7 +81,7 @@ public partial class MainWindow : Window
 
     private void UpdateTime()
     {
-        TimeTextBlock.Text = DateTime.Now.ToString("HH:mm:ss");
+        TimeTextBlock.Text = DateTime.Now.ToString(_showSeconds ? "HH:mm:ss" : "HH:mm");
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -17,12 +17,14 @@ public partial class SettingsWindow : Window
         BackgroundOpacitySlider.Value = 0.9;
         TextOpacitySlider.Value = 1.0;
         FontSizeSlider.Value = 48;
+        ShowSecondsCheckBox.IsChecked = true;
         UpdateAllValues();
         
         // Применяем начальные значения
         _mainWindow.SetBackgroundOpacity(BackgroundOpacitySlider.Value);
         _mainWindow.SetTextOpacity(TextOpacitySlider.Value);
         _mainWindow.SetFontSize(FontSizeSlider.Value);
+        _mainWindow.SetShowSeconds(ShowSecondsCheckBox.IsChecked ?? true);
     }
 
     private void BackgroundOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -49,6 +51,14 @@ public partial class SettingsWindow : Window
         {
             _mainWindow.SetFontSize(FontSizeSlider.Value);
             UpdateAllValues();
+        }
+    }
+
+    private void ShowSecondsCheckBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_mainWindow != null)
+        {
+            _mainWindow.SetShowSeconds(ShowSecondsCheckBox.IsChecked ?? true);
         }
     }
 
