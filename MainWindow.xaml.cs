@@ -22,12 +22,30 @@ public partial class MainWindow : Window
     private Point _dragStartPoint;
     private bool _isDragging;
     private SettingsWindow? _settingsWindow;
-    private bool _showSeconds = true;
+    internal WidgetSettings _settings;
     public bool IsSettingsWindowOpen { get; set; }
 
     public MainWindow()
     {
         InitializeComponent();
+        
+        // Загружаем настройки
+        _settings = WidgetSettings.Load();
+        
+        // Устанавливаем позицию окна
+        if (_settings.WindowLeft.HasValue && _settings.WindowTop.HasValue)
+        {
+            Left = _settings.WindowLeft.Value;
+            Top = _settings.WindowTop.Value;
+        }
+        else
+        {
+            // Если позиция не сохранена, используем значения по умолчанию
+            Left = Constants.DEFAULT_WINDOW_LEFT;
+            Top = Constants.DEFAULT_WINDOW_TOP;
+        }
+        
+        ApplySettings();
         
         // Отключаем контекстное меню
         ContextMenu = null;
@@ -48,30 +66,83 @@ public partial class MainWindow : Window
 
         // Обновляем время сразу при запуске
         UpdateTime();
+
+        // Добавляем обработчик закрытия окна
+        Closing += MainWindow_Closing;
+    }
+
+    private void ApplySettings()
+    {
+        // Применяем настройки с валидацией
+        SetBackgroundOpacity(ValidateOpacity(_settings.BackgroundOpacity, 
+            Constants.MIN_WINDOW_OPACITY, 
+            Constants.MAX_WINDOW_OPACITY, 
+            Constants.DEFAULT_WINDOW_OPACITY));
+        
+        SetTextOpacity(ValidateOpacity(_settings.TextOpacity, 
+            Constants.MIN_TEXT_OPACITY, 
+            Constants.MAX_TEXT_OPACITY, 
+            Constants.DEFAULT_TEXT_OPACITY));
+        
+        SetFontSize(ValidateFontSize(_settings.FontSize));
+        SetShowSeconds(_settings.ShowSeconds);
+    }
+
+    private double ValidateOpacity(double value, double minValue, double maxValue, double defaultValue)
+    {
+        if (value < minValue || value > maxValue)
+        {
+            return defaultValue;
+        }
+        // Округляем значение до ближайшего шага
+        return Math.Round(value / Constants.OPACITY_STEP) * Constants.OPACITY_STEP;
+    }
+
+    private double ValidateFontSize(double value)
+    {
+        if (value < Constants.MIN_FONT_SIZE || value > Constants.MAX_FONT_SIZE)
+        {
+            return Constants.DEFAULT_FONT_SIZE;
+        }
+        // Округляем значение до ближайшего шага
+        return Math.Round(value / Constants.FONT_SIZE_STEP) * Constants.FONT_SIZE_STEP;
     }
 
     public void SetBackgroundOpacity(double opacity)
     {
         // Устанавливаем прозрачность только для фона
-        BackgroundBorder.Opacity = opacity;
+        BackgroundBorder.Opacity = ValidateOpacity(opacity, 
+            Constants.MIN_WINDOW_OPACITY, 
+            Constants.MAX_WINDOW_OPACITY, 
+            Constants.DEFAULT_WINDOW_OPACITY);
+        _settings.BackgroundOpacity = BackgroundBorder.Opacity;
+        _settings.Save();
     }
 
     public void SetTextOpacity(double opacity)
     {
         // Устанавливаем прозрачность только для текста
-        TimeTextBlock.Opacity = opacity;
+        TimeTextBlock.Opacity = ValidateOpacity(opacity, 
+            Constants.MIN_TEXT_OPACITY, 
+            Constants.MAX_TEXT_OPACITY, 
+            Constants.DEFAULT_TEXT_OPACITY);
+        _settings.TextOpacity = TimeTextBlock.Opacity;
+        _settings.Save();
     }
 
     public void SetFontSize(double size)
     {
         // Устанавливаем размер шрифта
-        TimeTextBlock.FontSize = size;
+        TimeTextBlock.FontSize = ValidateFontSize(size);
+        _settings.FontSize = TimeTextBlock.FontSize;
+        _settings.Save();
     }
 
     public void SetShowSeconds(bool show)
     {
-        _showSeconds = show;
+        _settings.ShowSeconds = show;
         UpdateTime();
+        _settings.Save();
     }
 
     private void Timer_Tick(object? sender, EventArgs e)
@@ -81,7 +152,9 @@ public partial class MainWindow : Window
 
     private void UpdateTime()
     {
-        TimeTextBlock.Text = DateTime.Now.ToString(_showSeconds ? "HH:mm:ss" : "HH:mm");
+        TimeTextBlock.Text = DateTime.Now.ToString(_settings.ShowSeconds ? 
+            Constants.TIME_FORMAT_WITH_SECONDS : 
+            Constants.TIME_FORMAT_WITHOUT_SECONDS);
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -135,6 +208,25 @@ public partial class MainWindow : Window
         else
         {
             _settingsWindow.Activate();
+        }
+    }
+
+    private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        // Останавливаем таймер
+        _timer.Stop();
+        
+        // Сохраняем текущую позицию окна
+        _settings.WindowLeft = Left;
+        _settings.WindowTop = Top;
+        
+        // Сохраняем текущие настройки
+        _settings.Save();
+        
+        // Закрываем окно настроек, если оно открыто
+        if (_settingsWindow != null && _settingsWindow.IsVisible)
+        {
+            _settingsWindow.Close();
         }
     }
 }

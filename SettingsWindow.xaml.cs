@@ -14,17 +14,21 @@ public partial class SettingsWindow : Window
         _mainWindow = mainWindow;
         
         // Устанавливаем начальные значения слайдеров
-        BackgroundOpacitySlider.Value = 0.9;
-        TextOpacitySlider.Value = 1.0;
-        FontSizeSlider.Value = 48;
-        ShowSecondsCheckBox.IsChecked = true;
+        BackgroundOpacitySlider.Value = _mainWindow._settings.BackgroundOpacity;
+        TextOpacitySlider.Value = _mainWindow._settings.TextOpacity;
+        FontSizeSlider.Value = _mainWindow._settings.FontSize;
+        ShowSecondsCheckBox.IsChecked = _mainWindow._settings.ShowSeconds;
         UpdateAllValues();
         
-        // Применяем начальные значения
-        _mainWindow.SetBackgroundOpacity(BackgroundOpacitySlider.Value);
-        _mainWindow.SetTextOpacity(TextOpacitySlider.Value);
-        _mainWindow.SetFontSize(FontSizeSlider.Value);
-        _mainWindow.SetShowSeconds(ShowSecondsCheckBox.IsChecked ?? true);
+        // Добавляем обработчик закрытия окна
+        Closing += SettingsWindow_Closing;
+    }
+
+    private void SettingsWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        // Сохраняем текущие настройки
+        _mainWindow._settings.Save();
+        _mainWindow.IsSettingsWindowOpen = false;
     }
 
     private void BackgroundOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -73,11 +77,5 @@ public partial class SettingsWindow : Window
     {
         _mainWindow.Close();
         Close();
-    }
-
-    protected override void OnClosed(EventArgs e)
-    {
-        base.OnClosed(e);
-        _mainWindow.IsSettingsWindowOpen = false;
     }
 } 
