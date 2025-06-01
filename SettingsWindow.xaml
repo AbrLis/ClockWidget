@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         mc:Ignorable="d"
         Title="Настройки виджета" 
-        Height="250" 
+        Height="350" 
         Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -14,6 +14,8 @@
         Background="White">
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -59,10 +61,29 @@
                    Grid.Row="5" 
                    Text="100%" 
                    HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"/>
+                   Margin="0,0,0,10"/>
+
+        <TextBlock Text="Размер шрифта:" 
+                   Grid.Row="6" 
+                   Margin="0,0,0,5"/>
+        
+        <Slider x:Name="FontSizeSlider" 
+                Grid.Row="7"
+                Minimum="24" 
+                Maximum="96" 
+                Value="48"
+                TickFrequency="4"
+                IsSnapToTickEnabled="True"
+                ValueChanged="FontSizeSlider_ValueChanged"/>
+        
+        <TextBlock x:Name="FontSizeValueText" 
+                   Grid.Row="8" 
+                   Text="48px" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,10,0,0"/>
 
         <Button x:Name="CloseWidgetButton" 
-                Grid.Row="6"
+                Grid.Row="9"
                 Content="Закрыть виджет" 
                 Margin="0,10,0,0"
                 Padding="10,5"

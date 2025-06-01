@@ -61,6 +61,12 @@ public partial class MainWindow : Window
         TimeTextBlock.Opacity = opacity;
     }
 
+    public void SetFontSize(double size)
+    {
+        // Устанавливаем размер шрифта
+        TimeTextBlock.FontSize = size;
+    }
+
     private void Timer_Tick(object? sender, EventArgs e)
     {
         UpdateTime();

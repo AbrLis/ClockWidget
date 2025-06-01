@@ -16,11 +16,13 @@ public partial class SettingsWindow : Window
         // Устанавливаем начальные значения слайдеров
         BackgroundOpacitySlider.Value = 0.9;
         TextOpacitySlider.Value = 1.0;
-        UpdateOpacityTexts();
+        FontSizeSlider.Value = 48;
+        UpdateAllValues();
         
         // Применяем начальные значения
         _mainWindow.SetBackgroundOpacity(BackgroundOpacitySlider.Value);
         _mainWindow.SetTextOpacity(TextOpacitySlider.Value);
+        _mainWindow.SetFontSize(FontSizeSlider.Value);
     }
 
     private void BackgroundOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -28,7 +30,7 @@ public partial class SettingsWindow : Window
         if (_mainWindow != null)
         {
             _mainWindow.SetBackgroundOpacity(BackgroundOpacitySlider.Value);
-            UpdateOpacityTexts();
+            UpdateAllValues();
         }
     }
 
@@ -37,14 +39,24 @@ public partial class SettingsWindow : Window
         if (_mainWindow != null)
         {
             _mainWindow.SetTextOpacity(TextOpacitySlider.Value);
-            UpdateOpacityTexts();
+            UpdateAllValues();
         }
     }
 
-    private void UpdateOpacityTexts()
+    private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_mainWindow != null)
+        {
+            _mainWindow.SetFontSize(FontSizeSlider.Value);
+            UpdateAllValues();
+        }
+    }
+
+    private void UpdateAllValues()
     {
         BackgroundOpacityValueText.Text = $"{Math.Round(BackgroundOpacitySlider.Value * 100)}%";
         TextOpacityValueText.Text = $"{Math.Round(TextOpacitySlider.Value * 100)}%";
+        FontSizeValueText.Text = $"{Math.Round(FontSizeSlider.Value)}px";
     }
 
     private void CloseWidgetButton_Click(object sender, RoutedEventArgs e)
