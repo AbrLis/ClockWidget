@@ -21,6 +21,8 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _timer;
     private Point _dragStartPoint;
     private bool _isDragging;
+    private SettingsWindow? _settingsWindow;
+    public bool IsSettingsWindowOpen { get; set; }
 
     public MainWindow()
     {
@@ -37,13 +39,26 @@ public partial class MainWindow : Window
         _timer.Tick += Timer_Tick;
         _timer.Start();
 
-        // Добавляем обработчики событий мыши для перетаскивания
+        // Добавляем обработчики событий мыши
         PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown;
         PreviewMouseLeftButtonUp += MainWindow_PreviewMouseLeftButtonUp;
         PreviewMouseMove += MainWindow_PreviewMouseMove;
+        MouseRightButtonDown += MainWindow_MouseRightButtonDown;
 
         // Обновляем время сразу при запуске
         UpdateTime();
+    }
+
+    public void SetBackgroundOpacity(double opacity)
+    {
+        // Устанавливаем прозрачность только для фона
+        BackgroundBorder.Opacity = opacity;
+    }
+
+    public void SetTextOpacity(double opacity)
+    {
+        // Устанавливаем прозрачность только для текста
+        TimeTextBlock.Opacity = opacity;
     }
 
     private void Timer_Tick(object? sender, EventArgs e)
@@ -66,9 +81,12 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        _isDragging = false;
-        ReleaseMouseCapture();
-        e.Handled = true;
+        if (_isDragging)
+        {
+            _isDragging = false;
+            ReleaseMouseCapture();
+            e.Handled = true;
+        }
     }
 
     private void MainWindow_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -80,6 +98,30 @@ public partial class MainWindow : Window
             Left += diff.X;
             Top += diff.Y;
             e.Handled = true;
+        }
+    }
+
+    private void MainWindow_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        // Открываем окно настроек по правой кнопке мыши
+        if (!IsSettingsWindowOpen)
+        {
+            OpenSettingsWindow();
+        }
+        e.Handled = true; // Предотвращаем появление контекстного меню
+    }
+
+    private void OpenSettingsWindow()
+    {
+        if (_settingsWindow == null || !_settingsWindow.IsVisible)
+        {
+            _settingsWindow = new SettingsWindow(this);
+            IsSettingsWindowOpen = true;
+            _settingsWindow.Show();
+        }
+        else
+        {
+            _settingsWindow.Activate();
         }
     }
 }
