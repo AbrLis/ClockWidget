@@ -1,4 +1,4 @@
-namespace ClockWidgetApp;
+namespace ClockWidgetApp.Helpers;
 
 public static class Constants
 {

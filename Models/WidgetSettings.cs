@@ -3,8 +3,9 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
+using ClockWidgetApp.Helpers;
 
-namespace ClockWidgetApp;
+namespace ClockWidgetApp.Models;
 
 public class WidgetSettings
 {
@@ -92,7 +93,7 @@ public class WidgetSettings
         catch (Exception)
         {
             // В случае ошибки сохранения просто игнорируем её
-            // В реальном приложении здесь можно добавить логирование
+            // можно добавить логирование
         }
     }
 

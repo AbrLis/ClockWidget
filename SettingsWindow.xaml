@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClockWidgetApp"
+        xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
         Title="Настройки виджета" 
         Height="380" 
@@ -18,15 +19,14 @@
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="BackgroundOpacitySlider" 
-                Minimum="{x:Static local:Constants.MIN_WINDOW_OPACITY}" 
-                Maximum="{x:Static local:Constants.MAX_WINDOW_OPACITY}" 
-                Value="{x:Static local:Constants.DEFAULT_WINDOW_OPACITY}"
-                TickFrequency="{x:Static local:Constants.OPACITY_STEP}"
-                IsSnapToTickEnabled="True"
-                ValueChanged="BackgroundOpacitySlider_ValueChanged"/>
+                Minimum="{x:Static helpers:Constants.MIN_WINDOW_OPACITY}" 
+                Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}" 
+                Value="{Binding BackgroundOpacity, Mode=TwoWay}"
+                TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
+                IsSnapToTickEnabled="True"/>
         
         <TextBlock x:Name="BackgroundOpacityValueText" 
-                   Text="90%" 
+                   Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
                    HorizontalAlignment="Center" 
                    Margin="0,0,0,10"/>
 
@@ -35,15 +35,14 @@
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="TextOpacitySlider" 
-                Minimum="{x:Static local:Constants.MIN_TEXT_OPACITY}" 
-                Maximum="{x:Static local:Constants.MAX_TEXT_OPACITY}" 
-                Value="{x:Static local:Constants.DEFAULT_TEXT_OPACITY}"
-                TickFrequency="{x:Static local:Constants.OPACITY_STEP}"
-                IsSnapToTickEnabled="True"
-                ValueChanged="TextOpacitySlider_ValueChanged"/>
+                Minimum="{x:Static helpers:Constants.MIN_TEXT_OPACITY}" 
+                Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}" 
+                Value="{Binding TextOpacity, Mode=TwoWay}"
+                TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
+                IsSnapToTickEnabled="True"/>
         
         <TextBlock x:Name="TextOpacityValueText" 
-                   Text="100%" 
+                   Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"
                    HorizontalAlignment="Center" 
                    Margin="0,0,0,10"/>
 
@@ -52,25 +51,22 @@
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="FontSizeSlider" 
-                Minimum="{x:Static local:Constants.MIN_FONT_SIZE}" 
-                Maximum="{x:Static local:Constants.MAX_FONT_SIZE}" 
-                Value="{x:Static local:Constants.DEFAULT_FONT_SIZE}"
-                TickFrequency="{x:Static local:Constants.FONT_SIZE_STEP}"
-                IsSnapToTickEnabled="True"
-                ValueChanged="FontSizeSlider_ValueChanged"/>
+                Minimum="{x:Static helpers:Constants.MIN_FONT_SIZE}" 
+                Maximum="{x:Static helpers:Constants.MAX_FONT_SIZE}" 
+                Value="{Binding FontSize, Mode=TwoWay}"
+                TickFrequency="{x:Static helpers:Constants.FONT_SIZE_STEP}"
+                IsSnapToTickEnabled="True"/>
         
         <TextBlock x:Name="FontSizeValueText" 
-                   Text="48px" 
+                   Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
                    HorizontalAlignment="Center" 
                    Margin="0,0,0,10"/>
 
         <!-- Чекбокс отображения секунд -->
         <CheckBox x:Name="ShowSecondsCheckBox"
                   Content="Показывать секунды"
-                  IsChecked="{x:Static local:Constants.DEFAULT_SHOW_SECONDS}"
-                  Margin="0,10,0,10"
-                  Checked="ShowSecondsCheckBox_Changed"
-                  Unchecked="ShowSecondsCheckBox_Changed"/>
+                  IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
+                  Margin="0,10,0,10"/>
 
         <!-- Кнопка закрытия -->
         <Button x:Name="CloseWidgetButton" 

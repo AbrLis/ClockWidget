@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClockWidgetApp"
+        xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
         Title="" 
         WindowStyle="None"
@@ -13,12 +14,15 @@
         ResizeMode="NoResize"
         Topmost="True">
     <Grid>
-        <Border x:Name="BackgroundBorder" Background="Black" Opacity="0.9"/>
+        <Border x:Name="BackgroundBorder" 
+                Background="Black" 
+                Opacity="{Binding BackgroundOpacity}"/>
         <TextBlock x:Name="TimeTextBlock" 
+                   Text="{Binding TimeText}"
                    Foreground="White" 
-                   FontSize="48" 
+                   FontSize="{Binding FontSize}"
                    FontFamily="Segoe UI"
                    Margin="20"
-                   Opacity="1.0"/>
+                   Opacity="{Binding TextOpacity}"/>
     </Grid>
 </Window>
