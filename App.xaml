@@ -5,6 +5,12 @@
              xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <Image x:Key="AppIcon16" Source="/Resources/Icons/app_ico_16.ico"/>
+            <Image x:Key="AppIcon32" Source="/Resources/Icons/app_ico_32.ico"/>
+            <Image x:Key="AppIcon64" Source="/Resources/Icons/app_ico_64.ico"/>
+            <Image x:Key="AppIcon128" Source="/Resources/Icons/app_ico_128.ico"/>
+            <Image x:Key="AppIcon256" Source="/Resources/Icons/app_ico_256.ico"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -6,13 +6,19 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
-        Title="" 
+        Title="Clock Widget" 
+        Height="450" 
+        Width="800"
+        Icon="/Resources/Icons/app_ico_32.ico"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         Topmost="True">
+    <Window.Resources>
+        <BitmapImage x:Key="WindowIcon" UriSource="/Resources/Icons/app_ico_32.ico"/>
+    </Window.Resources>
     <Grid>
         <Border x:Name="BackgroundBorder" 
                 Background="Black" 
