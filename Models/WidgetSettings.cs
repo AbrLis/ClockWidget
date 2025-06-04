@@ -7,41 +7,64 @@ using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.Models;
 
+/// <summary>
+/// Класс, представляющий настройки виджета часов.
+/// Содержит все настраиваемые параметры виджета и их значения по умолчанию.
+/// </summary>
 public class WidgetSettings
 {
+    /// <summary>
+    /// Получает или устанавливает прозрачность фона виджета.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_OPACITY"/>.
+    /// </summary>
     [JsonPropertyName("backgroundOpacity")]
-    public double BackgroundOpacity { get; set; }
+    public double BackgroundOpacity { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_OPACITY;
 
+    /// <summary>
+    /// Получает или устанавливает прозрачность текста виджета.
+    /// Значение по умолчанию: <see cref="Constants.TextSettings.DEFAULT_TEXT_OPACITY"/>.
+    /// </summary>
     [JsonPropertyName("textOpacity")]
-    public double TextOpacity { get; set; }
+    public double TextOpacity { get; set; } = Constants.TextSettings.DEFAULT_TEXT_OPACITY;
 
+    /// <summary>
+    /// Получает или устанавливает размер шрифта текста.
+    /// Значение по умолчанию: <see cref="Constants.TextSettings.DEFAULT_FONT_SIZE"/>.
+    /// </summary>
     [JsonPropertyName("fontSize")]
-    public double FontSize { get; set; }
+    public double FontSize { get; set; } = Constants.TextSettings.DEFAULT_FONT_SIZE;
 
+    /// <summary>
+    /// Получает или устанавливает флаг отображения секунд.
+    /// Значение по умолчанию: <see cref="Constants.DisplaySettings.DEFAULT_SHOW_SECONDS"/>.
+    /// </summary>
     [JsonPropertyName("showSeconds")]
-    public bool ShowSeconds { get; set; }
+    public bool ShowSeconds { get; set; } = Constants.DisplaySettings.DEFAULT_SHOW_SECONDS;
 
+    /// <summary>
+    /// Получает или устанавливает позицию окна по горизонтали.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_LEFT"/>.
+    /// </summary>
     [JsonPropertyName("windowLeft")]
-    public double? WindowLeft { get; set; }
+    public double? WindowLeft { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_LEFT;
 
+    /// <summary>
+    /// Получает или устанавливает позицию окна по вертикали.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_TOP"/>.
+    /// </summary>
     [JsonPropertyName("windowTop")]
-    public double? WindowTop { get; set; }
+    public double? WindowTop { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_TOP;
 
     public WidgetSettings()
     {
-        // Значения по умолчанию
-        BackgroundOpacity = Constants.DEFAULT_WINDOW_OPACITY;
-        TextOpacity = Constants.DEFAULT_TEXT_OPACITY;
-        FontSize = Constants.DEFAULT_FONT_SIZE;
-        ShowSeconds = Constants.DEFAULT_SHOW_SECONDS;
-        // Позиция окна по умолчанию не устанавливается
+        // Значения по умолчанию уже установлены через инициализаторы свойств
     }
 
     public static WidgetSettings Load()
     {
         try
         {
-            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SETTINGS_FILENAME);
+            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.FileSettings.SETTINGS_FILENAME);
             
             if (!File.Exists(settingsPath))
             {
@@ -59,14 +82,14 @@ public class WidgetSettings
 
             // Валидация значений
             settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity, 
-                Constants.MIN_WINDOW_OPACITY, 
-                Constants.MAX_WINDOW_OPACITY, 
-                Constants.DEFAULT_WINDOW_OPACITY);
+                Constants.WindowSettings.MIN_WINDOW_OPACITY, 
+                Constants.WindowSettings.MAX_WINDOW_OPACITY, 
+                Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
             
             settings.TextOpacity = ValidateOpacity(settings.TextOpacity, 
-                Constants.MIN_TEXT_OPACITY, 
-                Constants.MAX_TEXT_OPACITY, 
-                Constants.DEFAULT_TEXT_OPACITY);
+                Constants.TextSettings.MIN_TEXT_OPACITY, 
+                Constants.TextSettings.MAX_TEXT_OPACITY, 
+                Constants.TextSettings.DEFAULT_TEXT_OPACITY);
             
             settings.FontSize = ValidateFontSize(settings.FontSize);
             // ShowSeconds - булево значение, не требует валидации
@@ -86,7 +109,7 @@ public class WidgetSettings
     {
         try
         {
-            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SETTINGS_FILENAME);
+            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.FileSettings.SETTINGS_FILENAME);
             string jsonString = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(settingsPath, jsonString);
         }
@@ -97,23 +120,56 @@ public class WidgetSettings
         }
     }
 
+    /// <summary>
+    /// Проверяет и корректирует значения настроек.
+    /// </summary>
+    /// <param name="settings">Настройки для проверки.</param>
+    /// <returns>Скорректированные настройки.</returns>
+    public static WidgetSettings ValidateSettings(WidgetSettings settings)
+    {
+        settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity, 
+            Constants.WindowSettings.MIN_WINDOW_OPACITY, 
+            Constants.WindowSettings.MAX_WINDOW_OPACITY, 
+            Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
+        
+        settings.TextOpacity = ValidateOpacity(settings.TextOpacity, 
+            Constants.TextSettings.MIN_TEXT_OPACITY, 
+            Constants.TextSettings.MAX_TEXT_OPACITY, 
+            Constants.TextSettings.DEFAULT_TEXT_OPACITY);
+        
+        settings.FontSize = ValidateFontSize(settings.FontSize);
+        
+        return settings;
+    }
+
+    /// <summary>
+    /// Проверяет и корректирует значение прозрачности.
+    /// </summary>
+    /// <param name="value">Проверяемое значение.</param>
+    /// <param name="minValue">Минимальное допустимое значение.</param>
+    /// <param name="maxValue">Максимальное допустимое значение.</param>
+    /// <param name="defaultValue">Значение по умолчанию.</param>
+    /// <returns>Скорректированное значение прозрачности.</returns>
     private static double ValidateOpacity(double value, double minValue, double maxValue, double defaultValue)
     {
         if (value < minValue || value > maxValue)
         {
             return defaultValue;
         }
-        // Округляем значение до ближайшего шага
-        return Math.Round(value / Constants.OPACITY_STEP) * Constants.OPACITY_STEP;
+        return Math.Round(value / Constants.WindowSettings.OPACITY_STEP) * Constants.WindowSettings.OPACITY_STEP;
     }
 
+    /// <summary>
+    /// Проверяет и корректирует значение размера шрифта.
+    /// </summary>
+    /// <param name="value">Проверяемое значение.</param>
+    /// <returns>Скорректированное значение размера шрифта.</returns>
     private static double ValidateFontSize(double value)
     {
-        if (value < Constants.MIN_FONT_SIZE || value > Constants.MAX_FONT_SIZE)
+        if (value < Constants.TextSettings.MIN_FONT_SIZE || value > Constants.TextSettings.MAX_FONT_SIZE)
         {
-            return Constants.DEFAULT_FONT_SIZE;
+            return Constants.TextSettings.DEFAULT_FONT_SIZE;
         }
-        // Округляем значение до ближайшего шага
-        return Math.Round(value / Constants.FONT_SIZE_STEP) * Constants.FONT_SIZE_STEP;
+        return Math.Round(value / Constants.TextSettings.FONT_SIZE_STEP) * Constants.TextSettings.FONT_SIZE_STEP;
     }
 } 

@@ -12,19 +12,20 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
+        Topmost="True"
         Background="White">
     <StackPanel Margin="10">
         <!-- Прозрачность фона -->
         <TextBlock Text="Видимость фона:" 
                    Margin="0,0,0,5"/>
         
-        <Slider x:Name="BackgroundOpacitySlider" 
-                Minimum="{x:Static helpers:Constants.MIN_WINDOW_OPACITY}" 
-                Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}" 
-                Value="{Binding BackgroundOpacity, Mode=TwoWay}"
+        <Slider x:Name="BackgroundOpacitySlider"
+                Grid.Row="1" Grid.Column="1"
+                Minimum="{x:Static helpers:Constants.MIN_WINDOW_OPACITY}"
+                Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}"
                 TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
                 IsSnapToTickEnabled="True"
-                IsMoveToPointEnabled="True"/>
+                Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"/>
         
         <TextBlock x:Name="BackgroundOpacityValueText" 
                    Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
@@ -35,13 +36,13 @@
         <TextBlock Text="Видимость текста:" 
                    Margin="0,0,0,5"/>
         
-        <Slider x:Name="TextOpacitySlider" 
-                Minimum="{x:Static helpers:Constants.MIN_TEXT_OPACITY}" 
-                Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}" 
-                Value="{Binding TextOpacity, Mode=TwoWay}"
+        <Slider x:Name="TextOpacitySlider"
+                Grid.Row="2" Grid.Column="1"
+                Minimum="{x:Static helpers:Constants.MIN_TEXT_OPACITY}"
+                Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}"
                 TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
                 IsSnapToTickEnabled="True"
-                IsMoveToPointEnabled="True"/>
+                Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"/>
         
         <TextBlock x:Name="TextOpacityValueText" 
                    Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"
@@ -52,12 +53,13 @@
         <TextBlock Text="Размер шрифта:" 
                    Margin="0,0,0,5"/>
         
-        <Slider x:Name="FontSizeSlider" 
-                Minimum="{x:Static helpers:Constants.MIN_FONT_SIZE}" 
-                Maximum="{x:Static helpers:Constants.MAX_FONT_SIZE}" 
-                Value="{Binding FontSize, Mode=TwoWay}"
+        <Slider x:Name="FontSizeSlider"
+                Grid.Row="3" Grid.Column="1"
+                Minimum="{x:Static helpers:Constants.MIN_FONT_SIZE}"
+                Maximum="{x:Static helpers:Constants.MAX_FONT_SIZE}"
                 TickFrequency="{x:Static helpers:Constants.FONT_SIZE_STEP}"
-                IsSnapToTickEnabled="True"/>
+                IsSnapToTickEnabled="True"
+                Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"/>
         
         <TextBlock x:Name="FontSizeValueText" 
                    Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
