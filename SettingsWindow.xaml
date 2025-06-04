@@ -15,7 +15,7 @@
         Background="White">
     <StackPanel Margin="10">
         <!-- Прозрачность фона -->
-        <TextBlock Text="Прозрачность фона:" 
+        <TextBlock Text="Видимость фона:" 
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="BackgroundOpacitySlider" 
@@ -23,7 +23,8 @@
                 Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}" 
                 Value="{Binding BackgroundOpacity, Mode=TwoWay}"
                 TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
-                IsSnapToTickEnabled="True"/>
+                IsSnapToTickEnabled="True"
+                IsMoveToPointEnabled="True"/>
         
         <TextBlock x:Name="BackgroundOpacityValueText" 
                    Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
@@ -31,7 +32,7 @@
                    Margin="0,0,0,10"/>
 
         <!-- Прозрачность текста -->
-        <TextBlock Text="Прозрачность текста:" 
+        <TextBlock Text="Видимость текста:" 
                    Margin="0,0,0,5"/>
         
         <Slider x:Name="TextOpacitySlider" 
@@ -39,7 +40,8 @@
                 Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}" 
                 Value="{Binding TextOpacity, Mode=TwoWay}"
                 TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
-                IsSnapToTickEnabled="True"/>
+                IsSnapToTickEnabled="True"
+                IsMoveToPointEnabled="True"/>
         
         <TextBlock x:Name="TextOpacityValueText" 
                    Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"

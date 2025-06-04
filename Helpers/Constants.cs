@@ -3,7 +3,7 @@ namespace ClockWidgetApp.Helpers;
 public static class Constants
 {
     // Настройки окна
-    public const double DEFAULT_WINDOW_OPACITY = 0.9;
+    public const double DEFAULT_WINDOW_OPACITY = 0.6;
     public const double MIN_WINDOW_OPACITY = 0.1;
     public const double MAX_WINDOW_OPACITY = 1.0;
     public const double OPACITY_STEP = 0.1;
