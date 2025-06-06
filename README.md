@@ -56,7 +56,7 @@ ClockWidgetApp/              # Корневая директория
 
 Скрипт выполнит очистку предыдущих сборок, соберет проект и удалит лишние файлы, оставив только папку `publish` с итоговым билдом.
 
-Файл будет находиться в папке `ClockWidgetApp/bin/Release/net9.0-windows/win-x64/publish/`
+Файл будет находиться в папке `bin/Release/net9.0-windows/win-x64/publish/`
 
 ## Лицензия
 MIT License
