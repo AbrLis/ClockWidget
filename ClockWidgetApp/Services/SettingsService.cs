@@ -26,8 +26,18 @@ public class SettingsService
     /// </summary>
     public SettingsService()
     {
-        _settingsPath = Path.Combine(
+        var appDataPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ClockWidget");
+            
+        // Создаем папку, если она не существует
+        if (!Directory.Exists(appDataPath))
+        {
+            Directory.CreateDirectory(appDataPath);
+        }
+
+        _settingsPath = Path.Combine(
+            appDataPath,
             Constants.FileSettings.SETTINGS_FILENAME);
         _currentSettings = LoadSettings();
     }

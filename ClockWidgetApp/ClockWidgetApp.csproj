@@ -8,6 +8,13 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\Icons\app.ico</ApplicationIcon>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    
+    <!-- Настройки для публикации в один файл -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <DebugType>None</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
