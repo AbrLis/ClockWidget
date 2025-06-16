@@ -39,7 +39,7 @@ public partial class App : Application
     public App()
     {
         // Инициализируем логирование
-        LoggingService.Initialize(logToFile: true);
+        LoggingService.Initialize();
         _logger = LoggingService.CreateLogger<App>();
 
         // Глобальный обработчик необработанных исключений

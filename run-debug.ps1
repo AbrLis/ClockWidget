@@ -1,4 +1,7 @@
-# Запуск приложения с включенным логированием
+# Устанавливаем переменные окружения для логирования
 $env:ASPNETCORE_ENVIRONMENT = "Development"
-$env:LOG_LEVEL = "Debug"
+$env:CONSOLE_LOG_LEVEL = "WARN"  # В консоль только предупреждения и ошибки
+$env:FILE_LOG_LEVELS = "DEBUG,WARN,ERROR"  # В файл записываем DEBUG, WARN и ERROR сообщения
+
+# Запускаем приложение
 dotnet run --project ClockWidgetApp 
