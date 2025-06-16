@@ -30,61 +30,39 @@
                 </StackPanel>
             </GroupBox>
 
-            <!-- Размер окна аналоговых часов -->
-            <GroupBox Header="Размер аналоговых часов" Margin="0,0,0,10">
-                <StackPanel Margin="5">
-                    <TextBlock Text="Размер окна:" 
-                              Margin="0,0,0,5"/>
-                    
-                    <Slider x:Name="AnalogClockSizeSlider"
-                            Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
-                            Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
-                            Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
-                            TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
-                            IsSnapToTickEnabled="True"
-                            IsMoveToPointEnabled="True"
-                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
-                    
-                    <TextBlock x:Name="AnalogClockSizeValueText" 
-                              Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
-                              HorizontalAlignment="Center" 
-                              Margin="0,0,0,5"/>
-                </StackPanel>
-            </GroupBox>
-
             <!-- Прозрачность фона -->
-            <TextBlock Text="Видимость фона:" 
+            <TextBlock Text="Прозрачность фона:" 
                        Margin="0,0,0,5"/>
             
             <Slider x:Name="BackgroundOpacitySlider"
-                    Grid.Row="1" Grid.Column="1"
-                    Minimum="0" Maximum="1"
+                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
+                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
                     Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="0.1"
+                    TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
                     IsSnapToTickEnabled="True"
                     IsMoveToPointEnabled="True"
                     ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
             
             <TextBlock x:Name="BackgroundOpacityValueText" 
-                       Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
+                       Text="{Binding BackgroundOpacity, StringFormat=P0}"
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,10"/>
 
             <!-- Прозрачность текста -->
-            <TextBlock Text="Видимость текста:" 
+            <TextBlock Text="Прозрачность текста:" 
                        Margin="0,0,0,5"/>
             
             <Slider x:Name="TextOpacitySlider"
-                    Grid.Row="2" Grid.Column="1"
-                    Minimum="0" Maximum="1"
+                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
+                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
                     Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="0.1"
+                    TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
                     IsSnapToTickEnabled="True"
                     IsMoveToPointEnabled="True"
                     ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
             
             <TextBlock x:Name="TextOpacityValueText" 
-                       Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"
+                       Text="{Binding TextOpacity, StringFormat=P0}"
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,10"/>
 
@@ -93,16 +71,34 @@
                        Margin="0,0,0,5"/>
             
             <Slider x:Name="FontSizeSlider"
-                    Grid.Row="3" Grid.Column="1"
-                    Minimum="12" Maximum="72"
+                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
+                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
                     Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="1"
+                    TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
                     IsSnapToTickEnabled="True"
                     IsMoveToPointEnabled="True"
                     ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
             
             <TextBlock x:Name="FontSizeValueText" 
                        Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,10"/>
+
+            <!-- Размер аналоговых часов -->
+            <TextBlock Text="Размер аналоговых часов:" 
+                       Margin="0,0,0,5"/>
+            
+            <Slider x:Name="AnalogClockSizeSlider"
+                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
+                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
+                    Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
+                    TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
+                    IsSnapToTickEnabled="True"
+                    IsMoveToPointEnabled="True"
+                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
+            
+            <TextBlock x:Name="AnalogClockSizeValueText" 
+                       Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,10"/>
 
