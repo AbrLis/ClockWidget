@@ -15,6 +15,22 @@ public partial class App : Application
     private MainWindow? _mainWindow;
     private AnalogClockWindow? _analogClockWindow;
     private readonly ILogger<App> _logger;
+    private static SettingsService? _settingsService;
+
+    /// <summary>
+    /// Получает экземпляр сервиса настроек.
+    /// </summary>
+    public static SettingsService SettingsService
+    {
+        get
+        {
+            if (_settingsService == null)
+            {
+                _settingsService = new SettingsService();
+            }
+            return _settingsService;
+        }
+    }
 
     public App()
     {
@@ -41,12 +57,18 @@ public partial class App : Application
             _logger.LogInformation("Starting application");
             base.OnStartup(e);
 
+            // Загружаем настройки
+            var settings = SettingsService.CurrentSettings;
+            _logger.LogInformation("Settings loaded: {Settings}", 
+                System.Text.Json.JsonSerializer.Serialize(settings));
+
             // Проверяем, не создано ли уже окно с цифровыми часами
             if (Application.Current.MainWindow == null)
             {
                 // Создаем и показываем основное окно
                 _mainWindow = new MainWindow();
                 Application.Current.MainWindow = _mainWindow;
+                _mainWindow.Visibility = settings.ShowDigitalClock ? Visibility.Visible : Visibility.Hidden;
                 _mainWindow.Show();
                 _logger.LogInformation("Main window created and shown");
             }
@@ -57,6 +79,7 @@ public partial class App : Application
 
             // Создаем и показываем окно с аналоговыми часами
             _analogClockWindow = new AnalogClockWindow();
+            _analogClockWindow.Visibility = settings.ShowAnalogClock ? Visibility.Visible : Visibility.Hidden;
             _analogClockWindow.Show();
             _logger.LogInformation("Analog clock window created and shown");
 

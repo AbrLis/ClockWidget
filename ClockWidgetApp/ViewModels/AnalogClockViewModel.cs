@@ -112,7 +112,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, ISettingsViewModel, 
             _logger.LogInformation("Initializing analog clock view model");
             
             _timeService = new TimeService();
-            _settingsService = new SettingsService();
+            _settingsService = App.SettingsService;
             
             // Инициализируем трансформации стрелок
             _hourHandTransform = new TransformGroup();
@@ -121,6 +121,9 @@ public class AnalogClockViewModel : INotifyPropertyChanged, ISettingsViewModel, 
             
             // Загружаем настройки
             var settings = _settingsService.CurrentSettings;
+            _logger.LogInformation("Loading settings for analog clock: {Settings}", 
+                System.Text.Json.JsonSerializer.Serialize(settings));
+                
             _backgroundOpacity = settings.BackgroundOpacity;
             _textOpacity = settings.TextOpacity;
             

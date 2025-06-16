@@ -69,6 +69,20 @@ public class WidgetSettings
     [JsonPropertyName("analogClockTop")]
     public double? AnalogClockTop { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
 
+    /// <summary>
+    /// Получает или устанавливает флаг отображения цифровых часов.
+    /// Значение по умолчанию: true.
+    /// </summary>
+    [JsonPropertyName("showDigitalClock")]
+    public bool ShowDigitalClock { get; set; } = true;
+
+    /// <summary>
+    /// Получает или устанавливает флаг отображения аналоговых часов.
+    /// Значение по умолчанию: true.
+    /// </summary>
+    [JsonPropertyName("showAnalogClock")]
+    public bool ShowAnalogClock { get; set; } = true;
+
     public WidgetSettings()
     {
         // Значения по умолчанию уже установлены через инициализаторы свойств
@@ -152,6 +166,12 @@ public class WidgetSettings
             Constants.TextSettings.DEFAULT_TEXT_OPACITY);
         
         settings.FontSize = ValidateFontSize(settings.FontSize);
+        
+        // Убеждаемся, что хотя бы одно окно видимо
+        if (!settings.ShowDigitalClock && !settings.ShowAnalogClock)
+        {
+            settings.ShowDigitalClock = true;
+        }
         
         return settings;
     }

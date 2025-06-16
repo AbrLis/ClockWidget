@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.Services;
 
@@ -14,6 +15,7 @@ public class SettingsService
 {
     private readonly string _settingsPath;
     private WidgetSettings _currentSettings;
+    private readonly ILogger<SettingsService> _logger = LoggingService.CreateLogger<SettingsService>();
 
     /// <summary>
     /// Получает текущие настройки виджета.
@@ -34,11 +36,14 @@ public class SettingsService
         if (!Directory.Exists(appDataPath))
         {
             Directory.CreateDirectory(appDataPath);
+            _logger.LogInformation("Created settings directory: {Path}", appDataPath);
         }
 
         _settingsPath = Path.Combine(
             appDataPath,
             Constants.FileSettings.SETTINGS_FILENAME);
+            
+        _logger.LogInformation("Settings file path: {Path}", _settingsPath);
         _currentSettings = LoadSettings();
     }
 
@@ -48,8 +53,19 @@ public class SettingsService
     /// <param name="updateAction">Действие для обновления настроек.</param>
     public void UpdateSettings(Action<WidgetSettings> updateAction)
     {
-        updateAction(_currentSettings);
-        SaveSettings();
+        try
+        {
+            _logger.LogInformation("Updating settings");
+            updateAction(_currentSettings);
+            SaveSettings();
+            _logger.LogInformation("Settings updated successfully: {Settings}", 
+                JsonSerializer.Serialize(_currentSettings));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating settings");
+            throw;
+        }
     }
 
     /// <summary>
@@ -63,15 +79,34 @@ public class SettingsService
         {
             if (File.Exists(_settingsPath))
             {
+                _logger.LogInformation("Loading settings from file: {Path}", _settingsPath);
                 var json = File.ReadAllText(_settingsPath);
-                return JsonSerializer.Deserialize<WidgetSettings>(json) ?? new WidgetSettings();
+                var settings = JsonSerializer.Deserialize<WidgetSettings>(json);
+                
+                if (settings != null)
+                {
+                    _logger.LogInformation("Settings loaded successfully: {Settings}", json);
+                    return settings;
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to deserialize settings, using defaults");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Settings file not found, using defaults");
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // В случае ошибки возвращаем настройки по умолчанию
+            _logger.LogError(ex, "Error loading settings from file: {Path}", _settingsPath);
         }
-        return new WidgetSettings();
+        
+        var defaultSettings = new WidgetSettings();
+        _logger.LogInformation("Using default settings: {Settings}", 
+            JsonSerializer.Serialize(defaultSettings));
+        return defaultSettings;
     }
 
     /// <summary>
@@ -81,12 +116,15 @@ public class SettingsService
     {
         try
         {
+            _logger.LogInformation("Saving settings to file: {Path}", _settingsPath);
             var json = JsonSerializer.Serialize(_currentSettings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_settingsPath, json);
+            _logger.LogInformation("Settings saved successfully: {Settings}", json);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Игнорируем ошибки сохранения
+            _logger.LogError(ex, "Error saving settings to file: {Path}", _settingsPath);
+            throw;
         }
     }
 } 

@@ -11,6 +11,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using ClockWidgetApp.ViewModels;
+using ClockWidgetApp.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp;
 
@@ -20,6 +22,7 @@ namespace ClockWidgetApp;
 public partial class MainWindow : Window
 {
     private readonly MainWindowViewModel _viewModel;
+    private readonly ILogger<MainWindow> _logger = LoggingService.CreateLogger<MainWindow>();
     private Point _dragStartPoint;
     private bool _isDragging;
     private SettingsWindow? _settingsWindow;
@@ -27,28 +30,40 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
-        InitializeComponent();
-        
-        // Инициализируем ViewModel
-        _viewModel = new MainWindowViewModel();
-        DataContext = _viewModel;
-        
-        // Устанавливаем позицию окна
-        var (left, top) = _viewModel.GetWindowPosition();
-        Left = left;
-        Top = top;
-        
-        // Отключаем контекстное меню
-        ContextMenu = null;
-        
-        // Добавляем обработчики событий мыши
-        PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown;
-        PreviewMouseLeftButtonUp += MainWindow_PreviewMouseLeftButtonUp;
-        PreviewMouseMove += MainWindow_PreviewMouseMove;
-        MouseRightButtonDown += MainWindow_MouseRightButtonDown;
+        try
+        {
+            _logger.LogInformation("Initializing main window");
+            
+            InitializeComponent();
+            
+            // Инициализируем ViewModel
+            _viewModel = new MainWindowViewModel(LoggingService.CreateLogger<MainWindowViewModel>());
+            DataContext = _viewModel;
+            
+            // Устанавливаем позицию окна
+            var (left, top) = _viewModel.GetWindowPosition();
+            Left = left;
+            Top = top;
+            
+            // Отключаем контекстное меню
+            ContextMenu = null;
+            
+            // Добавляем обработчики событий мыши
+            PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown;
+            PreviewMouseLeftButtonUp += MainWindow_PreviewMouseLeftButtonUp;
+            PreviewMouseMove += MainWindow_PreviewMouseMove;
+            MouseRightButtonDown += MainWindow_MouseRightButtonDown;
 
-        // Добавляем обработчик закрытия окна
-        Closing += MainWindow_Closing;
+            // Добавляем обработчик закрытия окна
+            Closing += MainWindow_Closing;
+            
+            _logger.LogInformation("Main window initialized");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing main window");
+            throw;
+        }
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

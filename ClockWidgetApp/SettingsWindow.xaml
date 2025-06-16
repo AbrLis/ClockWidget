@@ -7,76 +7,93 @@
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
         Title="Настройки виджета" 
-        Height="380" 
+        MinHeight="300"
+        MaxHeight="600"
         Width="300"
+        SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
         Topmost="True"
         Background="White">
-    <StackPanel Margin="10">
-        <!-- Прозрачность фона -->
-        <TextBlock Text="Видимость фона:" 
-                   Margin="0,0,0,5"/>
-        
-        <Slider x:Name="BackgroundOpacitySlider"
-                Grid.Row="1" Grid.Column="1"
-                Minimum="{x:Static helpers:Constants.MIN_WINDOW_OPACITY}"
-                Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}"
-                TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
-                IsSnapToTickEnabled="True"
-                Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <TextBlock x:Name="BackgroundOpacityValueText" 
-                   Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
-                   HorizontalAlignment="Center" 
-                   Margin="0,0,0,10"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <!-- Группа настроек видимости окон -->
+            <GroupBox Header="Видимость окон" Margin="0,0,0,10">
+                <StackPanel Margin="5">
+                    <CheckBox Content="Показывать цифровые часы" 
+                              IsChecked="{Binding ShowDigitalClock}"
+                              Margin="0,5"/>
+                    <CheckBox Content="Показывать аналоговые часы" 
+                              IsChecked="{Binding ShowAnalogClock}"
+                              Margin="0,5"/>
+                </StackPanel>
+            </GroupBox>
 
-        <!-- Прозрачность текста -->
-        <TextBlock Text="Видимость текста:" 
-                   Margin="0,0,0,5"/>
-        
-        <Slider x:Name="TextOpacitySlider"
-                Grid.Row="2" Grid.Column="1"
-                Minimum="{x:Static helpers:Constants.MIN_TEXT_OPACITY}"
-                Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}"
-                TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
-                IsSnapToTickEnabled="True"
-                Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <TextBlock x:Name="TextOpacityValueText" 
-                   Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"
-                   HorizontalAlignment="Center" 
-                   Margin="0,0,0,10"/>
+            <!-- Прозрачность фона -->
+            <TextBlock Text="Видимость фона:" 
+                       Margin="0,0,0,5"/>
+            
+            <Slider x:Name="BackgroundOpacitySlider"
+                    Grid.Row="1" Grid.Column="1"
+                    Minimum="{x:Static helpers:Constants.MIN_WINDOW_OPACITY}"
+                    Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}"
+                    TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
+                    IsSnapToTickEnabled="True"
+                    Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <TextBlock x:Name="BackgroundOpacityValueText" 
+                       Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,10"/>
 
-        <!-- Размер шрифта -->
-        <TextBlock Text="Размер шрифта:" 
-                   Margin="0,0,0,5"/>
-        
-        <Slider x:Name="FontSizeSlider"
-                Grid.Row="3" Grid.Column="1"
-                Minimum="{x:Static helpers:Constants.MIN_FONT_SIZE}"
-                Maximum="{x:Static helpers:Constants.MAX_FONT_SIZE}"
-                TickFrequency="{x:Static helpers:Constants.FONT_SIZE_STEP}"
-                IsSnapToTickEnabled="True"
-                Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <TextBlock x:Name="FontSizeValueText" 
-                   Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
-                   HorizontalAlignment="Center" 
-                   Margin="0,0,0,10"/>
+            <!-- Прозрачность текста -->
+            <TextBlock Text="Видимость текста:" 
+                       Margin="0,0,0,5"/>
+            
+            <Slider x:Name="TextOpacitySlider"
+                    Grid.Row="2" Grid.Column="1"
+                    Minimum="{x:Static helpers:Constants.MIN_TEXT_OPACITY}"
+                    Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}"
+                    TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
+                    IsSnapToTickEnabled="True"
+                    Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <TextBlock x:Name="TextOpacityValueText" 
+                       Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,10"/>
 
-        <!-- Чекбокс отображения секунд -->
-        <CheckBox x:Name="ShowSecondsCheckBox"
-                  Content="Показывать секунды"
-                  IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
-                  Margin="0,10,0,10"/>
+            <!-- Размер шрифта -->
+            <TextBlock Text="Размер шрифта:" 
+                       Margin="0,0,0,5"/>
+            
+            <Slider x:Name="FontSizeSlider"
+                    Grid.Row="3" Grid.Column="1"
+                    Minimum="{x:Static helpers:Constants.MIN_FONT_SIZE}"
+                    Maximum="{x:Static helpers:Constants.MAX_FONT_SIZE}"
+                    TickFrequency="{x:Static helpers:Constants.FONT_SIZE_STEP}"
+                    IsSnapToTickEnabled="True"
+                    Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <TextBlock x:Name="FontSizeValueText" 
+                       Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,10"/>
 
-        <!-- Кнопка закрытия -->
-        <Button x:Name="CloseWidgetButton" 
-                Content="Закрыть виджет" 
-                Margin="0,10,0,0"
-                Padding="10,5"
-                Click="CloseWidgetButton_Click"/>
-    </StackPanel>
+            <!-- Чекбокс отображения секунд -->
+            <CheckBox x:Name="ShowSecondsCheckBox"
+                      Content="Показывать секунды"
+                      IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
+                      Margin="0,10,0,10"/>
+
+            <!-- Кнопка закрытия -->
+            <Button x:Name="CloseWidgetButton" 
+                    Content="Закрыть виджет" 
+                    Margin="0,10,0,0"
+                    Padding="10,5"
+                    Background="#FFE0E0"
+                    Click="CloseWidgetButton_Click"/>
+        </StackPanel>
+    </ScrollViewer>
 </Window> 
