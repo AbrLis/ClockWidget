@@ -7,6 +7,8 @@ using System.Windows;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Linq;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -27,6 +29,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     private bool _showDigitalClock = true;
     private bool _showAnalogClock = true;
     private AnalogClockWindow? _analogClockWindow;
+    private const double ANIMATION_STEP = 0.05; // Шаг анимации
+    private const int ANIMATION_INTERVAL = 16; // Интервал анимации (приблизительно 60 FPS)
 
     /// <summary>
     /// Событие, возникающее при изменении значения свойства.
@@ -55,12 +59,17 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         get => _backgroundOpacity;
         set
         {
-            _backgroundOpacity = ValidateOpacity(value, 
+            var validatedValue = ValidateOpacity(value, 
                 Constants.WindowSettings.MIN_WINDOW_OPACITY, 
                 Constants.WindowSettings.MAX_WINDOW_OPACITY, 
                 Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
-            OnPropertyChanged();
-            _settingsService.UpdateSettings(s => s.BackgroundOpacity = _backgroundOpacity);
+            
+            if (_backgroundOpacity != validatedValue)
+            {
+                _backgroundOpacity = validatedValue;
+                OnPropertyChanged();
+                _settingsService.UpdateSettings(s => s.BackgroundOpacity = validatedValue);
+            }
         }
     }
 
@@ -73,12 +82,17 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         get => _textOpacity;
         set
         {
-            _textOpacity = ValidateOpacity(value, 
+            var validatedValue = ValidateOpacity(value, 
                 Constants.TextSettings.MIN_TEXT_OPACITY, 
                 Constants.TextSettings.MAX_TEXT_OPACITY, 
                 Constants.TextSettings.DEFAULT_TEXT_OPACITY);
-            OnPropertyChanged();
-            _settingsService.UpdateSettings(s => s.TextOpacity = _textOpacity);
+            
+            if (_textOpacity != validatedValue)
+            {
+                _textOpacity = validatedValue;
+                OnPropertyChanged();
+                _settingsService.UpdateSettings(s => s.TextOpacity = validatedValue);
+            }
         }
     }
 
@@ -91,9 +105,14 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         get => _fontSize;
         set
         {
-            _fontSize = ValidateFontSize(value);
-            OnPropertyChanged();
-            _settingsService.UpdateSettings(s => s.FontSize = _fontSize);
+            var validatedValue = ValidateFontSize(value);
+            
+            if (_fontSize != validatedValue)
+            {
+                _fontSize = validatedValue;
+                OnPropertyChanged();
+                _settingsService.UpdateSettings(s => s.FontSize = validatedValue);
+            }
         }
     }
 
@@ -209,7 +228,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
             _logger.LogInformation("Loading settings for main window: {Settings}", 
                 JsonSerializer.Serialize(settings));
                 
-            // Устанавливаем значения настроек
+            // Устанавливаем начальные значения
             _backgroundOpacity = settings.BackgroundOpacity;
             _textOpacity = settings.TextOpacity;
             _fontSize = settings.FontSize;

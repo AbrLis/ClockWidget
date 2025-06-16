@@ -36,11 +36,12 @@
             
             <Slider x:Name="BackgroundOpacitySlider"
                     Grid.Row="1" Grid.Column="1"
-                    Minimum="{x:Static helpers:Constants.MIN_WINDOW_OPACITY}"
-                    Maximum="{x:Static helpers:Constants.MAX_WINDOW_OPACITY}"
-                    TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
+                    Minimum="0" Maximum="1"
+                    Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
+                    TickFrequency="0.1"
                     IsSnapToTickEnabled="True"
-                    Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"/>
+                    IsMoveToPointEnabled="True"
+                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
             
             <TextBlock x:Name="BackgroundOpacityValueText" 
                        Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
@@ -53,11 +54,12 @@
             
             <Slider x:Name="TextOpacitySlider"
                     Grid.Row="2" Grid.Column="1"
-                    Minimum="{x:Static helpers:Constants.MIN_TEXT_OPACITY}"
-                    Maximum="{x:Static helpers:Constants.MAX_TEXT_OPACITY}"
-                    TickFrequency="{x:Static helpers:Constants.OPACITY_STEP}"
+                    Minimum="0" Maximum="1"
+                    Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
+                    TickFrequency="0.1"
                     IsSnapToTickEnabled="True"
-                    Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"/>
+                    IsMoveToPointEnabled="True"
+                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
             
             <TextBlock x:Name="TextOpacityValueText" 
                        Text="{Binding TextOpacity, StringFormat='{}{0:P0}'}"
@@ -70,11 +72,12 @@
             
             <Slider x:Name="FontSizeSlider"
                     Grid.Row="3" Grid.Column="1"
-                    Minimum="{x:Static helpers:Constants.MIN_FONT_SIZE}"
-                    Maximum="{x:Static helpers:Constants.MAX_FONT_SIZE}"
-                    TickFrequency="{x:Static helpers:Constants.FONT_SIZE_STEP}"
+                    Minimum="12" Maximum="72"
+                    Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
+                    TickFrequency="1"
                     IsSnapToTickEnabled="True"
-                    Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"/>
+                    IsMoveToPointEnabled="True"
+                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
             
             <TextBlock x:Name="FontSizeValueText" 
                        Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
