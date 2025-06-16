@@ -15,7 +15,11 @@
         Background="Transparent"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
-        Topmost="True">
+        ShowInTaskbar="False"
+        ShowActivated="True"
+        WindowStartupLocation="Manual"
+        Topmost="True"
+        Visibility="Collapsed">
     
     <Grid>
         <!-- Фон окна с прозрачностью -->

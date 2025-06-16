@@ -38,7 +38,7 @@ public partial class MainWindow : Window
             InitializeComponent();
             
             // Инициализируем ViewModel
-            _viewModel = new MainWindowViewModel(LoggingService.CreateLogger<MainWindowViewModel>());
+            _viewModel = new MainWindowViewModel();
             DataContext = _viewModel;
             
             // Устанавливаем позицию окна

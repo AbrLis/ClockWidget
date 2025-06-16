@@ -15,7 +15,11 @@
         Background="Transparent"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
-        Topmost="True">
+        ShowInTaskbar="False"
+        ShowActivated="True"
+        WindowStartupLocation="Manual"
+        Topmost="True"
+        Visibility="Visible">
     <Window.Resources>
         <BitmapImage x:Key="WindowIcon" UriSource="/Resources/Icons/app_ico_32.ico"/>
     </Window.Resources>

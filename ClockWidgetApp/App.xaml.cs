@@ -69,20 +69,15 @@ public partial class App : Application
             _logger.LogInformation("Settings loaded: {Settings}", 
                 System.Text.Json.JsonSerializer.Serialize(settings));
 
-            // Проверяем, не создано ли уже окно с цифровыми часами
-            if (Application.Current.MainWindow == null)
-            {
-                // Создаем и показываем основное окно
-                _mainWindow = new MainWindow();
-                Application.Current.MainWindow = _mainWindow;
-                MainViewModel = ((MainWindow)Application.Current.MainWindow).ViewModel;
-                _mainWindow.Show();
-                _logger.LogInformation("Main window created and shown");
-            }
-            else
-            {
-                _logger.LogWarning("Main window already exists, skipping creation");
-            }
+            // Создаем и показываем основное окно
+            _mainWindow = new MainWindow();
+            Application.Current.MainWindow = _mainWindow;
+            MainViewModel = _mainWindow.ViewModel;
+            
+            // Явно показываем и активируем окно
+            _mainWindow.Show();
+            _mainWindow.Activate();
+            _logger.LogInformation("Main window created, shown and activated");
 
             // Устанавливаем режим завершения приложения
             ShutdownMode = ShutdownMode.OnLastWindowClose;

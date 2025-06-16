@@ -17,8 +17,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     private readonly TimeService _timeService;
     private readonly SettingsService _settingsService;
     private readonly ILogger<AnalogClockViewModel> _logger = LoggingService.CreateLogger<AnalogClockViewModel>();
-    private double _backgroundOpacity;
-    private double _textOpacity;
     private TransformGroup _hourHandTransform;
     private TransformGroup _minuteHandTransform;
     private TransformGroup _secondHandTransform;
@@ -30,38 +28,14 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Получает или устанавливает прозрачность фона.
+    /// Получает прозрачность фона.
     /// </summary>
-    public double BackgroundOpacity
-    {
-        get => _backgroundOpacity;
-        set
-        {
-            _backgroundOpacity = ValidateOpacity(value, 
-                Constants.WindowSettings.MIN_WINDOW_OPACITY,
-                Constants.WindowSettings.MAX_WINDOW_OPACITY,
-                Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
-            OnPropertyChanged();
-            _settingsService.UpdateSettings(s => s.BackgroundOpacity = _backgroundOpacity);
-        }
-    }
+    public double BackgroundOpacity => App.MainViewModel.BackgroundOpacity;
 
     /// <summary>
-    /// Получает или устанавливает прозрачность текста и стрелок.
+    /// Получает прозрачность текста и стрелок.
     /// </summary>
-    public double TextOpacity
-    {
-        get => _textOpacity;
-        set
-        {
-            _textOpacity = ValidateOpacity(value,
-                Constants.TextSettings.MIN_TEXT_OPACITY,
-                Constants.TextSettings.MAX_TEXT_OPACITY,
-                Constants.TextSettings.DEFAULT_TEXT_OPACITY);
-            OnPropertyChanged();
-            _settingsService.UpdateSettings(s => s.TextOpacity = _textOpacity);
-        }
-    }
+    public double TextOpacity => App.MainViewModel.TextOpacity;
 
     /// <summary>
     /// Получает трансформацию для часовой стрелки.
@@ -119,17 +93,23 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             _minuteHandTransform = new TransformGroup();
             _secondHandTransform = new TransformGroup();
             
-            // Загружаем настройки
-            var settings = _settingsService.CurrentSettings;
-            _logger.LogInformation("Loading settings for analog clock: {Settings}", 
-                System.Text.Json.JsonSerializer.Serialize(settings));
-                
-            _backgroundOpacity = settings.BackgroundOpacity;
-            _textOpacity = settings.TextOpacity;
-            
             // Подписываемся на обновление времени
             _timeService.TimeUpdated += OnTimeUpdated;
             _timeService.Start();
+
+            // Немедленно обновляем стрелки текущим временем
+            OnTimeUpdated(this, DateTime.Now);
+
+            // Подписываемся на изменения настроек
+            if (App.MainViewModel != null)
+            {
+                App.MainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
+                _logger.LogInformation("Subscribed to MainViewModel property changes");
+            }
+            else
+            {
+                _logger.LogWarning("MainViewModel is not initialized");
+            }
             
             _logger.LogInformation("Analog clock view model initialized");
         }
@@ -140,16 +120,28 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_disposed)
+        {
+            _logger.LogWarning("PropertyChanged received after disposal");
+            return;
+        }
+
+        if (e.PropertyName == nameof(App.MainViewModel.BackgroundOpacity) ||
+            e.PropertyName == nameof(App.MainViewModel.TextOpacity))
+        {
+            _logger.LogDebug("Settings changed in main view model: {Property}", e.PropertyName);
+            OnPropertyChanged(e.PropertyName);
+        }
+    }
+
     /// <summary>
     /// Получает сохраненную позицию окна.
     /// </summary>
     public (double Left, double Top) GetWindowPosition()
     {
-        var settings = _settingsService.CurrentSettings;
-        return (
-            settings.AnalogClockLeft ?? Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT,
-            settings.AnalogClockTop ?? Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP
-        );
+        return WindowPositionHelper.GetWindowPosition(_settingsService, true);
     }
 
     /// <summary>
@@ -157,11 +149,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// </summary>
     public void SaveWindowPosition(double left, double top)
     {
-        _settingsService.UpdateSettings(s =>
-        {
-            s.AnalogClockLeft = left;
-            s.AnalogClockTop = top;
-        });
+        WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, true);
     }
 
     /// <summary>
@@ -211,18 +199,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>
-    /// Проверяет и корректирует значение прозрачности.
-    /// </summary>
-    private double ValidateOpacity(double value, double minValue, double maxValue, double defaultValue)
-    {
-        if (value < minValue || value > maxValue)
-        {
-            return defaultValue;
-        }
-        return Math.Round(value / Constants.WindowSettings.OPACITY_STEP) * Constants.WindowSettings.OPACITY_STEP;
-    }
-
-    /// <summary>
     /// Вызывает событие изменения свойства.
     /// </summary>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -235,56 +211,11 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// </summary>
     public void Dispose()
     {
-        try
-        {
-            _logger.LogInformation("Disposing analog clock view model");
-            Dispose(true);
-            GC.SuppressFinalize(this);
-            _logger.LogInformation("Analog clock view model disposed");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error disposing analog clock view model");
-        }
-    }
-
-    /// <summary>
-    /// Освобождает неуправляемые ресурсы и опционально освобождает управляемые ресурсы.
-    /// </summary>
-    /// <param name="disposing">Значение true позволяет освободить управляемые и неуправляемые ресурсы; значение false позволяет освободить только неуправляемые ресурсы.</param>
-    protected virtual void Dispose(bool disposing)
-    {
         if (!_disposed)
         {
-            if (disposing)
-            {
-                try
-                {
-                    _logger.LogDebug("Disposing managed resources");
-                    // Останавливаем сервис времени
-                    _timeService.Stop();
-                    _timeService.TimeUpdated -= OnTimeUpdated;
-                    if (_timeService is IDisposable disposable)
-                    {
-                        disposable.Dispose();
-                    }
-                    _logger.LogDebug("Managed resources disposed");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error disposing managed resources");
-                }
-            }
-
+            _timeService.TimeUpdated -= OnTimeUpdated;
+            App.MainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
             _disposed = true;
         }
-    }
-
-    /// <summary>
-    /// Деструктор для освобождения неуправляемых ресурсов.
-    /// </summary>
-    ~AnalogClockViewModel()
-    {
-        Dispose(false);
     }
 } 

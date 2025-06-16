@@ -18,7 +18,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
 {
     private readonly TimeService _timeService;
     private readonly SettingsService _settingsService;
-    private readonly ILogger<MainWindowViewModel> _logger;
+    private readonly ILogger<MainWindowViewModel> _logger = LoggingService.CreateLogger<MainWindowViewModel>();
     private string _timeText = string.Empty;
     private double _backgroundOpacity;
     private double _textOpacity;
@@ -195,32 +195,55 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     /// Инициализирует новый экземпляр класса <see cref="MainWindowViewModel"/>.
     /// Загружает сохраненные настройки и запускает сервис обновления времени.
     /// </summary>
-    public MainWindowViewModel(ILogger<MainWindowViewModel> logger)
+    public MainWindowViewModel()
     {
-        _timeService = new TimeService();
-        _settingsService = App.SettingsService;
-        _logger = logger;
-        
-        // Загружаем настройки
-        var settings = _settingsService.CurrentSettings;
-        _logger.LogInformation("Loading settings for main window: {Settings}", 
-            JsonSerializer.Serialize(settings));
+        try
+        {
+            _logger.LogInformation("Initializing main window view model");
             
-        _backgroundOpacity = settings.BackgroundOpacity;
-        _textOpacity = settings.TextOpacity;
-        _fontSize = settings.FontSize;
-        _showSeconds = settings.ShowSeconds;
-        _showDigitalClock = settings.ShowDigitalClock;
-        _showAnalogClock = settings.ShowAnalogClock;
-        
-        _timeService.TimeUpdated += OnTimeUpdated;
-        _timeService.Start();
-
-        // Находим существующее окно аналоговых часов
-        _analogClockWindow = Application.Current.Windows.OfType<AnalogClockWindow>().FirstOrDefault();
-        
-        // Обновляем видимость окон в соответствии с настройками
-        UpdateWindowsVisibility();
+            _timeService = new TimeService();
+            _settingsService = App.SettingsService;
+            
+            // Загружаем настройки
+            var settings = _settingsService.CurrentSettings;
+            _logger.LogInformation("Loading settings for main window: {Settings}", 
+                JsonSerializer.Serialize(settings));
+                
+            // Устанавливаем значения настроек
+            _backgroundOpacity = settings.BackgroundOpacity;
+            _textOpacity = settings.TextOpacity;
+            _fontSize = settings.FontSize;
+            _showSeconds = settings.ShowSeconds;
+            
+            // Устанавливаем значения видимости окон
+            _showDigitalClock = settings.ShowDigitalClock;
+            _showAnalogClock = settings.ShowAnalogClock;
+            
+            // Запускаем сервис обновления времени и подписываемся на события
+            _timeService.TimeUpdated += OnTimeUpdated;
+            _timeService.Start();
+            
+            // Немедленно обновляем время
+            OnTimeUpdated(this, DateTime.Now);
+            
+            // Обновляем видимость окон в соответствии с настройками
+            _logger.LogInformation("Initial windows visibility: Digital={ShowDigital}, Analog={ShowAnalog}", 
+                _showDigitalClock, _showAnalogClock);
+            
+            // Отложенное обновление видимости окон, чтобы дать время на инициализацию
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                UpdateWindowsVisibility();
+                _logger.LogInformation("Windows visibility updated after initialization");
+            }));
+            
+            _logger.LogInformation("Main window view model initialized");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing main window view model");
+            throw;
+        }
     }
 
     /// <summary>
@@ -276,30 +299,22 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     }
 
     /// <summary>
+    /// Получает сохраненную позицию окна.
+    /// </summary>
+    /// <returns>Кортеж с координатами X и Y окна.</returns>
+    public (double Left, double Top) GetWindowPosition()
+    {
+        return WindowPositionHelper.GetWindowPosition(_settingsService, false);
+    }
+
+    /// <summary>
     /// Сохраняет текущую позицию окна.
     /// </summary>
     /// <param name="left">Координата X окна.</param>
     /// <param name="top">Координата Y окна.</param>
     public void SaveWindowPosition(double left, double top)
     {
-        _settingsService.UpdateSettings(s =>
-        {
-            s.WindowLeft = left;
-            s.WindowTop = top;
-        });
-    }
-
-    /// <summary>
-    /// Получает сохраненную позицию окна.
-    /// </summary>
-    /// <returns>Кортеж с координатами X и Y окна.</returns>
-    public (double Left, double Top) GetWindowPosition()
-    {
-        var settings = _settingsService.CurrentSettings;
-        return (
-            settings.WindowLeft ?? Constants.WindowSettings.DEFAULT_WINDOW_LEFT,
-            settings.WindowTop ?? Constants.WindowSettings.DEFAULT_WINDOW_TOP
-        );
+        WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
     }
 
     /// <summary>
@@ -313,39 +328,65 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
                 _showDigitalClock, _showAnalogClock);
 
             // Обновляем видимость основного окна
-            if (Application.Current.MainWindow != null)
+            if (Application.Current.MainWindow is MainWindow mainWindow)
             {
                 var newVisibility = _showDigitalClock ? Visibility.Visible : Visibility.Hidden;
-                if (Application.Current.MainWindow.Visibility != newVisibility)
+                if (mainWindow.Visibility != newVisibility)
                 {
-                    Application.Current.MainWindow.Visibility = newVisibility;
-                    _logger.LogInformation("Main window visibility set to {Visibility}", newVisibility);
+                    mainWindow.Visibility = newVisibility;
+                    if (newVisibility == Visibility.Visible)
+                    {
+                        mainWindow.Show();
+                        mainWindow.Activate();
+                        _logger.LogInformation("Main window shown and activated");
+                    }
+                    else
+                    {
+                        mainWindow.Hide();
+                        _logger.LogInformation("Main window hidden");
+                    }
                 }
+            }
+            else
+            {
+                _logger.LogWarning("Main window is not of type MainWindow");
             }
 
             // Обновляем видимость окна аналоговых часов
-            if (_analogClockWindow == null && _showAnalogClock)
+            if (_showAnalogClock)
             {
-                // Если окно не существует и должно быть видимым - создаем его
-                _analogClockWindow = new AnalogClockWindow();
-                _analogClockWindow.Show();
-                _logger.LogInformation("Created and showed analog clock window");
-            }
-            else if (_analogClockWindow != null)
-            {
-                // Если окно существует - обновляем его видимость
-                var newVisibility = _showAnalogClock ? Visibility.Visible : Visibility.Hidden;
-                if (_analogClockWindow.Visibility != newVisibility)
+                if (_analogClockWindow == null)
                 {
-                    _analogClockWindow.Visibility = newVisibility;
-                    _logger.LogInformation("Analog clock window visibility set to {Visibility}", newVisibility);
+                    _logger.LogInformation("Creating analog clock window");
+                    _analogClockWindow = new AnalogClockWindow();
+                    var (left, top) = GetAnalogClockPosition();
+                    _analogClockWindow.Left = left;
+                    _analogClockWindow.Top = top;
+                    _analogClockWindow.Show();
                 }
+                else if (!_analogClockWindow.IsVisible)
+                {
+                    _analogClockWindow.Show();
+                }
+                
+                _analogClockWindow.Activate();
+                _logger.LogInformation("Analog clock window shown and activated at position: Left={Left}, Top={Top}", 
+                    _analogClockWindow.Left, _analogClockWindow.Top);
+            }
+            else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
+            {
+                _logger.LogInformation("Hiding analog clock window");
+                _analogClockWindow.Hide();
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating windows visibility");
-            throw; // Пробрасываем исключение, чтобы восстановить предыдущие значения
         }
+    }
+
+    private (double Left, double Top) GetAnalogClockPosition()
+    {
+        return WindowPositionHelper.GetWindowPosition(_settingsService, true);
     }
 } 
