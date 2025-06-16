@@ -5,12 +5,12 @@ namespace ClockWidgetApp;
 
 public partial class SettingsWindow : Window
 {
-    private readonly SettingsWindowViewModel _viewModel;
+    private readonly ISettingsViewModel _viewModel;
 
-    public SettingsWindow(MainWindowViewModel mainViewModel)
+    public SettingsWindow(ISettingsViewModel viewModel)
     {
         InitializeComponent();
-        _viewModel = new SettingsWindowViewModel(mainViewModel);
+        _viewModel = viewModel;
         DataContext = _viewModel;
         
         // Добавляем обработчик закрытия окна

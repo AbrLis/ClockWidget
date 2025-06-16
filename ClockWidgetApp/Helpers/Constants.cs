@@ -11,6 +11,8 @@ public static class Constants
     public static double OPACITY_STEP => WindowSettings.OPACITY_STEP;
     public static double DEFAULT_WINDOW_LEFT => WindowSettings.DEFAULT_WINDOW_LEFT;
     public static double DEFAULT_WINDOW_TOP => WindowSettings.DEFAULT_WINDOW_TOP;
+    public static double DEFAULT_ANALOG_CLOCK_LEFT => WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
+    public static double DEFAULT_ANALOG_CLOCK_TOP => WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
 
     public static double MIN_TEXT_OPACITY => TextSettings.MIN_TEXT_OPACITY;
     public static double MAX_TEXT_OPACITY => TextSettings.MAX_TEXT_OPACITY;
@@ -59,6 +61,16 @@ public static class Constants
         /// Позиция окна по вертикали по умолчанию.
         /// </summary>
         public const double DEFAULT_WINDOW_TOP = 100.0;
+
+        /// <summary>
+        /// Позиция окна аналоговых часов по горизонтали по умолчанию.
+        /// </summary>
+        public const double DEFAULT_ANALOG_CLOCK_LEFT = 100.0;
+
+        /// <summary>
+        /// Позиция окна аналоговых часов по вертикали по умолчанию.
+        /// </summary>
+        public const double DEFAULT_ANALOG_CLOCK_TOP = 100.0;
     }
 
     /// <summary>

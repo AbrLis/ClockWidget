@@ -55,6 +55,20 @@ public class WidgetSettings
     [JsonPropertyName("windowTop")]
     public double? WindowTop { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_TOP;
 
+    /// <summary>
+    /// Получает или устанавливает позицию окна аналоговых часов по горизонтали.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT"/>.
+    /// </summary>
+    [JsonPropertyName("analogClockLeft")]
+    public double? AnalogClockLeft { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
+
+    /// <summary>
+    /// Получает или устанавливает позицию окна аналоговых часов по вертикали.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP"/>.
+    /// </summary>
+    [JsonPropertyName("analogClockTop")]
+    public double? AnalogClockTop { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
+
     public WidgetSettings()
     {
         // Значения по умолчанию уже установлены через инициализаторы свойств

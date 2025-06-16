@@ -10,7 +10,7 @@ namespace ClockWidgetApp.ViewModels;
 /// ViewModel для главного окна виджета часов.
 /// Управляет отображением времени, прозрачностью и другими настройками виджета.
 /// </summary>
-public class MainWindowViewModel : INotifyPropertyChanged
+public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
 {
     private readonly TimeService _timeService;
     private readonly SettingsService _settingsService;
