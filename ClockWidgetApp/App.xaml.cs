@@ -41,10 +41,19 @@ public partial class App : Application
             _logger.LogInformation("Starting application");
             base.OnStartup(e);
 
-            // Создаем и показываем основное окно
-            _mainWindow = new MainWindow();
-            _mainWindow.Show();
-            _logger.LogInformation("Main window created and shown");
+            // Проверяем, не создано ли уже окно с цифровыми часами
+            if (Application.Current.MainWindow == null)
+            {
+                // Создаем и показываем основное окно
+                _mainWindow = new MainWindow();
+                Application.Current.MainWindow = _mainWindow;
+                _mainWindow.Show();
+                _logger.LogInformation("Main window created and shown");
+            }
+            else
+            {
+                _logger.LogWarning("Main window already exists, skipping creation");
+            }
 
             // Создаем и показываем окно с аналоговыми часами
             _analogClockWindow = new AnalogClockWindow();
