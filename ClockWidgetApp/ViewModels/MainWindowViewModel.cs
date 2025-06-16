@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Linq;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using ClockWidgetApp.Models;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -16,7 +17,7 @@ namespace ClockWidgetApp.ViewModels;
 /// ViewModel для главного окна виджета часов.
 /// Управляет отображением времени, прозрачностью и другими настройками виджета.
 /// </summary>
-public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
+public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel, IDisposable
 {
     private readonly TimeService _timeService;
     private readonly SettingsService _settingsService;
@@ -32,6 +33,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     private AnalogClockWindow? _analogClockWindow;
     private const double ANIMATION_STEP = 0.05; // Шаг анимации
     private const int ANIMATION_INTERVAL = 16; // Интервал анимации (приблизительно 60 FPS)
+    private bool _disposed;
 
     /// <summary>
     /// Событие, возникающее при изменении значения свойства.
@@ -450,6 +452,107 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         {
             _analogClockWindow.Width = _analogClockSize;
             _analogClockWindow.Height = _analogClockSize;
+        }
+    }
+
+    /// <summary>
+    /// Обновляет настройки цифровых часов.
+    /// </summary>
+    /// <param name="settings">Новые настройки.</param>
+    public void UpdateSettings(WidgetSettings settings)
+    {
+        if (settings == null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+
+        // Валидируем настройки перед применением
+        settings = WidgetSettings.ValidateSettings(settings);
+
+        // Обновляем настройки цифровых часов
+        if (settings.ShowDigitalClock)
+        {
+            if (Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.Show();
+                mainWindow.Activate();
+            }
+        }
+        else
+        {
+            Application.Current.MainWindow?.Hide();
+        }
+
+        // Обновляем настройки аналоговых часов
+        UpdateAnalogClockSettings(settings);
+
+        // Сохраняем настройки
+        _settingsService.SaveSettings(settings);
+    }
+
+    /// <summary>
+    /// Обновляет настройки аналоговых часов.
+    /// </summary>
+    /// <param name="settings">Новые настройки.</param>
+    private void UpdateAnalogClockSettings(WidgetSettings settings)
+    {
+        if (settings == null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+
+        // Валидируем настройки перед применением
+        settings = WidgetSettings.ValidateSettings(settings);
+
+        // Обновляем видимость окна аналоговых часов
+        if (settings.ShowAnalogClock)
+        {
+            if (_analogClockWindow == null)
+            {
+                _logger.LogInformation("Creating analog clock window");
+                _analogClockWindow = new AnalogClockWindow();
+                var (left, top) = GetAnalogClockPosition();
+                _analogClockWindow.Left = left;
+                _analogClockWindow.Top = top;
+                _analogClockWindow.Width = settings.AnalogClockSize;
+                _analogClockWindow.Height = settings.AnalogClockSize;
+                _analogClockWindow.Show();
+            }
+            else if (!_analogClockWindow.IsVisible)
+            {
+                _analogClockWindow.Show();
+            }
+            
+            _analogClockWindow.Activate();
+            _logger.LogInformation("Analog clock window shown and activated at position: Left={Left}, Top={Top}", 
+                _analogClockWindow.Left, _analogClockWindow.Top);
+        }
+        else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
+        {
+            _logger.LogInformation("Hiding analog clock window");
+            _analogClockWindow.Hide();
+        }
+    }
+
+    /// <summary>
+    /// Освобождает ресурсы, используемые экземпляром класса <see cref="MainWindowViewModel"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            try
+            {
+                _logger.LogInformation("Disposing main window view model");
+                _timeService.TimeUpdated -= OnTimeUpdated;
+                _timeService.Dispose();
+                _disposed = true;
+                _logger.LogInformation("Main window view model disposed");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error disposing main window view model");
+            }
         }
     }
 } 

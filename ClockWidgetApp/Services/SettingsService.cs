@@ -57,7 +57,7 @@ public class SettingsService
         {
             _logger.LogInformation("Updating settings");
             updateAction(_currentSettings);
-            SaveSettings();
+            SaveSettings(_currentSettings);
             _logger.LogInformation("Settings updated successfully: {Settings}", 
                 JsonSerializer.Serialize(_currentSettings));
         }
@@ -70,60 +70,62 @@ public class SettingsService
 
     /// <summary>
     /// Загружает настройки из файла.
-    /// Если файл не существует или поврежден, возвращает настройки по умолчанию.
     /// </summary>
-    /// <returns>Загруженные настройки или настройки по умолчанию.</returns>
-    private WidgetSettings LoadSettings()
+    /// <returns>Загруженные настройки.</returns>
+    public WidgetSettings LoadSettings()
     {
         try
         {
-            if (File.Exists(_settingsPath))
+            if (!File.Exists(_settingsPath))
             {
-                _logger.LogInformation("Loading settings from file: {Path}", _settingsPath);
-                var json = File.ReadAllText(_settingsPath);
-                var settings = JsonSerializer.Deserialize<WidgetSettings>(json);
-                
-                if (settings != null)
-                {
-                    _logger.LogInformation("Settings loaded successfully: {Settings}", json);
-                    return settings;
-                }
-                else
-                {
-                    _logger.LogWarning("Failed to deserialize settings, using defaults");
-                }
+                return WidgetSettings.ValidateSettings(new WidgetSettings());
             }
-            else
-            {
-                _logger.LogInformation("Settings file not found, using defaults");
-            }
+
+            var json = File.ReadAllText(_settingsPath);
+            var settings = JsonSerializer.Deserialize<WidgetSettings>(json) ?? new WidgetSettings();
+            return WidgetSettings.ValidateSettings(settings);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading settings from file: {Path}", _settingsPath);
+            _logger.LogError(ex, "Ошибка при загрузке настроек");
+            return WidgetSettings.ValidateSettings(new WidgetSettings());
         }
-        
-        var defaultSettings = new WidgetSettings();
-        _logger.LogInformation("Using default settings: {Settings}", 
-            JsonSerializer.Serialize(defaultSettings));
-        return defaultSettings;
     }
 
     /// <summary>
-    /// Сохраняет текущие настройки в файл.
+    /// Сохраняет настройки в файл.
     /// </summary>
-    private void SaveSettings()
+    /// <param name="settings">Настройки для сохранения.</param>
+    public void SaveSettings(WidgetSettings settings)
     {
         try
         {
-            _logger.LogInformation("Saving settings to file: {Path}", _settingsPath);
-            var json = JsonSerializer.Serialize(_currentSettings, new JsonSerializerOptions { WriteIndented = true });
+            if (settings == null)
+            {
+                throw new ArgumentNullException(nameof(settings));
+            }
+
+            // Валидируем настройки перед сохранением
+            settings = WidgetSettings.ValidateSettings(settings);
+
+            var directory = Path.GetDirectoryName(_settingsPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            var json = JsonSerializer.Serialize(settings, options);
             File.WriteAllText(_settingsPath, json);
-            _logger.LogInformation("Settings saved successfully: {Settings}", json);
+            _logger.LogInformation("Настройки успешно сохранены");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving settings to file: {Path}", _settingsPath);
+            _logger.LogError(ex, "Ошибка при сохранении настроек");
             throw;
         }
     }

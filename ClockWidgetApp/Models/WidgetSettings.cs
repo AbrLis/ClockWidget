@@ -163,18 +163,27 @@ public class WidgetSettings
     /// <returns>Скорректированные настройки.</returns>
     public static WidgetSettings ValidateSettings(WidgetSettings settings)
     {
+        if (settings == null)
+        {
+            return new WidgetSettings();
+        }
+
+        // Валидация прозрачности фона
         settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity, 
             Constants.WindowSettings.MIN_WINDOW_OPACITY, 
             Constants.WindowSettings.MAX_WINDOW_OPACITY, 
             Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
         
+        // Валидация прозрачности текста
         settings.TextOpacity = ValidateOpacity(settings.TextOpacity, 
             Constants.TextSettings.MIN_TEXT_OPACITY, 
             Constants.TextSettings.MAX_TEXT_OPACITY, 
             Constants.TextSettings.DEFAULT_TEXT_OPACITY);
         
+        // Валидация размера шрифта
         settings.FontSize = ValidateFontSize(settings.FontSize);
         
+        // Валидация размера аналоговых часов
         settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
         
         // Убеждаемся, что хотя бы одно окно видимо
@@ -182,6 +191,8 @@ public class WidgetSettings
         {
             settings.ShowDigitalClock = true;
         }
+
+        // Позиции окон не валидируются, так как могут быть null
         
         return settings;
     }
@@ -194,7 +205,7 @@ public class WidgetSettings
     /// <param name="maxValue">Максимальное допустимое значение.</param>
     /// <param name="defaultValue">Значение по умолчанию.</param>
     /// <returns>Скорректированное значение прозрачности.</returns>
-    private static double ValidateOpacity(double value, double minValue, double maxValue, double defaultValue)
+    public static double ValidateOpacity(double value, double minValue, double maxValue, double defaultValue)
     {
         if (value < minValue || value > maxValue)
         {
@@ -208,7 +219,7 @@ public class WidgetSettings
     /// </summary>
     /// <param name="value">Проверяемое значение.</param>
     /// <returns>Скорректированное значение размера шрифта.</returns>
-    private static double ValidateFontSize(double value)
+    public static double ValidateFontSize(double value)
     {
         if (value < Constants.TextSettings.MIN_FONT_SIZE || value > Constants.TextSettings.MAX_FONT_SIZE)
         {
@@ -222,7 +233,7 @@ public class WidgetSettings
     /// </summary>
     /// <param name="value">Проверяемое значение.</param>
     /// <returns>Скорректированное значение размера окна.</returns>
-    private static double ValidateAnalogClockSize(double value)
+    public static double ValidateAnalogClockSize(double value)
     {
         if (value < Constants.WindowSettings.MIN_ANALOG_CLOCK_SIZE || 
             value > Constants.WindowSettings.MAX_ANALOG_CLOCK_SIZE)

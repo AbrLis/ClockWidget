@@ -1,6 +1,6 @@
 using System;
 using System.Timers;
-using ClockWidgetApp.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.Services;
 
@@ -11,6 +11,7 @@ namespace ClockWidgetApp.Services;
 public class TimeService : IDisposable
 {
     private readonly System.Timers.Timer _timer;
+    private readonly ILogger<TimeService> _logger = LoggingService.CreateLogger<TimeService>();
     private DateTime _currentTime;
     private bool _isDisposed;
 
@@ -27,15 +28,15 @@ public class TimeService : IDisposable
     {
         try
         {
-            DebugHelper.WriteLine("TimeService: Constructor started");
+            _logger.LogDebug("TimeService: Constructor started");
             _timer = new System.Timers.Timer(1000); // Обновление каждую секунду
             _timer.Elapsed += OnTimerElapsed;
             _currentTime = DateTime.Now;
-            DebugHelper.WriteLine("TimeService: Constructor completed");
+            _logger.LogDebug("TimeService: Constructor completed");
         }
         catch (Exception ex)
         {
-            DebugHelper.WriteError("TimeService: Constructor error", ex);
+            _logger.LogError(ex, "TimeService: Constructor error");
             throw;
         }
     }
@@ -49,18 +50,18 @@ public class TimeService : IDisposable
         {
             if (_isDisposed)
             {
-                DebugHelper.WriteLine("TimeService: Start called after disposal");
+                _logger.LogWarning("TimeService: Start called after disposal");
                 return;
             }
 
-            DebugHelper.WriteLine("TimeService: Starting timer");
+            _logger.LogDebug("TimeService: Starting timer");
             _timer.Start();
             OnTimerElapsed(this, EventArgs.Empty); // Немедленное обновление при старте
-            DebugHelper.WriteLine("TimeService: Timer started");
+            _logger.LogDebug("TimeService: Timer started");
         }
         catch (Exception ex)
         {
-            DebugHelper.WriteError("TimeService: Start error", ex);
+            _logger.LogError(ex, "TimeService: Start error");
             throw;
         }
     }
@@ -74,17 +75,17 @@ public class TimeService : IDisposable
         {
             if (_isDisposed)
             {
-                DebugHelper.WriteLine("TimeService: Stop called after disposal");
+                _logger.LogWarning("TimeService: Stop called after disposal");
                 return;
             }
 
-            DebugHelper.WriteLine("TimeService: Stopping timer");
+            _logger.LogDebug("TimeService: Stopping timer");
             _timer.Stop();
-            DebugHelper.WriteLine("TimeService: Timer stopped");
+            _logger.LogDebug("TimeService: Timer stopped");
         }
         catch (Exception ex)
         {
-            DebugHelper.WriteError("TimeService: Stop error", ex);
+            _logger.LogError(ex, "TimeService: Stop error");
             throw;
         }
     }
@@ -101,12 +102,12 @@ public class TimeService : IDisposable
         {
             if (_isDisposed)
             {
-                DebugHelper.WriteLine("TimeService: Timer elapsed after disposal");
+                _logger.LogWarning("TimeService: Timer elapsed after disposal");
                 return;
             }
 
             _currentTime = DateTime.Now;
-            DebugHelper.WriteLine($"TimeService: Timer elapsed - {_currentTime}");
+            _logger.LogTrace("TimeService: Timer elapsed - {Time}", _currentTime);
             
             var handler = TimeUpdated;
             if (handler != null)
@@ -116,7 +117,7 @@ public class TimeService : IDisposable
         }
         catch (Exception ex)
         {
-            DebugHelper.WriteError("TimeService: Timer elapsed error", ex);
+            _logger.LogError(ex, "TimeService: Timer elapsed error");
         }
     }
 
@@ -129,16 +130,16 @@ public class TimeService : IDisposable
         {
             if (!_isDisposed)
             {
-                DebugHelper.WriteLine("TimeService: Disposing");
+                _logger.LogDebug("TimeService: Disposing");
                 Stop();
                 _timer.Dispose();
                 _isDisposed = true;
-                DebugHelper.WriteLine("TimeService: Disposed");
+                _logger.LogDebug("TimeService: Disposed");
             }
         }
         catch (Exception ex)
         {
-            DebugHelper.WriteError("TimeService: Dispose error", ex);
+            _logger.LogError(ex, "TimeService: Dispose error");
         }
     }
 } 

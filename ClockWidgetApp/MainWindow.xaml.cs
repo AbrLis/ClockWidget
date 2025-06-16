@@ -54,8 +54,6 @@ public partial class MainWindow : Window
             PreviewMouseLeftButtonUp += MainWindow_PreviewMouseLeftButtonUp;
             PreviewMouseMove += MainWindow_PreviewMouseMove;
             MouseRightButtonDown += MainWindow_MouseRightButtonDown;
-
-            // Добавляем обработчик закрытия окна
             Closing += MainWindow_Closing;
             
             _logger.LogInformation("Main window initialized");
@@ -123,13 +121,38 @@ public partial class MainWindow : Window
 
     private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
-        // Сохраняем текущую позицию окна
-        _viewModel.SaveWindowPosition(Left, Top);
-        
-        // Закрываем окно настроек, если оно открыто
-        if (_settingsWindow != null && _settingsWindow.IsVisible)
+        try
         {
-            _settingsWindow.Close();
+            _logger.LogInformation("Main window closing");
+            
+            // Отписываемся от событий
+            PreviewMouseLeftButtonDown -= MainWindow_PreviewMouseLeftButtonDown;
+            PreviewMouseLeftButtonUp -= MainWindow_PreviewMouseLeftButtonUp;
+            PreviewMouseMove -= MainWindow_PreviewMouseMove;
+            MouseRightButtonDown -= MainWindow_MouseRightButtonDown;
+            Closing -= MainWindow_Closing;
+            
+            // Сохраняем текущую позицию окна
+            _viewModel.SaveWindowPosition(Left, Top);
+            
+            // Закрываем окно настроек, если оно открыто
+            if (_settingsWindow != null && _settingsWindow.IsVisible)
+            {
+                _settingsWindow.Close();
+            }
+            
+            // Очищаем DataContext и освобождаем ресурсы ViewModel
+            if (_viewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+            DataContext = null;
+            
+            _logger.LogInformation("Main window closed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during window closing");
         }
     }
 }
