@@ -18,95 +18,108 @@
         Background="White">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="10">
-            <!-- Группа настроек видимости окон -->
-            <GroupBox Header="Видимость окон" Margin="0,0,0,10">
+            <!-- Общие настройки -->
+            <GroupBox Header="Общие настройки" Margin="0,0,0,10">
+                <StackPanel Margin="5">
+                    <!-- Прозрачность фона -->
+                    <TextBlock Text="Прозрачность фона:" 
+                              Margin="0,0,0,5"/>
+                    
+                    <Slider x:Name="BackgroundOpacitySlider"
+                            Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
+                            Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
+                            Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
+                            IsSnapToTickEnabled="True"
+                            IsMoveToPointEnabled="True"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
+                    
+                    <TextBlock x:Name="BackgroundOpacityValueText" 
+                              Text="{Binding BackgroundOpacity, StringFormat=P0}"
+                              HorizontalAlignment="Center" 
+                              Margin="0,0,0,10"/>
+
+                    <!-- Прозрачность текста -->
+                    <TextBlock Text="Прозрачность текста:" 
+                              Margin="0,0,0,5"/>
+                    
+                    <Slider x:Name="TextOpacitySlider"
+                            Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
+                            Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
+                            Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
+                            IsSnapToTickEnabled="True"
+                            IsMoveToPointEnabled="True"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
+                    
+                    <TextBlock x:Name="TextOpacityValueText" 
+                              Text="{Binding TextOpacity, StringFormat=P0}"
+                              HorizontalAlignment="Center" 
+                              Margin="0,0,0,10"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Настройки аналоговых часов -->
+            <GroupBox Header="Настройки аналоговых часов" Margin="0,0,0,10">
+                <StackPanel Margin="5">
+                    <CheckBox Content="Показывать аналоговые часы" 
+                              IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="0,5"/>
+
+                    <!-- Размер аналоговых часов -->
+                    <TextBlock Text="Размер аналоговых часов:" 
+                              Margin="0,10,0,5"/>
+                    
+                    <Slider x:Name="AnalogClockSizeSlider"
+                            Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
+                            Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
+                            Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
+                            IsSnapToTickEnabled="True"
+                            IsMoveToPointEnabled="True"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
+                    
+                    <TextBlock x:Name="AnalogClockSizeValueText" 
+                              Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
+                              HorizontalAlignment="Center" 
+                              Margin="0,0,0,10"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Настройки цифровых часов -->
+            <GroupBox Header="Настройки цифровых часов" Margin="0,0,0,10">
                 <StackPanel Margin="5">
                     <CheckBox Content="Показывать цифровые часы" 
                               IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Margin="0,5"/>
-                    <CheckBox Content="Показывать аналоговые часы" 
-                              IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Margin="0,5"/>
+
+                    <!-- Чекбокс отображения секунд -->
+                    <CheckBox x:Name="ShowSecondsCheckBox"
+                              Content="Показывать секунды"
+                              IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
+                              Margin="0,10,0,10"/>
+
+                    <!-- Размер шрифта -->
+                    <TextBlock Text="Размер шрифта:" 
+                              Margin="0,10,0,5"/>
+                    
+                    <Slider x:Name="FontSizeSlider"
+                            Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
+                            Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
+                            Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
+                            IsSnapToTickEnabled="True"
+                            IsMoveToPointEnabled="True"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
+                    
+                    <TextBlock x:Name="FontSizeValueText" 
+                              Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
+                              HorizontalAlignment="Center" 
+                              Margin="0,0,0,10"/>
+
+                    
                 </StackPanel>
             </GroupBox>
-
-            <!-- Прозрачность фона -->
-            <TextBlock Text="Прозрачность фона:" 
-                       Margin="0,0,0,5"/>
-            
-            <Slider x:Name="BackgroundOpacitySlider"
-                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
-                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
-                    Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
-                    IsSnapToTickEnabled="True"
-                    IsMoveToPointEnabled="True"
-                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
-            
-            <TextBlock x:Name="BackgroundOpacityValueText" 
-                       Text="{Binding BackgroundOpacity, StringFormat=P0}"
-                       HorizontalAlignment="Center" 
-                       Margin="0,0,0,10"/>
-
-            <!-- Прозрачность текста -->
-            <TextBlock Text="Прозрачность текста:" 
-                       Margin="0,0,0,5"/>
-            
-            <Slider x:Name="TextOpacitySlider"
-                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
-                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
-                    Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
-                    IsSnapToTickEnabled="True"
-                    IsMoveToPointEnabled="True"
-                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
-            
-            <TextBlock x:Name="TextOpacityValueText" 
-                       Text="{Binding TextOpacity, StringFormat=P0}"
-                       HorizontalAlignment="Center" 
-                       Margin="0,0,0,10"/>
-
-            <!-- Размер шрифта -->
-            <TextBlock Text="Размер шрифта:" 
-                       Margin="0,0,0,5"/>
-            
-            <Slider x:Name="FontSizeSlider"
-                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
-                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
-                    Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
-                    IsSnapToTickEnabled="True"
-                    IsMoveToPointEnabled="True"
-                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
-            
-            <TextBlock x:Name="FontSizeValueText" 
-                       Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
-                       HorizontalAlignment="Center" 
-                       Margin="0,0,0,10"/>
-
-            <!-- Размер аналоговых часов -->
-            <TextBlock Text="Размер аналоговых часов:" 
-                       Margin="0,0,0,5"/>
-            
-            <Slider x:Name="AnalogClockSizeSlider"
-                    Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
-                    Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
-                    Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
-                    TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
-                    IsSnapToTickEnabled="True"
-                    IsMoveToPointEnabled="True"
-                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
-            
-            <TextBlock x:Name="AnalogClockSizeValueText" 
-                       Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
-                       HorizontalAlignment="Center" 
-                       Margin="0,0,0,10"/>
-
-            <!-- Чекбокс отображения секунд -->
-            <CheckBox x:Name="ShowSecondsCheckBox"
-                      Content="Показывать секунды"
-                      IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
-                      Margin="0,10,0,10"/>
 
             <!-- Кнопка закрытия -->
             <Button x:Name="CloseWidgetButton" 
