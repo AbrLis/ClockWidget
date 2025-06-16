@@ -4,6 +4,7 @@ using System.Data;
 using System.Windows;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
+using ClockWidgetApp.ViewModels;
 
 namespace ClockWidgetApp;
 
@@ -12,24 +13,27 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class App : Application
 {
-    private MainWindow? _mainWindow;
-    private AnalogClockWindow? _analogClockWindow;
-    private readonly ILogger<App> _logger;
     private static SettingsService? _settingsService;
+    private static MainWindowViewModel? _mainViewModel;
+    private MainWindow? _mainWindow;
+    private readonly ILogger<App> _logger = LoggingService.CreateLogger<App>();
 
     /// <summary>
-    /// Получает экземпляр сервиса настроек.
+    /// Получает сервис настроек приложения.
     /// </summary>
     public static SettingsService SettingsService
     {
-        get
-        {
-            if (_settingsService == null)
-            {
-                _settingsService = new SettingsService();
-            }
-            return _settingsService;
-        }
+        get => _settingsService ?? throw new InvalidOperationException("SettingsService is not initialized");
+        private set => _settingsService = value;
+    }
+
+    /// <summary>
+    /// Получает ViewModel главного окна.
+    /// </summary>
+    public static MainWindowViewModel MainViewModel
+    {
+        get => _mainViewModel ?? throw new InvalidOperationException("MainViewModel is not initialized");
+        private set => _mainViewModel = value;
     }
 
     public App()
@@ -55,8 +59,11 @@ public partial class App : Application
         try
         {
             _logger.LogInformation("Starting application");
-            base.OnStartup(e);
-
+            
+            // Инициализируем сервисы
+            SettingsService = new SettingsService();
+            _logger.LogInformation("Services initialized");
+            
             // Загружаем настройки
             var settings = SettingsService.CurrentSettings;
             _logger.LogInformation("Settings loaded: {Settings}", 
@@ -68,7 +75,7 @@ public partial class App : Application
                 // Создаем и показываем основное окно
                 _mainWindow = new MainWindow();
                 Application.Current.MainWindow = _mainWindow;
-                _mainWindow.Visibility = settings.ShowDigitalClock ? Visibility.Visible : Visibility.Hidden;
+                MainViewModel = ((MainWindow)Application.Current.MainWindow).ViewModel;
                 _mainWindow.Show();
                 _logger.LogInformation("Main window created and shown");
             }
@@ -77,16 +84,10 @@ public partial class App : Application
                 _logger.LogWarning("Main window already exists, skipping creation");
             }
 
-            // Создаем и показываем окно с аналоговыми часами
-            _analogClockWindow = new AnalogClockWindow();
-            _analogClockWindow.Visibility = settings.ShowAnalogClock ? Visibility.Visible : Visibility.Hidden;
-            _analogClockWindow.Show();
-            _logger.LogInformation("Analog clock window created and shown");
-
-            // Устанавливаем ShutdownMode в OnLastWindowClose
-            // чтобы приложение закрывалось только когда все окна закрыты
+            // Устанавливаем режим завершения приложения
             ShutdownMode = ShutdownMode.OnLastWindowClose;
-            _logger.LogInformation("Application startup completed");
+            
+            _logger.LogInformation("Application started successfully");
         }
         catch (Exception ex)
         {

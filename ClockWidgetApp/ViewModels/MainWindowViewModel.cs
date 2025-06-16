@@ -6,6 +6,7 @@ using ClockWidgetApp.Services;
 using System.Windows;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using System.Linq;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -25,6 +26,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     private bool _showSeconds;
     private bool _showDigitalClock = true;
     private bool _showAnalogClock = true;
+    private AnalogClockWindow? _analogClockWindow;
 
     /// <summary>
     /// Событие, возникающее при изменении значения свойства.
@@ -119,15 +121,32 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         {
             if (_showDigitalClock != value)
             {
-                // Не позволяем скрыть оба окна
-                if (!value && !_showAnalogClock)
+                try
                 {
-                    return;
+                    // Не позволяем скрыть оба окна
+                    if (!value && !_showAnalogClock)
+                    {
+                        _logger.LogWarning("Cannot hide both windows, keeping digital clock visible");
+                        return;
+                    }
+
+                    _logger.LogInformation("Updating show digital clock: {Value}", value);
+                    _showDigitalClock = value;
+                    OnPropertyChanged();
+
+                    // Сохраняем настройки
+                    _settingsService.UpdateSettings(s => s.ShowDigitalClock = value);
+                    
+                    // Обновляем видимость окон
+                    UpdateWindowsVisibility();
                 }
-                _showDigitalClock = value;
-                OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.ShowDigitalClock = value);
-                UpdateWindowsVisibility();
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating show digital clock setting");
+                    // Восстанавливаем предыдущее значение
+                    _showDigitalClock = !value;
+                    OnPropertyChanged();
+                }
             }
         }
     }
@@ -142,15 +161,32 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         {
             if (_showAnalogClock != value)
             {
-                // Не позволяем скрыть оба окна
-                if (!value && !_showDigitalClock)
+                try
                 {
-                    return;
+                    // Не позволяем скрыть оба окна
+                    if (!value && !_showDigitalClock)
+                    {
+                        _logger.LogWarning("Cannot hide both windows, keeping analog clock visible");
+                        return;
+                    }
+
+                    _logger.LogInformation("Updating show analog clock: {Value}", value);
+                    _showAnalogClock = value;
+                    OnPropertyChanged();
+
+                    // Сохраняем настройки
+                    _settingsService.UpdateSettings(s => s.ShowAnalogClock = value);
+                    
+                    // Обновляем видимость окон
+                    UpdateWindowsVisibility();
                 }
-                _showAnalogClock = value;
-                OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.ShowAnalogClock = value);
-                UpdateWindowsVisibility();
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating show analog clock setting");
+                    // Восстанавливаем предыдущее значение
+                    _showAnalogClock = !value;
+                    OnPropertyChanged();
+                }
             }
         }
     }
@@ -179,6 +215,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
         
         _timeService.TimeUpdated += OnTimeUpdated;
         _timeService.Start();
+
+        // Находим существующее окно аналоговых часов
+        _analogClockWindow = Application.Current.Windows.OfType<AnalogClockWindow>().FirstOrDefault();
+        
+        // Обновляем видимость окон в соответствии с настройками
+        UpdateWindowsVisibility();
     }
 
     /// <summary>
@@ -265,19 +307,45 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     /// </summary>
     private void UpdateWindowsVisibility()
     {
-        if (Application.Current.MainWindow is MainWindow mainWindow)
+        try
         {
-            mainWindow.Visibility = ShowDigitalClock ? Visibility.Visible : Visibility.Hidden;
-        }
+            _logger.LogInformation("Updating windows visibility: Digital={ShowDigital}, Analog={ShowAnalog}", 
+                _showDigitalClock, _showAnalogClock);
 
-        // Находим окно аналоговых часов
-        foreach (Window window in Application.Current.Windows)
-        {
-            if (window is AnalogClockWindow analogClockWindow)
+            // Обновляем видимость основного окна
+            if (Application.Current.MainWindow != null)
             {
-                analogClockWindow.Visibility = ShowAnalogClock ? Visibility.Visible : Visibility.Hidden;
-                break;
+                var newVisibility = _showDigitalClock ? Visibility.Visible : Visibility.Hidden;
+                if (Application.Current.MainWindow.Visibility != newVisibility)
+                {
+                    Application.Current.MainWindow.Visibility = newVisibility;
+                    _logger.LogInformation("Main window visibility set to {Visibility}", newVisibility);
+                }
             }
+
+            // Обновляем видимость окна аналоговых часов
+            if (_analogClockWindow == null && _showAnalogClock)
+            {
+                // Если окно не существует и должно быть видимым - создаем его
+                _analogClockWindow = new AnalogClockWindow();
+                _analogClockWindow.Show();
+                _logger.LogInformation("Created and showed analog clock window");
+            }
+            else if (_analogClockWindow != null)
+            {
+                // Если окно существует - обновляем его видимость
+                var newVisibility = _showAnalogClock ? Visibility.Visible : Visibility.Hidden;
+                if (_analogClockWindow.Visibility != newVisibility)
+                {
+                    _analogClockWindow.Visibility = newVisibility;
+                    _logger.LogInformation("Analog clock window visibility set to {Visibility}", newVisibility);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating windows visibility");
+            throw; // Пробрасываем исключение, чтобы восстановить предыдущие значения
         }
     }
 } 

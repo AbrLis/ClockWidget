@@ -12,7 +12,7 @@ namespace ClockWidgetApp.ViewModels;
 /// ViewModel для окна с аналоговыми часами.
 /// Управляет отображением стрелок, прозрачностью и другими настройками.
 /// </summary>
-public class AnalogClockViewModel : INotifyPropertyChanged, ISettingsViewModel, IDisposable
+public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly TimeService _timeService;
     private readonly SettingsService _settingsService;

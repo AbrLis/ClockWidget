@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private bool _isDragging;
     private SettingsWindow? _settingsWindow;
     public bool IsSettingsWindowOpen { get; set; }
+    public MainWindowViewModel ViewModel => _viewModel;
 
     public MainWindow()
     {

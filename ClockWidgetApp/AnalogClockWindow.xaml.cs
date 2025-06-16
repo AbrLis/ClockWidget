@@ -133,7 +133,7 @@ public partial class AnalogClockWindow : Window
         {
             _logger.LogInformation("Opening settings window");
             // Открываем окно настроек при правом клике
-            var settingsWindow = new SettingsWindow(_viewModel);
+            var settingsWindow = new SettingsWindow(App.MainViewModel);
             settingsWindow.Owner = this;
             settingsWindow.Show();
             e.Handled = true;

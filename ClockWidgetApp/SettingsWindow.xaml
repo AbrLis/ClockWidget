@@ -22,10 +22,10 @@
             <GroupBox Header="Видимость окон" Margin="0,0,0,10">
                 <StackPanel Margin="5">
                     <CheckBox Content="Показывать цифровые часы" 
-                              IsChecked="{Binding ShowDigitalClock}"
+                              IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Margin="0,5"/>
                     <CheckBox Content="Показывать аналоговые часы" 
-                              IsChecked="{Binding ShowAnalogClock}"
+                              IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Margin="0,5"/>
                 </StackPanel>
             </GroupBox>
