@@ -9,6 +9,11 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
 {
     private readonly MainWindowViewModel _mainViewModel;
     private readonly ILogger<SettingsWindowViewModel> _logger = LoggingService.CreateLogger<SettingsWindowViewModel>();
+    private double _backgroundOpacity;
+    private double _textOpacity;
+    private double _fontSize;
+    private double _analogClockSize;
+    private bool _showSeconds;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -96,10 +101,34 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Получает или устанавливает размер окна аналоговых часов.
+    /// </summary>
+    public double AnalogClockSize
+    {
+        get => _mainViewModel.AnalogClockSize;
+        set
+        {
+            if (Math.Abs(_mainViewModel.AnalogClockSize - value) > 0.001)
+            {
+                _logger.LogInformation("Updating analog clock size: {Value}", value);
+                _mainViewModel.AnalogClockSize = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public SettingsWindowViewModel(MainWindowViewModel mainViewModel)
     {
         _mainViewModel = mainViewModel;
         _logger.LogInformation("Settings window view model initialized");
+        
+        // Инициализируем значения из MainWindowViewModel
+        _backgroundOpacity = _mainViewModel.BackgroundOpacity;
+        _textOpacity = _mainViewModel.TextOpacity;
+        _fontSize = _mainViewModel.FontSize;
+        _analogClockSize = _mainViewModel.AnalogClockSize;
+        _showSeconds = _mainViewModel.ShowSeconds;
         
         // Подписываемся на изменения свойств MainWindowViewModel
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;

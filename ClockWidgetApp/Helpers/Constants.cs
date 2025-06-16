@@ -13,6 +13,10 @@ public static class Constants
     public static double DEFAULT_WINDOW_TOP => WindowSettings.DEFAULT_WINDOW_TOP;
     public static double DEFAULT_ANALOG_CLOCK_LEFT => WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
     public static double DEFAULT_ANALOG_CLOCK_TOP => WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
+    public static double DEFAULT_ANALOG_CLOCK_SIZE => WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
+    public static double MIN_ANALOG_CLOCK_SIZE => WindowSettings.MIN_ANALOG_CLOCK_SIZE;
+    public static double MAX_ANALOG_CLOCK_SIZE => WindowSettings.MAX_ANALOG_CLOCK_SIZE;
+    public static double ANALOG_CLOCK_SIZE_STEP => WindowSettings.ANALOG_CLOCK_SIZE_STEP;
 
     public static double MIN_TEXT_OPACITY => TextSettings.MIN_TEXT_OPACITY;
     public static double MAX_TEXT_OPACITY => TextSettings.MAX_TEXT_OPACITY;
@@ -71,6 +75,26 @@ public static class Constants
         /// Позиция окна аналоговых часов по вертикали по умолчанию.
         /// </summary>
         public const double DEFAULT_ANALOG_CLOCK_TOP = 100.0;
+
+        /// <summary>
+        /// Размер окна аналоговых часов по умолчанию.
+        /// </summary>
+        public const double DEFAULT_ANALOG_CLOCK_SIZE = 300.0;
+
+        /// <summary>
+        /// Минимальный размер окна аналоговых часов.
+        /// </summary>
+        public const double MIN_ANALOG_CLOCK_SIZE = 100.0;
+
+        /// <summary>
+        /// Максимальный размер окна аналоговых часов.
+        /// </summary>
+        public const double MAX_ANALOG_CLOCK_SIZE = 500.0;
+
+        /// <summary>
+        /// Шаг изменения размера окна аналоговых часов.
+        /// </summary>
+        public const double ANALOG_CLOCK_SIZE_STEP = 10.0;
     }
 
     /// <summary>

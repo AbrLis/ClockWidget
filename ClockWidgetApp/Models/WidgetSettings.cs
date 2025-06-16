@@ -70,6 +70,13 @@ public class WidgetSettings
     public double? AnalogClockTop { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
 
     /// <summary>
+    /// Получает или устанавливает размер окна аналоговых часов.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE"/>.
+    /// </summary>
+    [JsonPropertyName("analogClockSize")]
+    public double AnalogClockSize { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
+
+    /// <summary>
     /// Получает или устанавливает флаг отображения цифровых часов.
     /// Значение по умолчанию: true.
     /// </summary>
@@ -120,6 +127,7 @@ public class WidgetSettings
                 Constants.TextSettings.DEFAULT_TEXT_OPACITY);
             
             settings.FontSize = ValidateFontSize(settings.FontSize);
+            settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
             // ShowSeconds - булево значение, не требует валидации
 
             // Позиция окна не валидируется, так как может быть null
@@ -167,6 +175,8 @@ public class WidgetSettings
         
         settings.FontSize = ValidateFontSize(settings.FontSize);
         
+        settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
+        
         // Убеждаемся, что хотя бы одно окно видимо
         if (!settings.ShowDigitalClock && !settings.ShowAnalogClock)
         {
@@ -205,5 +215,21 @@ public class WidgetSettings
             return Constants.TextSettings.DEFAULT_FONT_SIZE;
         }
         return Math.Round(value / Constants.TextSettings.FONT_SIZE_STEP) * Constants.TextSettings.FONT_SIZE_STEP;
+    }
+
+    /// <summary>
+    /// Проверяет и корректирует значение размера окна аналоговых часов.
+    /// </summary>
+    /// <param name="value">Проверяемое значение.</param>
+    /// <returns>Скорректированное значение размера окна.</returns>
+    private static double ValidateAnalogClockSize(double value)
+    {
+        if (value < Constants.WindowSettings.MIN_ANALOG_CLOCK_SIZE || 
+            value > Constants.WindowSettings.MAX_ANALOG_CLOCK_SIZE)
+        {
+            return Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
+        }
+        return Math.Round(value / Constants.WindowSettings.ANALOG_CLOCK_SIZE_STEP) * 
+               Constants.WindowSettings.ANALOG_CLOCK_SIZE_STEP;
     }
 } 

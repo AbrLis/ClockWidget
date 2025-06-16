@@ -30,6 +30,28 @@
                 </StackPanel>
             </GroupBox>
 
+            <!-- Размер окна аналоговых часов -->
+            <GroupBox Header="Размер аналоговых часов" Margin="0,0,0,10">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Размер окна:" 
+                              Margin="0,0,0,5"/>
+                    
+                    <Slider x:Name="AnalogClockSizeSlider"
+                            Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
+                            Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
+                            Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
+                            IsSnapToTickEnabled="True"
+                            IsMoveToPointEnabled="True"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
+                    
+                    <TextBlock x:Name="AnalogClockSizeValueText" 
+                              Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
+                              HorizontalAlignment="Center" 
+                              Margin="0,0,0,5"/>
+                </StackPanel>
+            </GroupBox>
+
             <!-- Прозрачность фона -->
             <TextBlock Text="Видимость фона:" 
                        Margin="0,0,0,5"/>

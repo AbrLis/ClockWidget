@@ -28,6 +28,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     private bool _showSeconds;
     private bool _showDigitalClock = true;
     private bool _showAnalogClock = true;
+    private double _analogClockSize;
     private AnalogClockWindow? _analogClockWindow;
     private const double ANIMATION_STEP = 0.05; // Шаг анимации
     private const int ANIMATION_INTERVAL = 16; // Интервал анимации (приблизительно 60 FPS)
@@ -211,6 +212,39 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     }
 
     /// <summary>
+    /// Получает или устанавливает размер окна аналоговых часов.
+    /// </summary>
+    public double AnalogClockSize
+    {
+        get => _analogClockSize;
+        set
+        {
+            if (Math.Abs(_analogClockSize - value) > 0.001)
+            {
+                try
+                {
+                    _logger.LogInformation("Updating analog clock size: {Value}", value);
+                    _analogClockSize = value;
+                    OnPropertyChanged();
+
+                    // Сохраняем настройки
+                    _settingsService.UpdateSettings(s => s.AnalogClockSize = value);
+                    
+                    // Обновляем размер окна аналоговых часов
+                    UpdateAnalogClockSize();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating analog clock size");
+                    // Восстанавливаем предыдущее значение
+                    _analogClockSize = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="MainWindowViewModel"/>.
     /// Загружает сохраненные настройки и запускает сервис обновления времени.
     /// </summary>
@@ -233,10 +267,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
             _textOpacity = settings.TextOpacity;
             _fontSize = settings.FontSize;
             _showSeconds = settings.ShowSeconds;
-            
-            // Устанавливаем значения видимости окон
             _showDigitalClock = settings.ShowDigitalClock;
             _showAnalogClock = settings.ShowAnalogClock;
+            _analogClockSize = settings.AnalogClockSize;
             
             // Запускаем сервис обновления времени и подписываемся на события
             _timeService.TimeUpdated += OnTimeUpdated;
@@ -381,6 +414,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
                     var (left, top) = GetAnalogClockPosition();
                     _analogClockWindow.Left = left;
                     _analogClockWindow.Top = top;
+                    _analogClockWindow.Width = _analogClockSize;
+                    _analogClockWindow.Height = _analogClockSize;
                     _analogClockWindow.Show();
                 }
                 else if (!_analogClockWindow.IsVisible)
@@ -407,5 +442,14 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel
     private (double Left, double Top) GetAnalogClockPosition()
     {
         return WindowPositionHelper.GetWindowPosition(_settingsService, true);
+    }
+
+    private void UpdateAnalogClockSize()
+    {
+        if (_analogClockWindow != null)
+        {
+            _analogClockWindow.Width = _analogClockSize;
+            _analogClockWindow.Height = _analogClockSize;
+        }
     }
 } 

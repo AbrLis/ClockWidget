@@ -13,7 +13,6 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         ShowActivated="True"
@@ -28,91 +27,93 @@
                 Opacity="{Binding BackgroundOpacity}"/>
         
         <!-- Контейнер для часов -->
-        <Canvas x:Name="ClockCanvas" 
-                Width="250" 
-                Height="250"
-                Margin="25">
-            
-            <!-- Циферблат -->
-            <Ellipse Width="250" 
-                     Height="250" 
-                     Stroke="White" 
-                     StrokeThickness="2"
-                     Opacity="{Binding TextOpacity}"/>
-            
-            <!-- Центральная точка -->
-            <Ellipse Canvas.Left="122" 
-                     Canvas.Top="122" 
-                     Width="6" 
-                     Height="6" 
-                     Fill="White"
-                     Opacity="{Binding TextOpacity}"/>
-            
-            <!-- Цифры на циферблате -->
-            <TextBlock Canvas.Left="115" 
-                       Canvas.Top="10" 
-                       Text="12" 
-                       Foreground="White" 
-                       FontSize="20"
-                       Opacity="{Binding TextOpacity}"/>
-            <TextBlock Canvas.Left="220" 
-                       Canvas.Top="115" 
-                       Text="3" 
-                       Foreground="White" 
-                       FontSize="20"
-                       Opacity="{Binding TextOpacity}"/>
-            <TextBlock Canvas.Left="115" 
-                       Canvas.Top="220" 
-                       Text="6" 
-                       Foreground="White" 
-                       FontSize="20"
-                       Opacity="{Binding TextOpacity}"/>
-            <TextBlock Canvas.Left="10" 
-                       Canvas.Top="115" 
-                       Text="9" 
-                       Foreground="White" 
-                       FontSize="20"
-                       Opacity="{Binding TextOpacity}"/>
-            
-            <!-- Стрелки часов -->
-            <!-- Часовая стрелка -->
-            <Path x:Name="HourHand" 
-                  Stroke="White" 
-                  StrokeThickness="4" 
-                  StrokeStartLineCap="Round" 
-                  StrokeEndLineCap="Round"
-                  Opacity="{Binding TextOpacity}"
-                  RenderTransform="{Binding HourHandTransform}">
-                <Path.Data>
-                    <LineGeometry StartPoint="125,125" EndPoint="125,75"/>
-                </Path.Data>
-            </Path>
-            
-            <!-- Минутная стрелка -->
-            <Path x:Name="MinuteHand" 
-                  Stroke="White" 
-                  StrokeThickness="3" 
-                  StrokeStartLineCap="Round" 
-                  StrokeEndLineCap="Round"
-                  Opacity="{Binding TextOpacity}"
-                  RenderTransform="{Binding MinuteHandTransform}">
-                <Path.Data>
-                    <LineGeometry StartPoint="125,125" EndPoint="125,60"/>
-                </Path.Data>
-            </Path>
-            
-            <!-- Секундная стрелка -->
-            <Path x:Name="SecondHand" 
-                  Stroke="Red" 
-                  StrokeThickness="1" 
-                  StrokeStartLineCap="Round" 
-                  StrokeEndLineCap="Round"
-                  Opacity="{Binding TextOpacity}"
-                  RenderTransform="{Binding SecondHandTransform}">
-                <Path.Data>
-                    <LineGeometry StartPoint="125,125" EndPoint="125,50"/>
-                </Path.Data>
-            </Path>
-        </Canvas>
+        <Viewbox Stretch="Uniform">
+            <Canvas x:Name="ClockCanvas" 
+                    Width="250" 
+                    Height="250"
+                    Margin="25">
+                
+                <!-- Циферблат -->
+                <Ellipse Width="250" 
+                         Height="250" 
+                         Stroke="White" 
+                         StrokeThickness="2"
+                         Opacity="{Binding TextOpacity}"/>
+                
+                <!-- Центральная точка -->
+                <Ellipse Canvas.Left="122" 
+                         Canvas.Top="122" 
+                         Width="6" 
+                         Height="6" 
+                         Fill="White"
+                         Opacity="{Binding TextOpacity}"/>
+                
+                <!-- Цифры на циферблате -->
+                <TextBlock Canvas.Left="115" 
+                           Canvas.Top="10" 
+                           Text="12" 
+                           Foreground="White" 
+                           FontSize="20"
+                           Opacity="{Binding TextOpacity}"/>
+                <TextBlock Canvas.Left="220" 
+                           Canvas.Top="115" 
+                           Text="3" 
+                           Foreground="White" 
+                           FontSize="20"
+                           Opacity="{Binding TextOpacity}"/>
+                <TextBlock Canvas.Left="115" 
+                           Canvas.Top="220" 
+                           Text="6" 
+                           Foreground="White" 
+                           FontSize="20"
+                           Opacity="{Binding TextOpacity}"/>
+                <TextBlock Canvas.Left="10" 
+                           Canvas.Top="115" 
+                           Text="9" 
+                           Foreground="White" 
+                           FontSize="20"
+                           Opacity="{Binding TextOpacity}"/>
+                
+                <!-- Стрелки часов -->
+                <!-- Часовая стрелка -->
+                <Path x:Name="HourHand" 
+                      Stroke="White" 
+                      StrokeThickness="4" 
+                      StrokeStartLineCap="Round" 
+                      StrokeEndLineCap="Round"
+                      Opacity="{Binding TextOpacity}"
+                      RenderTransform="{Binding HourHandTransform}">
+                    <Path.Data>
+                        <LineGeometry StartPoint="125,125" EndPoint="125,75"/>
+                    </Path.Data>
+                </Path>
+                
+                <!-- Минутная стрелка -->
+                <Path x:Name="MinuteHand" 
+                      Stroke="White" 
+                      StrokeThickness="3" 
+                      StrokeStartLineCap="Round" 
+                      StrokeEndLineCap="Round"
+                      Opacity="{Binding TextOpacity}"
+                      RenderTransform="{Binding MinuteHandTransform}">
+                    <Path.Data>
+                        <LineGeometry StartPoint="125,125" EndPoint="125,60"/>
+                    </Path.Data>
+                </Path>
+                
+                <!-- Секундная стрелка -->
+                <Path x:Name="SecondHand" 
+                      Stroke="Red" 
+                      StrokeThickness="2" 
+                      StrokeStartLineCap="Round" 
+                      StrokeEndLineCap="Round"
+                      Opacity="{Binding TextOpacity}"
+                      RenderTransform="{Binding SecondHandTransform}">
+                    <Path.Data>
+                        <LineGeometry StartPoint="125,125" EndPoint="125,50"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </Viewbox>
     </Grid>
 </Window> 
