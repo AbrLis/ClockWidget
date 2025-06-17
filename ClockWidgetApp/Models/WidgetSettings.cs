@@ -95,67 +95,6 @@ public class WidgetSettings
         // Значения по умолчанию уже установлены через инициализаторы свойств
     }
 
-    public static WidgetSettings Load()
-    {
-        try
-        {
-            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.FileSettings.SETTINGS_FILENAME);
-            
-            if (!File.Exists(settingsPath))
-            {
-                return new WidgetSettings();
-            }
-
-            string jsonString = File.ReadAllText(settingsPath);
-            var settings = JsonSerializer.Deserialize<WidgetSettings>(jsonString);
-
-            // Проверяем корректность загруженных значений
-            if (settings == null)
-            {
-                return new WidgetSettings();
-            }
-
-            // Валидация значений
-            settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity, 
-                Constants.WindowSettings.MIN_WINDOW_OPACITY, 
-                Constants.WindowSettings.MAX_WINDOW_OPACITY, 
-                Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
-            
-            settings.TextOpacity = ValidateOpacity(settings.TextOpacity, 
-                Constants.TextSettings.MIN_TEXT_OPACITY, 
-                Constants.TextSettings.MAX_TEXT_OPACITY, 
-                Constants.TextSettings.DEFAULT_TEXT_OPACITY);
-            
-            settings.FontSize = ValidateFontSize(settings.FontSize);
-            settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
-            // ShowSeconds - булево значение, не требует валидации
-
-            // Позиция окна не валидируется, так как может быть null
-
-            return settings;
-        }
-        catch (Exception)
-        {
-            // В случае любой ошибки возвращаем настройки по умолчанию
-            return new WidgetSettings();
-        }
-    }
-
-    public void Save()
-    {
-        try
-        {
-            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.FileSettings.SETTINGS_FILENAME);
-            string jsonString = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(settingsPath, jsonString);
-        }
-        catch (Exception)
-        {
-            // В случае ошибки сохранения просто игнорируем её
-            // можно добавить логирование
-        }
-    }
-
     /// <summary>
     /// Проверяет и корректирует значения настроек.
     /// </summary>

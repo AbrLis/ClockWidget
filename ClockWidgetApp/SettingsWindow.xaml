@@ -21,8 +21,8 @@
             <!-- Общие настройки -->
             <GroupBox Header="Общие настройки" Margin="0,0,0,10">
                 <StackPanel Margin="5">
-                    <!-- Прозрачность фона -->
-                    <TextBlock Text="Прозрачность фона:" 
+                    <!-- Видимость фона -->
+                    <TextBlock Text="Видимость фона:" 
                               Margin="0,0,0,5"/>
                     
                     <Slider x:Name="BackgroundOpacitySlider"
@@ -39,8 +39,8 @@
                               HorizontalAlignment="Center" 
                               Margin="0,0,0,10"/>
 
-                    <!-- Прозрачность текста -->
-                    <TextBlock Text="Прозрачность текста:" 
+                    <!-- Видимость текста -->
+                    <TextBlock Text="Видимость текста:" 
                               Margin="0,0,0,5"/>
                     
                     <Slider x:Name="TextOpacitySlider"
