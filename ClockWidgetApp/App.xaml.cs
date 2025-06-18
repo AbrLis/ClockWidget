@@ -16,7 +16,7 @@ public partial class App : Application
     private static SettingsService? _settingsService;
     private static MainWindowViewModel? _mainViewModel;
     private MainWindow? _mainWindow;
-    private readonly ILogger<App> _logger = LoggingService.CreateLogger<App>();
+    private ILogger<App>? _logger;
 
     /// <summary>
     /// Получает сервис настроек приложения.
@@ -45,11 +45,11 @@ public partial class App : Application
         // Глобальный обработчик необработанных исключений
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
-            _logger.LogError(args.ExceptionObject as Exception, "Unhandled exception (AppDomain)");
+            _logger?.LogError(args.ExceptionObject as Exception, "Unhandled exception (AppDomain)");
         };
         DispatcherUnhandledException += (sender, args) =>
         {
-            _logger.LogError(args.Exception, "Unhandled exception (Dispatcher)");
+            _logger?.LogError(args.Exception, "Unhandled exception (Dispatcher)");
             args.Handled = true;
         };
     }
@@ -58,15 +58,15 @@ public partial class App : Application
     {
         try
         {
-            _logger.LogInformation("Starting application");
+            _logger?.LogInformation("Starting application");
             
             // Инициализируем сервисы
             SettingsService = new SettingsService();
-            _logger.LogInformation("Services initialized");
+            _logger?.LogInformation("Services initialized");
             
             // Загружаем настройки
             var settings = SettingsService.CurrentSettings;
-            _logger.LogInformation("Settings loaded: {Settings}", 
+            _logger?.LogInformation("Settings loaded: {Settings}", 
                 System.Text.Json.JsonSerializer.Serialize(settings));
 
             // Создаем и показываем основное окно
@@ -77,16 +77,16 @@ public partial class App : Application
             // Явно показываем и активируем окно
             _mainWindow.Show();
             _mainWindow.Activate();
-            _logger.LogInformation("Main window created, shown and activated");
+            _logger?.LogInformation("Main window created, shown and activated");
 
             // Устанавливаем режим завершения приложения
             ShutdownMode = ShutdownMode.OnLastWindowClose;
             
-            _logger.LogInformation("Application started successfully");
+            _logger?.LogInformation("Application started successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during application startup");
+            _logger?.LogError(ex, "Error during application startup");
             throw;
         }
     }
@@ -95,13 +95,13 @@ public partial class App : Application
     {
         try
         {
-            _logger.LogInformation("Application shutting down");
+            _logger?.LogInformation("Application shutting down");
             base.OnExit(e);
-            _logger.LogInformation("Application shutdown completed");
+            _logger?.LogInformation("Application shutdown completed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during application shutdown");
+            _logger?.LogError(ex, "Error during application shutdown");
             throw;
         }
     }

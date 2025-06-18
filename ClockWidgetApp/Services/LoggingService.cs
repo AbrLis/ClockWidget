@@ -16,30 +16,11 @@ public static class LoggingService
     private static bool _isInitialized;
 
     /// <summary>
-    /// Преобразует строковый уровень логирования в LogEventLevel.
-    /// </summary>
-    private static LogEventLevel ParseLogLevel(string? level)
-    {
-        if (string.IsNullOrEmpty(level)) return LogEventLevel.Debug;
-
-        return level.ToUpperInvariant() switch
-        {
-            "TRACE" => LogEventLevel.Verbose,
-            "DEBUG" => LogEventLevel.Debug,
-            "INFO" => LogEventLevel.Information,
-            "WARN" => LogEventLevel.Warning,
-            "ERROR" => LogEventLevel.Error,
-            "FATAL" => LogEventLevel.Fatal,
-            _ => LogEventLevel.Debug
-        };
-    }
-
-    /// <summary>
     /// Преобразует строку с уровнями логирования в массив LogEventLevel.
     /// </summary>
     private static LogEventLevel[] ParseLogLevels(string? levels)
     {
-        if (string.IsNullOrEmpty(levels)) return new[] { LogEventLevel.Debug };
+        if (string.IsNullOrEmpty(levels)) return Array.Empty<LogEventLevel>();
 
         return levels.Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(level => level.Trim().ToUpperInvariant())
@@ -61,61 +42,59 @@ public static class LoggingService
     /// Инициализирует сервис логирования.
     /// </summary>
     /// <param name="logToFile">Флаг, указывающий, нужно ли записывать логи в файл.</param>
-    public static void Initialize(bool logToFile = false)
+    public static void Initialize(bool logToFile = true)
     {
         if (_isInitialized) return;
 
-        // Проверяем переменные окружения
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        var consoleLogLevel = Environment.GetEnvironmentVariable("CONSOLE_LOG_LEVEL");
+        // Проверяем переменную окружения для уровней логирования в файл
         var fileLogLevels = Environment.GetEnvironmentVariable("FILE_LOG_LEVELS");
         
-        // Определяем уровни логирования
-        var consoleMinimumLevel = ParseLogLevel(consoleLogLevel);
+        // По умолчанию для файла используем WARN, ERROR, FATAL если не указано иное
         var fileLevels = ParseLogLevels(fileLogLevels);
-
-        // Если не указаны уровни для файла, используем уровень консоли
         if (fileLevels.Length == 0)
         {
-            fileLevels = new[] { consoleMinimumLevel };
-        }
-
-        // Если переменные окружения установлены, используем их значения для logToFile
-        if (!string.IsNullOrEmpty(environment))
-        {
-            logToFile = environment.Equals("Development", StringComparison.OrdinalIgnoreCase);
+            fileLevels = new[] { LogEventLevel.Warning, LogEventLevel.Error, LogEventLevel.Fatal };
         }
 
         var loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Is(consoleMinimumLevel)
-            .WriteTo.Console(
-                restrictedToMinimumLevel: consoleMinimumLevel,
-                outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}");
+            .MinimumLevel.Is(LogEventLevel.Verbose); // Минимальный уровень для всех логов
 
         if (logToFile)
         {
-            var logPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "ClockWidget",
-                "logs",
-                "clock-widget-.log");
-
-            // Создаем директорию для логов, если она не существует
-            var logDir = Path.GetDirectoryName(logPath);
-            if (!string.IsNullOrEmpty(logDir) && !Directory.Exists(logDir))
+            try
             {
-                Directory.CreateDirectory(logDir);
+                var logPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "ClockWidget",
+                    "logs",
+                    "clock-widget-.log");
+
+                // Создаем директорию для логов, если она не существует
+                var logDir = Path.GetDirectoryName(logPath);
+                if (!string.IsNullOrEmpty(logDir))
+                {
+                    if (!Directory.Exists(logDir))
+                    {
+                        Directory.CreateDirectory(logDir);
+                    }
+                }
+
+                // Добавляем фильтр для каждого уровня логирования
+                foreach (var level in fileLevels)
+                {
+                    loggerConfiguration.WriteTo.Logger(lc => lc
+                        .Filter.ByIncludingOnly(e => e.Level == level)
+                        .WriteTo.File(
+                            logPath,
+                            rollingInterval: RollingInterval.Day,
+                            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}"));
+                }
             }
-
-            // Добавляем фильтр для каждого уровня логирования
-            foreach (var level in fileLevels)
+            catch (Exception ex)
             {
-                loggerConfiguration.WriteTo.Logger(lc => lc
-                    .Filter.ByIncludingOnly(e => e.Level == level)
-                    .WriteTo.File(
-                        logPath,
-                        rollingInterval: RollingInterval.Day,
-                        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}"));
+                // Если не удалось настроить логирование в файл, выводим ошибку в консоль
+                Console.WriteLine($"[ERROR] Failed to setup file logging: {ex.Message}");
+                Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
             }
         }
 

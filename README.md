@@ -92,73 +92,27 @@ ClockWidgetApp/              # Корневая директория
 Здесь сохраняются:
 - Файл настроек приложения (`settings.json`)
 
-### Логирование и отладка
-Приложение поддерживает гибкую настройку логирования через переменные окружения. Для запуска в режиме отладки используйте скрипт `run-debug.ps1`:
+## Логирование
+
+Приложение использует Serilog для логирования. Логи записываются в файл `logs/clock-widget.log`.
+
+### Настройка уровня логирования
+
+Уровень логирования можно настроить через переменную окружения `FILE_LOG_LEVELS`:
 
 ```powershell
-.\run-debug.ps1
+# Включить отладочные сообщения
+$env:FILE_LOG_LEVELS="DEBUG"
+.\ClockWidgetApp.exe
+
+# Или только ошибки
+$env:FILE_LOG_LEVELS="ERROR"
+.\ClockWidgetApp.exe
 ```
 
-#### Переменные окружения для логирования
-1. `ASPNETCORE_ENVIRONMENT` - определяет, будет ли включено логирование в файл
-   - `Development` - логирование в файл включено
-   - любое другое значение - логирование в файл отключено
+Доступные уровни: `VERBOSE`, `DEBUG`, `INFORMATION`, `WARNING`, `ERROR`, `FATAL`
 
-2. `CONSOLE_LOG_LEVEL` - уровень логирования для консоли
-   Доступные уровни (от самого подробного к самому критичному):
-   - `TRACE` (или `VERBOSE`)
-   - `DEBUG`
-   - `INFO`
-   - `WARN`
-   - `ERROR`
-   - `FATAL`
-
-3. `FILE_LOG_LEVELS` - уровни логирования для файла (можно указать несколько через запятую)
-   Примеры:
-   ```powershell
-   # Только предупреждения и ошибки
-   $env:FILE_LOG_LEVELS = "WARN,ERROR"
-   
-   # Отладочные сообщения, предупреждения и ошибки
-   $env:FILE_LOG_LEVELS = "DEBUG,WARN,ERROR"
-   
-   # Все уровни логирования
-   $env:FILE_LOG_LEVELS = "TRACE,DEBUG,INFO,WARN,ERROR,FATAL"
-   ```
-
-#### Расположение логов
-Файлы логов сохраняются в директории:
-```
-%APPDATA%\Roaming\ClockWidget\logs\
-```
-
-Имя файла лога: `clock-widget-YYYYMMDD.log`
-- Файлы создаются ежедневно
-- Старые файлы сохраняются автоматически
-- Максимальный размер файла: 10 МБ
-- Максимальное количество файлов: 31 (примерно месяц)
-
-#### Примеры конфигурации
-1. Только ошибки в консоль, все сообщения в файл:
-   ```powershell
-   $env:ASPNETCORE_ENVIRONMENT = "Development"
-   $env:CONSOLE_LOG_LEVEL = "ERROR"
-   $env:FILE_LOG_LEVELS = "DEBUG,INFO,WARN,ERROR,FATAL"
-   ```
-
-2. Предупреждения и ошибки везде:
-   ```powershell
-   $env:ASPNETCORE_ENVIRONMENT = "Development"
-   $env:CONSOLE_LOG_LEVEL = "WARN"
-   $env:FILE_LOG_LEVELS = "WARN,ERROR"
-   ```
-
-3. Только отладочные сообщения:
-   ```powershell
-   $env:ASPNETCORE_ENVIRONMENT = "Development"
-   $env:CONSOLE_LOG_LEVEL = "DEBUG"
-   $env:FILE_LOG_LEVELS = "DEBUG"
-   ```
+По умолчанию логируются сообщения уровня WARNING и выше.
 
 ## Лицензия
 MIT License
