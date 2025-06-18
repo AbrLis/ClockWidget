@@ -1,9 +1,4 @@
 using ClockWidgetApp.Helpers;
-using ClockWidgetApp.Services;
-using System;
-using System.Windows;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.ViewModels;
@@ -19,8 +14,6 @@ public partial class MainWindowViewModel
     private bool _showAnalogClock = true;
     private double _analogClockSize;
     private AnalogClockWindow? _analogClockWindow;
-    private const double ANIMATION_STEP = 0.05;
-    private const int ANIMATION_INTERVAL = 16;
 
     public string TimeText
     {
@@ -91,18 +84,18 @@ public partial class MainWindowViewModel
                 {
                     if (!value && !_showAnalogClock)
                     {
-                        _logger.Log<string>(Microsoft.Extensions.Logging.LogLevel.Warning, new EventId(), string.Empty, null, (s, e) => "Cannot hide both windows, keeping digital clock visible");
+                        _logger.LogWarning("Cannot hide both windows, keeping digital clock visible");
                         return;
                     }
-                    _logger.Log<bool>(Microsoft.Extensions.Logging.LogLevel.Information, new EventId(), value, null, (v, e) => $"Updating show digital clock: {v}");
+                    _logger.LogInformation($"Updating show digital clock: {value}");
                     _showDigitalClock = value;
                     OnPropertyChanged();
                     _settingsService.UpdateSettings(s => s.ShowDigitalClock = value);
                     UpdateWindowsVisibility();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    _logger.Log<string>(Microsoft.Extensions.Logging.LogLevel.Error, new EventId(), string.Empty, ex, (s, e) => "Error updating show digital clock setting");
+                    _logger.LogError("Error updating show digital clock setting");
                     _showDigitalClock = !value;
                     OnPropertyChanged();
                 }
@@ -120,18 +113,18 @@ public partial class MainWindowViewModel
                 {
                     if (!value && !_showDigitalClock)
                     {
-                        _logger.Log<string>(Microsoft.Extensions.Logging.LogLevel.Warning, new EventId(), string.Empty, null, (s, e) => "Cannot hide both windows, keeping analog clock visible");
+                        _logger.LogWarning("Cannot hide both windows, keeping analog clock visible");
                         return;
                     }
-                    _logger.Log<bool>(Microsoft.Extensions.Logging.LogLevel.Information, new EventId(), value, null, (v, e) => $"Updating show analog clock: {v}");
+                    _logger.LogInformation($"Updating show analog clock: {value}");
                     _showAnalogClock = value;
                     OnPropertyChanged();
                     _settingsService.UpdateSettings(s => s.ShowAnalogClock = value);
                     UpdateWindowsVisibility();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    _logger.Log<string>(Microsoft.Extensions.Logging.LogLevel.Error, new EventId(), string.Empty, ex, (s, e) => "Error updating show analog clock setting");
+                    _logger.LogError("Error updating show analog clock setting");
                     _showAnalogClock = !value;
                     OnPropertyChanged();
                 }
@@ -147,15 +140,15 @@ public partial class MainWindowViewModel
             {
                 try
                 {
-                    _logger.Log<double>(Microsoft.Extensions.Logging.LogLevel.Information, new EventId(), value, null, (v, e) => $"Updating analog clock size: {v}");
+                    _logger.LogInformation($"Updating analog clock size: {value}");
                     _analogClockSize = value;
                     OnPropertyChanged();
                     _settingsService.UpdateSettings(s => s.AnalogClockSize = value);
                     UpdateAnalogClockSize();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    _logger.Log<string>(Microsoft.Extensions.Logging.LogLevel.Error, new EventId(), string.Empty, ex, (s, e) => "Error updating analog clock size");
+                    _logger.LogError("Error updating analog clock size");
                     _analogClockSize = value;
                     OnPropertyChanged();
                 }

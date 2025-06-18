@@ -1,15 +1,9 @@
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
 using System.Windows;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using System.Linq;
-using System.Windows.Media.Animation;
-using System.Windows.Threading;
-using ClockWidgetApp.Models;
 
 namespace ClockWidgetApp.ViewModels;
 

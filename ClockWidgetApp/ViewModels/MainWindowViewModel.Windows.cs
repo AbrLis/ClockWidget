@@ -1,8 +1,7 @@
-using System;
 using System.Windows;
-using Microsoft.Extensions.Logging;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -12,8 +11,7 @@ public partial class MainWindowViewModel
     {
         try
         {
-            _logger.LogInformation("Updating windows visibility: Digital={ShowDigital}, Analog={ShowAnalog}", 
-                _showDigitalClock, _showAnalogClock);
+            _logger.LogInformation("Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
             if (Application.Current.MainWindow is MainWindow mainWindow)
             {
                 var newVisibility = _showDigitalClock ? Visibility.Visible : Visibility.Hidden;
@@ -55,8 +53,7 @@ public partial class MainWindowViewModel
                     _analogClockWindow.Show();
                 }
                 _analogClockWindow.Activate();
-                _logger.LogInformation("Analog clock window shown and activated at position: Left={Left}, Top={Top}", 
-                    _analogClockWindow.Left, _analogClockWindow.Top);
+                _logger.LogInformation("Analog clock window shown and activated at position: Left={0}, Top={1}", _analogClockWindow.Left, _analogClockWindow.Top);
             }
             else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
             {
@@ -114,8 +111,7 @@ public partial class MainWindowViewModel
                 _analogClockWindow.Show();
             }
             _analogClockWindow.Activate();
-            _logger.LogInformation("Analog clock window shown and activated at position: Left={Left}, Top={Top}", 
-                _analogClockWindow.Left, _analogClockWindow.Top);
+            _logger.LogInformation("Analog clock window shown and activated at position: Left={0}, Top={1}", _analogClockWindow.Left, _analogClockWindow.Top);
         }
         else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
         {

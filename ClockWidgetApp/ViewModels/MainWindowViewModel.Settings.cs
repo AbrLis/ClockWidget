@@ -1,5 +1,3 @@
-using System;
-using System.Text.Json;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
 
