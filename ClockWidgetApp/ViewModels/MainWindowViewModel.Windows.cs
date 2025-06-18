@@ -1,0 +1,126 @@
+using System;
+using System.Windows;
+using Microsoft.Extensions.Logging;
+using ClockWidgetApp.Helpers;
+using ClockWidgetApp.Models;
+
+namespace ClockWidgetApp.ViewModels;
+
+public partial class MainWindowViewModel
+{
+    private void UpdateWindowsVisibility()
+    {
+        try
+        {
+            _logger.LogInformation("Updating windows visibility: Digital={ShowDigital}, Analog={ShowAnalog}", 
+                _showDigitalClock, _showAnalogClock);
+            if (Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                var newVisibility = _showDigitalClock ? Visibility.Visible : Visibility.Hidden;
+                if (mainWindow.Visibility != newVisibility)
+                {
+                    mainWindow.Visibility = newVisibility;
+                    if (newVisibility == Visibility.Visible)
+                    {
+                        mainWindow.Show();
+                        mainWindow.Activate();
+                        _logger.LogInformation("Main window shown and activated");
+                    }
+                    else
+                    {
+                        mainWindow.Hide();
+                        _logger.LogInformation("Main window hidden");
+                    }
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Main window is not of type MainWindow");
+            }
+            if (_showAnalogClock)
+            {
+                if (_analogClockWindow == null)
+                {
+                    _logger.LogInformation("Creating analog clock window");
+                    _analogClockWindow = new AnalogClockWindow();
+                    var (left, top) = GetAnalogClockPosition();
+                    _analogClockWindow.Left = left;
+                    _analogClockWindow.Top = top;
+                    _analogClockWindow.Width = _analogClockSize;
+                    _analogClockWindow.Height = _analogClockSize;
+                    _analogClockWindow.Show();
+                }
+                else if (!_analogClockWindow.IsVisible)
+                {
+                    _analogClockWindow.Show();
+                }
+                _analogClockWindow.Activate();
+                _logger.LogInformation("Analog clock window shown and activated at position: Left={Left}, Top={Top}", 
+                    _analogClockWindow.Left, _analogClockWindow.Top);
+            }
+            else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
+            {
+                _logger.LogInformation("Hiding analog clock window");
+                _analogClockWindow.Hide();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating windows visibility");
+        }
+    }
+    public (double Left, double Top) GetWindowPosition()
+    {
+        return WindowPositionHelper.GetWindowPosition(_settingsService, false);
+    }
+    public void SaveWindowPosition(double left, double top)
+    {
+        WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
+    }
+    private (double Left, double Top) GetAnalogClockPosition()
+    {
+        return WindowPositionHelper.GetWindowPosition(_settingsService, true);
+    }
+    private void UpdateAnalogClockSize()
+    {
+        if (_analogClockWindow != null)
+        {
+            _analogClockWindow.Width = _analogClockSize;
+            _analogClockWindow.Height = _analogClockSize;
+        }
+    }
+    private void UpdateAnalogClockSettings(WidgetSettings settings)
+    {
+        if (settings == null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+        settings = WidgetSettings.ValidateSettings(settings);
+        if (settings.ShowAnalogClock)
+        {
+            if (_analogClockWindow == null)
+            {
+                _logger.LogInformation("Creating analog clock window");
+                _analogClockWindow = new AnalogClockWindow();
+                var (left, top) = GetAnalogClockPosition();
+                _analogClockWindow.Left = left;
+                _analogClockWindow.Top = top;
+                _analogClockWindow.Width = settings.AnalogClockSize;
+                _analogClockWindow.Height = settings.AnalogClockSize;
+                _analogClockWindow.Show();
+            }
+            else if (!_analogClockWindow.IsVisible)
+            {
+                _analogClockWindow.Show();
+            }
+            _analogClockWindow.Activate();
+            _logger.LogInformation("Analog clock window shown and activated at position: Left={Left}, Top={Top}", 
+                _analogClockWindow.Left, _analogClockWindow.Top);
+        }
+        else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
+        {
+            _logger.LogInformation("Hiding analog clock window");
+            _analogClockWindow.Hide();
+        }
+    }
+} 
