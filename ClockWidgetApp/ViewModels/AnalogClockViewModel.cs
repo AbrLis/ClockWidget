@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
+using ClockWidgetApp.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.ViewModels;
@@ -20,6 +22,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     private TransformGroup _hourHandTransform;
     private TransformGroup _minuteHandTransform;
     private TransformGroup _secondHandTransform;
+    private List<ClockTick> _clockTicks = new List<ClockTick>();
     private bool _disposed;
 
     /// <summary>
@@ -36,6 +39,19 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// Получает прозрачность текста и стрелок.
     /// </summary>
     public double TextOpacity => App.MainViewModel.TextOpacity;
+
+    /// <summary>
+    /// Получает коллекцию рисок на циферблате.
+    /// </summary>
+    public List<ClockTick> ClockTicks
+    {
+        get => _clockTicks;
+        private set
+        {
+            _clockTicks = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Получает трансформацию для часовой стрелки.
@@ -93,6 +109,9 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             _minuteHandTransform = new TransformGroup();
             _secondHandTransform = new TransformGroup();
             
+            // Генерируем риски на циферблате
+            GenerateClockTicks();
+            
             // Подписываемся на обновление времени
             _timeService.TimeUpdated += OnTimeUpdated;
             _timeService.Start();
@@ -117,6 +136,47 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         {
             _logger.LogError(ex, "Error initializing analog clock view model");
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Генерирует риски на циферблате.
+    /// </summary>
+    private void GenerateClockTicks()
+    {
+        try
+        {
+            _logger.LogInformation("Generating clock ticks");
+            
+            var ticks = new List<ClockTick>();
+            
+            // Генерируем риски для каждой минуты (60 рисок)
+            for (int minute = 0; minute < 60; minute++)
+            {
+                double angleInRadians = (minute * 6 - 90) * Math.PI / 180; // -90 для начала с 12 часов
+                
+                // Определяем длину и толщину риски
+                double tickLength = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HOUR_TICK_LENGTH : AnalogClockConstants.TickSizes.MINUTE_TICK_LENGTH;
+                double tickThickness = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HOUR_TICK_THICKNESS : AnalogClockConstants.TickSizes.MINUTE_TICK_THICKNESS;
+                
+                // Вычисляем координаты начальной и конечной точек риски
+                double startRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS - tickLength;
+                double endRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS;
+                
+                double startX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + startRadius * Math.Cos(angleInRadians);
+                double startY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + startRadius * Math.Sin(angleInRadians);
+                double endX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + endRadius * Math.Cos(angleInRadians);
+                double endY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + endRadius * Math.Sin(angleInRadians);
+                
+                ticks.Add(new ClockTick(startX, startY, endX, endY, tickThickness));
+            }
+            
+            ClockTicks = ticks;
+            _logger.LogInformation("Generated {Count} clock ticks", ticks.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating clock ticks");
         }
     }
 
@@ -178,17 +238,17 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             {
                 HourHandTransform = new System.Windows.Media.TransformGroup
                 {
-                    Children = { new System.Windows.Media.RotateTransform(hourAngle, 125, 125) }
+                    Children = { new System.Windows.Media.RotateTransform(hourAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
                 };
 
                 MinuteHandTransform = new System.Windows.Media.TransformGroup
                 {
-                    Children = { new System.Windows.Media.RotateTransform(minuteAngle, 125, 125) }
+                    Children = { new System.Windows.Media.RotateTransform(minuteAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
                 };
 
                 SecondHandTransform = new System.Windows.Media.TransformGroup
                 {
-                    Children = { new System.Windows.Media.RotateTransform(secondAngle, 125, 125) }
+                    Children = { new System.Windows.Media.RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
                 };
             });
         }

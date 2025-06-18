@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClockWidgetApp"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
+        xmlns:converters="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
         Title="Analog Clock" 
         Height="300" 
@@ -29,46 +30,64 @@
         <!-- Контейнер для часов -->
         <Viewbox Stretch="Uniform">
             <Canvas x:Name="ClockCanvas" 
-                    Width="250" 
-                    Height="250"
-                    Margin="25">
+                    Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                    Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
+                    Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_MARGIN}}">
                 
                 <!-- Циферблат -->
-                <Ellipse Width="250" 
-                         Height="250" 
+                <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                         Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
                          Stroke="White" 
                          StrokeThickness="2"
                          Opacity="{Binding TextOpacity}"/>
                 
+                <!-- Риски на циферблате - генерируются программно -->
+                <ItemsControl ItemsSource="{Binding ClockTicks}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Line X1="{Binding X1}" Y1="{Binding Y1}" 
+                                  X2="{Binding X2}" Y2="{Binding Y2}"
+                                  Stroke="White" 
+                                  StrokeThickness="{Binding Thickness}"
+                                  Opacity="{Binding DataContext.TextOpacity, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                
                 <!-- Центральная точка -->
-                <Ellipse Canvas.Left="122" 
-                         Canvas.Top="122" 
-                         Width="6" 
-                         Height="6" 
+                <Ellipse Canvas.Left="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_X}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
+                         Canvas.Top="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_Y}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
+                         Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
+                         Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
                          Fill="White"
                          Opacity="{Binding TextOpacity}"/>
                 
                 <!-- Цифры на циферблате -->
                 <TextBlock Canvas.Left="115" 
-                           Canvas.Top="10" 
+                           Canvas.Top="20" 
                            Text="12" 
                            Foreground="White" 
                            FontSize="20"
                            Opacity="{Binding TextOpacity}"/>
-                <TextBlock Canvas.Left="220" 
-                           Canvas.Top="115" 
+                <TextBlock Canvas.Left="218" 
+                           Canvas.Top="110" 
                            Text="3" 
                            Foreground="White" 
                            FontSize="20"
                            Opacity="{Binding TextOpacity}"/>
-                <TextBlock Canvas.Left="115" 
-                           Canvas.Top="220" 
+                <TextBlock Canvas.Left="119" 
+                           Canvas.Top="205" 
                            Text="6" 
                            Foreground="White" 
                            FontSize="20"
                            Opacity="{Binding TextOpacity}"/>
-                <TextBlock Canvas.Left="10" 
-                           Canvas.Top="115" 
+                <TextBlock Canvas.Left="22" 
+                           Canvas.Top="110" 
                            Text="9" 
                            Foreground="White" 
                            FontSize="20"
