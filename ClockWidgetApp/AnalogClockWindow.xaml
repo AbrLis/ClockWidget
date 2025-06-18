@@ -21,118 +21,120 @@
         Topmost="True"
         Visibility="Collapsed">
     
-    <Grid>
-        <!-- Фон окна с прозрачностью -->
-        <Border x:Name="BackgroundBorder" 
-                Background="Black" 
-                Opacity="{Binding BackgroundOpacity}"/>
-        
-        <!-- Контейнер для часов -->
+    <Grid x:Name="RootGrid">
         <Viewbox Stretch="Uniform">
-            <Canvas x:Name="ClockCanvas" 
-                    Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+            <Grid>
+                <!-- Круглый фон, совпадающий с циферблатом -->
+                <Ellipse
+                    Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                     Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
-                    Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_MARGIN}}">
-                
-                <!-- Циферблат -->
-                <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
-                         Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
-                         Stroke="White" 
-                         StrokeThickness="2"
-                         Opacity="{Binding TextOpacity}"/>
-                
-                <!-- Риски на циферблате - генерируются программно -->
-                <ItemsControl ItemsSource="{Binding ClockTicks}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Line X1="{Binding X1}" Y1="{Binding Y1}" 
-                                  X2="{Binding X2}" Y2="{Binding Y2}"
-                                  Stroke="White" 
-                                  StrokeThickness="{Binding Thickness}"
-                                  Opacity="{Binding DataContext.TextOpacity, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                
-                <!-- Центральная точка -->
-                <Ellipse Canvas.Left="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_X}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
-                         Canvas.Top="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_Y}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
-                         Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
-                         Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
-                         Fill="White"
-                         Opacity="{Binding TextOpacity}"/>
-                
-                <!-- Цифры на циферблате -->
-                <TextBlock Canvas.Left="115" 
-                           Canvas.Top="20" 
-                           Text="12" 
-                           Foreground="White" 
-                           FontSize="20"
-                           Opacity="{Binding TextOpacity}"/>
-                <TextBlock Canvas.Left="218" 
-                           Canvas.Top="110" 
-                           Text="3" 
-                           Foreground="White" 
-                           FontSize="20"
-                           Opacity="{Binding TextOpacity}"/>
-                <TextBlock Canvas.Left="119" 
-                           Canvas.Top="205" 
-                           Text="6" 
-                           Foreground="White" 
-                           FontSize="20"
-                           Opacity="{Binding TextOpacity}"/>
-                <TextBlock Canvas.Left="22" 
-                           Canvas.Top="110" 
-                           Text="9" 
-                           Foreground="White" 
-                           FontSize="20"
-                           Opacity="{Binding TextOpacity}"/>
-                
-                <!-- Стрелки часов -->
-                <!-- Часовая стрелка -->
-                <Path x:Name="HourHand" 
-                      Stroke="White" 
-                      StrokeThickness="4" 
-                      StrokeStartLineCap="Round" 
-                      StrokeEndLineCap="Round"
-                      Opacity="{Binding TextOpacity}"
-                      RenderTransform="{Binding HourHandTransform}">
-                    <Path.Data>
-                        <LineGeometry StartPoint="125,125" EndPoint="125,75"/>
-                    </Path.Data>
-                </Path>
-                
-                <!-- Минутная стрелка -->
-                <Path x:Name="MinuteHand" 
-                      Stroke="White" 
-                      StrokeThickness="3" 
-                      StrokeStartLineCap="Round" 
-                      StrokeEndLineCap="Round"
-                      Opacity="{Binding TextOpacity}"
-                      RenderTransform="{Binding MinuteHandTransform}">
-                    <Path.Data>
-                        <LineGeometry StartPoint="125,125" EndPoint="125,60"/>
-                    </Path.Data>
-                </Path>
-                
-                <!-- Секундная стрелка -->
-                <Path x:Name="SecondHand" 
-                      Stroke="Red" 
-                      StrokeThickness="2" 
-                      StrokeStartLineCap="Round" 
-                      StrokeEndLineCap="Round"
-                      Opacity="{Binding TextOpacity}"
-                      RenderTransform="{Binding SecondHandTransform}">
-                    <Path.Data>
-                        <LineGeometry StartPoint="125,125" EndPoint="125,50"/>
-                    </Path.Data>
-                </Path>
-            </Canvas>
+                    Fill="Black"
+                    Opacity="{Binding BackgroundOpacity}"/>
+                <Canvas x:Name="ClockCanvas" 
+                        Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                        Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
+                        Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_MARGIN}}">
+                    
+                    <!-- Циферблат -->
+                    <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                             Stroke="White" 
+                             StrokeThickness="2"
+                             Opacity="{Binding TextOpacity}"/>
+                    
+                    <!-- Риски на циферблате - генерируются программно -->
+                    <ItemsControl ItemsSource="{Binding ClockTicks}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Line X1="{Binding X1}" Y1="{Binding Y1}" 
+                                      X2="{Binding X2}" Y2="{Binding Y2}"
+                                      Stroke="White" 
+                                      StrokeThickness="{Binding Thickness}"
+                                      Opacity="{Binding DataContext.TextOpacity, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <!-- Центральная точка -->
+                    <Ellipse Canvas.Left="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_X}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
+                             Canvas.Top="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_Y}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
+                             Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
+                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
+                             Fill="White"
+                             Opacity="{Binding TextOpacity}"/>
+                    
+                    <!-- Цифры на циферблате -->
+                    <TextBlock Canvas.Left="115" 
+                               Canvas.Top="20" 
+                               Text="12" 
+                               Foreground="White" 
+                               FontSize="20"
+                               Opacity="{Binding TextOpacity}"/>
+                    <TextBlock Canvas.Left="218" 
+                               Canvas.Top="110" 
+                               Text="3" 
+                               Foreground="White" 
+                               FontSize="20"
+                               Opacity="{Binding TextOpacity}"/>
+                    <TextBlock Canvas.Left="119" 
+                               Canvas.Top="205" 
+                               Text="6" 
+                               Foreground="White" 
+                               FontSize="20"
+                               Opacity="{Binding TextOpacity}"/>
+                    <TextBlock Canvas.Left="22" 
+                               Canvas.Top="110" 
+                               Text="9" 
+                               Foreground="White" 
+                               FontSize="20"
+                               Opacity="{Binding TextOpacity}"/>
+                    
+                    <!-- Стрелки часов -->
+                    <!-- Часовая стрелка -->
+                    <Path x:Name="HourHand" 
+                          Stroke="White" 
+                          StrokeThickness="4" 
+                          StrokeStartLineCap="Round" 
+                          StrokeEndLineCap="Round"
+                          Opacity="{Binding TextOpacity}"
+                          RenderTransform="{Binding HourHandTransform}">
+                        <Path.Data>
+                            <LineGeometry StartPoint="125,125" EndPoint="125,75"/>
+                        </Path.Data>
+                    </Path>
+                    
+                    <!-- Минутная стрелка -->
+                    <Path x:Name="MinuteHand" 
+                          Stroke="White" 
+                          StrokeThickness="3" 
+                          StrokeStartLineCap="Round" 
+                          StrokeEndLineCap="Round"
+                          Opacity="{Binding TextOpacity}"
+                          RenderTransform="{Binding MinuteHandTransform}">
+                        <Path.Data>
+                            <LineGeometry StartPoint="125,125" EndPoint="125,60"/>
+                        </Path.Data>
+                    </Path>
+                    
+                    <!-- Секундная стрелка -->
+                    <Path x:Name="SecondHand" 
+                          Stroke="Red" 
+                          StrokeThickness="2" 
+                          StrokeStartLineCap="Round" 
+                          StrokeEndLineCap="Round"
+                          Opacity="{Binding TextOpacity}"
+                          RenderTransform="{Binding SecondHandTransform}">
+                        <Path.Data>
+                            <LineGeometry StartPoint="125,125" EndPoint="125,50"/>
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Grid>
         </Viewbox>
     </Grid>
 </Window> 
