@@ -256,7 +256,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel, I
         {
             _logger.LogInformation("Initializing main window view model");
             
-            _timeService = new TimeService();
+            // Используем общий TimeService из App вместо создания нового
+            _timeService = App.TimeService;
             _settingsService = App.SettingsService;
             
             // Загружаем настройки
@@ -273,9 +274,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel, I
             _showAnalogClock = settings.ShowAnalogClock;
             _analogClockSize = settings.AnalogClockSize;
             
-            // Запускаем сервис обновления времени и подписываемся на события
+            // Подписываемся на события обновления времени
             _timeService.TimeUpdated += OnTimeUpdated;
-            _timeService.Start();
             
             // Немедленно обновляем время
             OnTimeUpdated(this, DateTime.Now);

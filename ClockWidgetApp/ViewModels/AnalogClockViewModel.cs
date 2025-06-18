@@ -101,7 +101,8 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         {
             _logger.LogInformation("Initializing analog clock view model");
             
-            _timeService = new TimeService();
+            // Используем общий TimeService из App вместо создания нового
+            _timeService = App.TimeService;
             _settingsService = App.SettingsService;
             
             // Инициализируем трансформации стрелок
@@ -114,7 +115,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             
             // Подписываемся на обновление времени
             _timeService.TimeUpdated += OnTimeUpdated;
-            _timeService.Start();
 
             // Немедленно обновляем стрелки текущим временем
             OnTimeUpdated(this, DateTime.Now);
@@ -236,20 +236,42 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             // Обновляем трансформации через Dispatcher (UI-поток)
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                HourHandTransform = new System.Windows.Media.TransformGroup
+                // Обновляем только углы поворота, не создавая новые объекты
+                if (_hourHandTransform.Children.Count > 0 && _hourHandTransform.Children[0] is System.Windows.Media.RotateTransform hourRotate)
                 {
-                    Children = { new System.Windows.Media.RotateTransform(hourAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
-                };
+                    hourRotate.Angle = hourAngle;
+                }
+                else
+                {
+                    HourHandTransform = new System.Windows.Media.TransformGroup
+                    {
+                        Children = { new System.Windows.Media.RotateTransform(hourAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
+                    };
+                }
 
-                MinuteHandTransform = new System.Windows.Media.TransformGroup
+                if (_minuteHandTransform.Children.Count > 0 && _minuteHandTransform.Children[0] is System.Windows.Media.RotateTransform minuteRotate)
                 {
-                    Children = { new System.Windows.Media.RotateTransform(minuteAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
-                };
+                    minuteRotate.Angle = minuteAngle;
+                }
+                else
+                {
+                    MinuteHandTransform = new System.Windows.Media.TransformGroup
+                    {
+                        Children = { new System.Windows.Media.RotateTransform(minuteAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
+                    };
+                }
 
-                SecondHandTransform = new System.Windows.Media.TransformGroup
+                if (_secondHandTransform.Children.Count > 0 && _secondHandTransform.Children[0] is System.Windows.Media.RotateTransform secondRotate)
                 {
-                    Children = { new System.Windows.Media.RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
-                };
+                    secondRotate.Angle = secondAngle;
+                }
+                else
+                {
+                    SecondHandTransform = new System.Windows.Media.TransformGroup
+                    {
+                        Children = { new System.Windows.Media.RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) }
+                    };
+                }
             });
         }
         catch (Exception ex)

@@ -15,6 +15,7 @@ public partial class App : Application
 {
     private static SettingsService? _settingsService;
     private static MainWindowViewModel? _mainViewModel;
+    private static TimeService? _timeService;
     private MainWindow? _mainWindow;
     private ILogger<App>? _logger;
 
@@ -34,6 +35,15 @@ public partial class App : Application
     {
         get => _mainViewModel ?? throw new InvalidOperationException("MainViewModel is not initialized");
         private set => _mainViewModel = value;
+    }
+
+    /// <summary>
+    /// Получает общий сервис времени приложения.
+    /// </summary>
+    public static TimeService TimeService
+    {
+        get => _timeService ?? throw new InvalidOperationException("TimeService is not initialized");
+        private set => _timeService = value;
     }
 
     public App()
@@ -62,6 +72,7 @@ public partial class App : Application
             
             // Инициализируем сервисы
             SettingsService = new SettingsService();
+            TimeService = new TimeService();
             _logger?.LogInformation("Services initialized");
             
             // Загружаем настройки
@@ -73,6 +84,10 @@ public partial class App : Application
             _mainWindow = new MainWindow();
             Application.Current.MainWindow = _mainWindow;
             MainViewModel = _mainWindow.ViewModel;
+            
+            // Запускаем общий сервис времени
+            TimeService.Start();
+            _logger?.LogInformation("Time service started");
             
             // Явно показываем и активируем окно
             _mainWindow.Show();
@@ -96,6 +111,15 @@ public partial class App : Application
         try
         {
             _logger?.LogInformation("Application shutting down");
+            
+            // Останавливаем и освобождаем TimeService
+            if (_timeService != null)
+            {
+                _timeService.Stop();
+                _timeService.Dispose();
+                _logger?.LogInformation("Time service disposed");
+            }
+            
             base.OnExit(e);
             _logger?.LogInformation("Application shutdown completed");
             

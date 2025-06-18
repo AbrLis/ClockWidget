@@ -14,6 +14,7 @@ public class TimeService : IDisposable
     private readonly ILogger<TimeService> _logger = LoggingService.CreateLogger<TimeService>();
     private DateTime _currentTime;
     private bool _isDisposed;
+    private DateTime _lastSecondUpdate;
 
     /// <summary>
     /// Событие, возникающее при обновлении времени.
@@ -22,16 +23,17 @@ public class TimeService : IDisposable
 
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="TimeService"/>.
-    /// Создает таймер с интервалом в 1 секунду.
+    /// Создает таймер с интервалом в 100мс для более точного обновления.
     /// </summary>
     public TimeService()
     {
         try
         {
             _logger.LogDebug("TimeService: Constructor started");
-            _timer = new System.Timers.Timer(1000); // Обновление каждую секунду
+            _timer = new System.Timers.Timer(100); // Обновление каждые 100мс для точности
             _timer.Elapsed += OnTimerElapsed;
             _currentTime = DateTime.Now;
+            _lastSecondUpdate = _currentTime;
             _logger.LogDebug("TimeService: Constructor completed");
         }
         catch (Exception ex)
@@ -92,7 +94,7 @@ public class TimeService : IDisposable
 
     /// <summary>
     /// Обработчик события таймера.
-    /// Обновляет текущее время и вызывает событие <see cref="TimeUpdated"/>.
+    /// Обновляет текущее время и вызывает событие <see cref="TimeUpdated"/> только при изменении секунды.
     /// </summary>
     /// <param name="sender">Источник события.</param>
     /// <param name="e">Данные события.</param>
@@ -107,12 +109,18 @@ public class TimeService : IDisposable
             }
 
             _currentTime = DateTime.Now;
-            _logger.LogTrace("TimeService: Timer elapsed - {Time}", _currentTime);
             
-            var handler = TimeUpdated;
-            if (handler != null)
+            // Проверяем, изменилась ли секунда с последнего обновления
+            if (_currentTime.Second != _lastSecondUpdate.Second)
             {
-                handler(this, _currentTime);
+                _lastSecondUpdate = _currentTime;
+                _logger.LogTrace("TimeService: Second changed - {Time}", _currentTime);
+                
+                var handler = TimeUpdated;
+                if (handler != null)
+                {
+                    handler(this, _currentTime);
+                }
             }
         }
         catch (Exception ex)
