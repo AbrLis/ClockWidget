@@ -1,5 +1,5 @@
 # Устанавливаем переменные окружения для логирования
-$env:FILE_LOG_LEVELS = "DEBUG,INFO,WARN,ERROR"  # В файл записываем все уровни для отладки
+$env:FILE_LOG_LEVELS = "DEBUG,WARN,ERROR"  # Необходимые флаги логирования через запятую.
 
 # Запускаем приложение
 dotnet run --project ClockWidgetApp 

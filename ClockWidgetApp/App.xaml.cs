@@ -98,6 +98,9 @@ public partial class App : Application
             _logger?.LogInformation("Application shutting down");
             base.OnExit(e);
             _logger?.LogInformation("Application shutdown completed");
+            
+            // Освобождаем ресурсы логгера
+            LoggingService.Dispose();
         }
         catch (Exception ex)
         {

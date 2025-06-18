@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
 using Serilog;
 using Serilog.Events;
 
@@ -14,6 +16,8 @@ public static class LoggingService
 {
     private static ILoggerFactory? _loggerFactory;
     private static bool _isInitialized;
+    private static readonly object _lock = new object();
+    private static Serilog.ILogger? _serilogLogger;
 
     /// <summary>
     /// Преобразует строку с уровнями логирования в массив LogEventLevel.
@@ -44,68 +48,88 @@ public static class LoggingService
     /// <param name="logToFile">Флаг, указывающий, нужно ли записывать логи в файл.</param>
     public static void Initialize(bool logToFile = true)
     {
-        if (_isInitialized) return;
-
-        // Проверяем переменную окружения для уровней логирования в файл
-        var fileLogLevels = Environment.GetEnvironmentVariable("FILE_LOG_LEVELS");
-        
-        // По умолчанию для файла используем WARN, ERROR, FATAL если не указано иное
-        var fileLevels = ParseLogLevels(fileLogLevels);
-        if (fileLevels.Length == 0)
+        lock (_lock)
         {
-            fileLevels = new[] { LogEventLevel.Warning, LogEventLevel.Error, LogEventLevel.Fatal };
-        }
+            if (_isInitialized) return;
 
-        var loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Is(LogEventLevel.Verbose); // Минимальный уровень для всех логов
-
-        if (logToFile)
-        {
-            try
+            // Проверяем переменную окружения для уровней логирования в файл
+            var fileLogLevels = Environment.GetEnvironmentVariable("FILE_LOG_LEVELS");
+            
+            // По умолчанию для файла используем WARN, ERROR, FATAL если не указано иное
+            var fileLevels = ParseLogLevels(fileLogLevels);
+            if (fileLevels.Length == 0)
             {
-                var logPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "ClockWidget",
-                    "logs",
-                    "clock-widget-.log");
+                fileLevels = new[] { LogEventLevel.Warning, LogEventLevel.Error, LogEventLevel.Fatal };
+            }
 
-                // Создаем директорию для логов, если она не существует
-                var logDir = Path.GetDirectoryName(logPath);
-                if (!string.IsNullOrEmpty(logDir))
+            var loggerConfiguration = new LoggerConfiguration()
+                .MinimumLevel.Is(LogEventLevel.Verbose); // Минимальный уровень для всех логов
+
+            if (logToFile)
+            {
+                try
                 {
-                    if (!Directory.Exists(logDir))
+                    var logPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                        "ClockWidget",
+                        "logs",
+                        "clock-widget-.log");
+
+                    // Создаем директорию для логов, если она не существует
+                    var logDir = Path.GetDirectoryName(logPath);
+                    if (!string.IsNullOrEmpty(logDir) && !Directory.Exists(logDir))
                     {
                         Directory.CreateDirectory(logDir);
                     }
-                }
 
-                // Добавляем фильтр для каждого уровня логирования
-                foreach (var level in fileLevels)
-                {
+                    // Настройка файлового логирования с фильтром только указанных уровней
                     loggerConfiguration.WriteTo.Logger(lc => lc
-                        .Filter.ByIncludingOnly(e => e.Level == level)
+                        .Filter.ByIncludingOnly(e => fileLevels.Contains(e.Level))
                         .WriteTo.File(
                             logPath,
                             rollingInterval: RollingInterval.Day,
-                            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}"));
+                            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+                            retainedFileCountLimit: 30)); // Храним логи за последние 30 дней
+                }
+                catch (Exception ex)
+                {
+                    // Если не удалось настроить логирование в файл, выводим ошибку в консоль
+                    Debug.WriteLine($"[ERROR] Failed to setup file logging: {ex.Message}");
+                    Debug.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
                 }
             }
-            catch (Exception ex)
+
+            _serilogLogger = loggerConfiguration.CreateLogger();
+
+            _loggerFactory = LoggerFactory.Create(builder =>
             {
-                // Если не удалось настроить логирование в файл, выводим ошибку в консоль
-                Console.WriteLine($"[ERROR] Failed to setup file logging: {ex.Message}");
-                Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
-            }
+                builder
+                    .AddSerilog(_serilogLogger, dispose: true)
+                    .AddDebug();
+            });
+
+            _isInitialized = true;
         }
+    }
 
-        var logger = loggerConfiguration.CreateLogger();
-
-        _loggerFactory = LoggerFactory.Create(builder =>
+    /// <summary>
+    /// Освобождает ресурсы логгера.
+    /// </summary>
+    public static void Dispose()
+    {
+        lock (_lock)
         {
-            builder.AddSerilog(logger);
-        });
-
-        _isInitialized = true;
+            // Serilog.ILogger не реализует IDisposable, поэтому не вызываем Dispose
+            _serilogLogger = null;
+            
+            if (_loggerFactory != null)
+            {
+                _loggerFactory.Dispose();
+                _loggerFactory = null;
+            }
+            
+            _isInitialized = false;
+        }
     }
 
     /// <summary>
@@ -121,20 +145,5 @@ public static class LoggingService
         }
 
         return _loggerFactory!.CreateLogger<T>();
-    }
-
-    /// <summary>
-    /// Создает логгер для указанного имени категории.
-    /// </summary>
-    /// <param name="categoryName">Имя категории логгера.</param>
-    /// <returns>Логгер для указанной категории.</returns>
-    public static Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
-    {
-        if (!_isInitialized)
-        {
-            Initialize();
-        }
-
-        return _loggerFactory!.CreateLogger(categoryName);
     }
 } 
