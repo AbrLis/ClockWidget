@@ -80,8 +80,9 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             try
             {
                 _logger.LogInformation("Disposing main window view model");
-                _timeService.TimeUpdated -= OnTimeUpdated;
-                _timeService.Dispose();
+                if (_timeService != null)
+                    _timeService.TimeUpdated -= OnTimeUpdated;
+                // Не вызываем _timeService.Dispose(), если это singleton из App
                 _disposed = true;
                 _logger.LogInformation("Main window view model disposed");
             }
