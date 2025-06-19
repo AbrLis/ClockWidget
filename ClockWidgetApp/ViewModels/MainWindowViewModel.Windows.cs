@@ -12,7 +12,7 @@ public partial class MainWindowViewModel
         try
         {
             _logger.LogInformation("Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
-            if (Application.Current.MainWindow is MainWindow mainWindow)
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
                 var newVisibility = _showDigitalClock ? Visibility.Visible : Visibility.Hidden;
                 if (mainWindow.Visibility != newVisibility)

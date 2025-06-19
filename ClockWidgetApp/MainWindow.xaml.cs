@@ -1,15 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+﻿using System.Windows;
 using ClockWidgetApp.ViewModels;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
@@ -23,7 +12,7 @@ public partial class MainWindow : Window
 {
     private readonly MainWindowViewModel _viewModel;
     private readonly ILogger<MainWindow> _logger = LoggingService.CreateLogger<MainWindow>();
-    private Point _dragStartPoint;
+    private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
     private SettingsWindow? _settingsWindow;
     public bool IsSettingsWindowOpen { get; set; }
@@ -65,7 +54,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void MainWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
         _dragStartPoint = e.GetPosition(this);
         _isDragging = true;
@@ -73,7 +62,7 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    private void MainWindow_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void MainWindow_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (_isDragging)
         {
@@ -83,11 +72,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MainWindow_PreviewMouseMove(object sender, MouseEventArgs e)
+    private void MainWindow_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (_isDragging && IsMouseCaptured)
         {
-            Point currentPosition = e.GetPosition(this);
+            System.Windows.Point currentPosition = e.GetPosition(this);
             Vector diff = currentPosition - _dragStartPoint;
             Left += diff.X;
             Top += diff.Y;
@@ -95,7 +84,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MainWindow_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    private void MainWindow_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         // Открываем окно настроек по правой кнопке мыши
         if (!IsSettingsWindowOpen)
@@ -105,7 +94,7 @@ public partial class MainWindow : Window
         e.Handled = true; // Предотвращаем появление контекстного меню
     }
 
-    private void OpenSettingsWindow()
+    public void OpenSettingsWindow()
     {
         if (_settingsWindow == null || !_settingsWindow.IsVisible)
         {

@@ -1,7 +1,4 @@
-using System;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
 using ClockWidgetApp.ViewModels;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
@@ -15,7 +12,7 @@ public partial class AnalogClockWindow : Window
 {
     private readonly AnalogClockViewModel _viewModel;
     private readonly ILogger<AnalogClockWindow> _logger = LoggingService.CreateLogger<AnalogClockWindow>();
-    private Point _dragStartPoint;
+    private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
 
     public AnalogClockWindow()
@@ -71,7 +68,7 @@ public partial class AnalogClockWindow : Window
         }
     }
 
-    private void AnalogClockWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void AnalogClockWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
         try
         {
@@ -87,7 +84,7 @@ public partial class AnalogClockWindow : Window
         }
     }
 
-    private void AnalogClockWindow_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void AnalogClockWindow_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseEventArgs e)
     {
         try
         {
@@ -105,7 +102,7 @@ public partial class AnalogClockWindow : Window
         }
     }
 
-    private void AnalogClockWindow_PreviewMouseMove(object sender, MouseEventArgs e)
+    private void AnalogClockWindow_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         try
         {
@@ -127,7 +124,7 @@ public partial class AnalogClockWindow : Window
         }
     }
 
-    private void AnalogClockWindow_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    private void AnalogClockWindow_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         try
         {

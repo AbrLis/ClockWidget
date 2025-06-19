@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using ClockWidgetApp.Services;
-using System.Windows;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -41,7 +40,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             InitializeFromSettings(settings);
             _timeService.TimeUpdated += OnTimeUpdated;
             OnTimeUpdated(this, DateTime.Now);
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 UpdateWindowsVisibility();
                 _logger.LogInformation("Windows visibility updated after initialization");

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;
@@ -11,13 +8,15 @@ namespace ClockWidgetApp;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private static SettingsService? _settingsService;
     private static MainWindowViewModel? _mainViewModel;
     private static TimeService? _timeService;
     private MainWindow? _mainWindow;
     private ILogger<App>? _logger;
+    private NotifyIcon? _notifyIcon = null;
+    private ContextMenuStrip? _trayMenu = null;
 
     /// <summary>
     /// Получает сервис настроек приложения.
@@ -57,7 +56,7 @@ public partial class App : Application
         {
             _logger?.LogError(args.ExceptionObject as Exception, "Unhandled exception (AppDomain)");
         };
-        DispatcherUnhandledException += (sender, args) =>
+        this.DispatcherUnhandledException += (sender, args) =>
         {
             _logger?.LogError(args.Exception, "Unhandled exception (Dispatcher)");
             args.Handled = true;
@@ -80,22 +79,31 @@ public partial class App : Application
             _logger?.LogInformation("Settings loaded: {Settings}", 
                 System.Text.Json.JsonSerializer.Serialize(settings));
 
-            // Создаем и показываем основное окно
-            _mainWindow = new MainWindow();
-            Application.Current.MainWindow = _mainWindow;
-            MainViewModel = _mainWindow.ViewModel;
-            
-            // Запускаем общий сервис времени
-            TimeService.Start();
-            _logger?.LogInformation("Time service started");
-            
-            // Явно показываем и активируем окно
-            _mainWindow.Show();
-            _mainWindow.Activate();
-            _logger?.LogInformation("Main window created, shown and activated");
+            if (settings.ShowDigitalClock)
+            {
+                _mainWindow = new MainWindow();
+                System.Windows.Application.Current.MainWindow = _mainWindow;
+                MainViewModel = _mainWindow.ViewModel;
+                TimeService.Start();
+                _logger?.LogInformation("Time service started");
+                _mainWindow.Show();
+                _mainWindow.Activate();
+                _logger?.LogInformation("Main window created, shown and activated");
+            }
+            else
+            {
+                // Инициализируем ViewModel напрямую для работы с треем и настройками
+                MainViewModel = new MainWindowViewModel();
+                TimeService.Start();
+                _logger?.LogInformation("Time service started (no main window)");
+                _logger?.LogInformation("Main window not created (ShowDigitalClock == false)");
+            }
+
+            // Добавляем иконку в трее
+            InitializeTrayIcon();
 
             // Устанавливаем режим завершения приложения
-            ShutdownMode = ShutdownMode.OnLastWindowClose;
+            this.ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
             
             _logger?.LogInformation("Application started successfully");
         }
@@ -104,6 +112,45 @@ public partial class App : Application
             _logger?.LogError(ex, "Error during application startup");
             throw;
         }
+    }
+
+    private void InitializeTrayIcon()
+    {
+        _trayMenu = new ContextMenuStrip();
+        var settingsItem = new ToolStripMenuItem("Настройки");
+        settingsItem.Click += (s, e) => ShowSettingsWindow();
+        var exitItem = new ToolStripMenuItem("Закрыть");
+        exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
+        _trayMenu.Items.Add(settingsItem);
+        _trayMenu.Items.Add(exitItem);
+
+        string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
+        _notifyIcon = new NotifyIcon();
+        _notifyIcon.Icon = new Icon(iconPath);
+        _notifyIcon.Visible = true;
+        _notifyIcon.Text = "Clock Widget App";
+        _notifyIcon.ContextMenuStrip = _trayMenu;
+        _notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseUp);
+    }
+
+    private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Left)
+        {
+            // Показываем контекстное меню под курсором
+            _trayMenu?.Show(Cursor.Position);
+        }
+    }
+
+    private void ShowSettingsWindow()
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.OpenSettingsWindow();
+            }
+        });
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -118,6 +165,12 @@ public partial class App : Application
                 _timeService.Stop();
                 _timeService.Dispose();
                 _logger?.LogInformation("Time service disposed");
+            }
+            
+            if (_notifyIcon != null)
+            {
+                _notifyIcon.Visible = false;
+                _notifyIcon.Dispose();
             }
             
             base.OnExit(e);

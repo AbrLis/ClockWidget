@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 using ClockWidgetApp.ViewModels;
 using ClockWidgetApp.Services;
@@ -36,7 +35,10 @@ public partial class SettingsWindow : Window
         try
         {
             _logger.LogInformation("Settings window closing");
-            ((MainWindow)Application.Current.MainWindow!).IsSettingsWindowOpen = false;
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.IsSettingsWindowOpen = false;
+            }
             _logger.LogInformation("Settings window closed");
         }
         catch (Exception ex)
@@ -52,7 +54,7 @@ public partial class SettingsWindow : Window
             _logger.LogInformation("Close widget button clicked");
             
             // Закрываем все окна приложения
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in System.Windows.Application.Current.Windows)
             {
                 _logger.LogDebug("Closing window: {WindowType}", window.GetType().Name);
                 window.Close();
@@ -60,13 +62,13 @@ public partial class SettingsWindow : Window
             
             // Завершаем работу приложения
             _logger.LogInformation("Shutting down application");
-            Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during application shutdown");
             // Даже в случае ошибки пытаемся завершить работу
-            Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
     }
 } 
