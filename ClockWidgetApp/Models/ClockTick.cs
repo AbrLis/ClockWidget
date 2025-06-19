@@ -1,10 +1,27 @@
 namespace ClockWidgetApp.Models;
 
 /// <summary>
-/// Модель для представления риски на циферблате часов.
+/// Класс, представляющий одну риску на циферблате аналоговых часов.
 /// </summary>
 public class ClockTick
 {
+    /// <summary>
+    /// Создаёт новую риску.
+    /// </summary>
+    /// <param name="startX">Начальная X.</param>
+    /// <param name="startY">Начальная Y.</param>
+    /// <param name="endX">Конечная X.</param>
+    /// <param name="endY">Конечная Y.</param>
+    /// <param name="thickness">Толщина риски.</param>
+    public ClockTick(double startX, double startY, double endX, double endY, double thickness)
+    {
+        X1 = startX;
+        Y1 = startY;
+        X2 = endX;
+        Y2 = endY;
+        Thickness = thickness;
+    }
+
     /// <summary>
     /// X-координата начальной точки риски.
     /// </summary>
@@ -29,16 +46,24 @@ public class ClockTick
     /// Толщина риски.
     /// </summary>
     public double Thickness { get; set; }
-    
+
     /// <summary>
-    /// Создает новый экземпляр риски.
+    /// X-координата начала риски.
     /// </summary>
-    public ClockTick(double x1, double y1, double x2, double y2, double thickness)
-    {
-        X1 = x1;
-        Y1 = y1;
-        X2 = x2;
-        Y2 = y2;
-        Thickness = thickness;
-    }
+    public double StartX => X1;
+
+    /// <summary>
+    /// Y-координата начала риски.
+    /// </summary>
+    public double StartY => Y1;
+
+    /// <summary>
+    /// X-координата конца риски.
+    /// </summary>
+    public double EndX => X2;
+
+    /// <summary>
+    /// Y-координата конца риски.
+    /// </summary>
+    public double EndY => Y2;
 } 

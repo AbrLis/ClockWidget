@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace ClockWidgetApp.Helpers;
 
 /// <summary>
-/// Конвертер для позиционирования центральной точки циферблата.
+/// Конвертер для вычисления позиции центральной точки аналоговых часов.
 /// Вычитает половину размера точки из координат центра для правильного позиционирования.
 /// </summary>
 public class CenterDotPositionConverter : IValueConverter
@@ -21,13 +21,13 @@ public class CenterDotPositionConverter : IValueConverter
     private CenterDotPositionConverter() { }
 
     /// <summary>
-    /// Конвертирует координату центра в позицию для отображения точки.
+    /// Преобразует входное значение для позиции точки.
     /// </summary>
-    /// <param name="value">Координата центра (X или Y).</param>
-    /// <param name="targetType">Тип целевого значения.</param>
+    /// <param name="value">Входное значение.</param>
+    /// <param name="targetType">Тип назначения.</param>
     /// <param name="parameter">Параметр конвертации.</param>
     /// <param name="culture">Культура.</param>
-    /// <returns>Позиция для отображения точки.</returns>
+    /// <returns>Преобразованное значение.</returns>
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is double centerCoordinate)

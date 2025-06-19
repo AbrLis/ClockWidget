@@ -17,11 +17,17 @@ public partial class MainWindowViewModel
     private bool _analogClockTopmost = true;
     private bool _digitalClockTopmost = true;
 
+    /// <summary>
+    /// Текст времени для отображения.
+    /// </summary>
     public string TimeText
     {
         get => _timeText;
         set { _timeText = value; OnPropertyChanged(); }
     }
+    /// <summary>
+    /// Прозрачность фона.
+    /// </summary>
     public double BackgroundOpacity
     {
         get => _backgroundOpacity;
@@ -39,6 +45,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Прозрачность текста.
+    /// </summary>
     public double TextOpacity
     {
         get => _textOpacity;
@@ -56,6 +65,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Размер шрифта.
+    /// </summary>
     public double FontSize
     {
         get => _fontSize;
@@ -70,11 +82,17 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Показывать секунды.
+    /// </summary>
     public bool ShowSeconds
     {
         get => _showSeconds;
         set { _showSeconds = value; OnPropertyChanged(); _settingsService.UpdateSettings(s => s.ShowSeconds = _showSeconds); }
     }
+    /// <summary>
+    /// Показывать цифровые часы.
+    /// </summary>
     public bool ShowDigitalClock
     {
         get => _showDigitalClock;
@@ -104,6 +122,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Показывать аналоговые часы.
+    /// </summary>
     public bool ShowAnalogClock
     {
         get => _showAnalogClock;
@@ -133,6 +154,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Размер аналоговых часов.
+    /// </summary>
     public double AnalogClockSize
     {
         get => _analogClockSize;
@@ -157,6 +181,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Аналоговые часы поверх всех окон.
+    /// </summary>
     public bool AnalogClockTopmost
     {
         get => _analogClockTopmost;
@@ -171,6 +198,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Цифровые часы поверх всех окон.
+    /// </summary>
     public bool DigitalClockTopmost
     {
         get => _digitalClockTopmost;

@@ -203,8 +203,10 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>
-    /// Сохраняет позицию окна.
+    /// Сохраняет позицию окна аналоговых часов.
     /// </summary>
+    /// <param name="left">Координата Left.</param>
+    /// <param name="top">Координата Top.</param>
     public void SaveWindowPosition(double left, double top)
     {
         WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, true);

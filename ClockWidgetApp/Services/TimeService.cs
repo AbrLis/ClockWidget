@@ -130,7 +130,7 @@ public class TimeService : IDisposable
     }
 
     /// <summary>
-    /// Освобождает ресурсы, используемые экземпляром класса <see cref="TimeService"/>.
+    /// Освобождает ресурсы, используемые сервисом времени.
     /// </summary>
     public void Dispose()
     {

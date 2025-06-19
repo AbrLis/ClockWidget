@@ -5,6 +5,9 @@ using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
+/// <summary>
+/// ViewModel для окна настроек. Связывает настройки главного окна с UI.
+/// </summary>
 public class SettingsWindowViewModel : INotifyPropertyChanged
 {
     private readonly MainWindowViewModel _mainViewModel;
@@ -15,8 +18,14 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     private double _analogClockSize;
     private bool _showSeconds;
 
+    /// <summary>
+    /// Событие, возникающее при изменении значения свойства.
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Получает или задает прозрачность фона.
+    /// </summary>
     public double BackgroundOpacity
     {
         get => _mainViewModel.BackgroundOpacity;
@@ -31,6 +40,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Получает или задает прозрачность текста.
+    /// </summary>
     public double TextOpacity
     {
         get => _mainViewModel.TextOpacity;
@@ -45,6 +57,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Получает или задает размер шрифта.
+    /// </summary>
     public double FontSize
     {
         get => _mainViewModel.FontSize;
@@ -59,6 +74,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Получает или задает отображение секунд.
+    /// </summary>
     public bool ShowSeconds
     {
         get => _mainViewModel.ShowSeconds;
@@ -73,6 +91,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Получает или задает отображение цифровых часов.
+    /// </summary>
     public bool ShowDigitalClock
     {
         get => _mainViewModel.ShowDigitalClock;
@@ -87,6 +108,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Получает или задает отображение аналоговых часов.
+    /// </summary>
     public bool ShowAnalogClock
     {
         get => _mainViewModel.ShowAnalogClock;
@@ -118,6 +142,10 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
+    /// </summary>
+    /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
     public SettingsWindowViewModel(MainWindowViewModel mainViewModel)
     {
         _mainViewModel = mainViewModel;

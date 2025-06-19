@@ -6,7 +6,7 @@ using ClockWidgetApp.ViewModels;
 namespace ClockWidgetApp;
 
 /// <summary>
-/// Interaction logic for App.xaml
+/// Класс приложения WPF. Точка входа и управление жизненным циклом.
 /// </summary>
 public partial class App : System.Windows.Application
 {
@@ -45,6 +45,9 @@ public partial class App : System.Windows.Application
         private set => _timeService = value;
     }
 
+    /// <summary>
+    /// Конструктор приложения. Инициализирует логирование и обработчики ошибок.
+    /// </summary>
     public App()
     {
         // Инициализируем логирование
@@ -63,6 +66,10 @@ public partial class App : System.Windows.Application
         };
     }
 
+    /// <summary>
+    /// Обработчик запуска приложения.
+    /// </summary>
+    /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
         try
@@ -153,6 +160,10 @@ public partial class App : System.Windows.Application
         });
     }
 
+    /// <summary>
+    /// Обработчик завершения приложения.
+    /// </summary>
+    /// <param name="e">Аргументы завершения.</param>
     protected override void OnExit(ExitEventArgs e)
     {
         try

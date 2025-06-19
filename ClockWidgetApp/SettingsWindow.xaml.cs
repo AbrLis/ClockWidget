@@ -5,11 +5,18 @@ using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp;
 
+/// <summary>
+/// Окно настроек приложения.
+/// </summary>
 public partial class SettingsWindow : Window
 {
     private readonly MainWindowViewModel _viewModel;
     private readonly ILogger<SettingsWindow> _logger = LoggingService.CreateLogger<SettingsWindow>();
 
+    /// <summary>
+    /// Создаёт новое окно настроек.
+    /// </summary>
+    /// <param name="viewModel">ViewModel главного окна.</param>
     public SettingsWindow(MainWindowViewModel viewModel)
     {
         try

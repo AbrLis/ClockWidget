@@ -1,5 +1,8 @@
 namespace ClockWidgetApp.ViewModels;
 
+/// <summary>
+/// Интерфейс для ViewModel, поддерживающих работу с настройками.
+/// </summary>
 public interface ISettingsViewModel
 {
     double BackgroundOpacity { get; set; }

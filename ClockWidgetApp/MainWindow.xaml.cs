@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace ClockWidgetApp;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Главное окно приложения (цифровые часы).
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -18,6 +18,9 @@ public partial class MainWindow : Window
     public bool IsSettingsWindowOpen { get; set; }
     public MainWindowViewModel ViewModel => _viewModel;
 
+    /// <summary>
+    /// Создаёт главное окно приложения.
+    /// </summary>
     public MainWindow()
     {
         try

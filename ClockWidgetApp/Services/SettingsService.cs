@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace ClockWidgetApp.Services;
 
 /// <summary>
-/// Сервис для работы с настройками виджета.
+/// Сервис для управления настройками виджета.
 /// Обеспечивает сохранение и загрузку настроек в JSON-файл.
 /// </summary>
 public class SettingsService

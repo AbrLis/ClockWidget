@@ -108,10 +108,10 @@ public class WidgetSettings
     }
 
     /// <summary>
-    /// Проверяет и корректирует значения настроек.
+    /// Проверяет и корректирует значения всех настроек.
     /// </summary>
-    /// <param name="settings">Настройки для проверки.</param>
-    /// <returns>Скорректированные настройки.</returns>
+    /// <param name="settings">Объект настроек.</param>
+    /// <returns>Скорректированный объект настроек.</returns>
     public static WidgetSettings ValidateSettings(WidgetSettings settings)
     {
         if (settings == null)

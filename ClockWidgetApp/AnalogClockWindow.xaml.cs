@@ -15,6 +15,9 @@ public partial class AnalogClockWindow : Window
     private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
 
+    /// <summary>
+    /// Создаёт окно с аналоговыми часами.
+    /// </summary>
     public AnalogClockWindow()
     {
         try

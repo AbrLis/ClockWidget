@@ -7,6 +7,9 @@ namespace ClockWidgetApp.ViewModels;
 
 public partial class MainWindowViewModel
 {
+    /// <summary>
+    /// Обновляет видимость окон (цифровых и аналоговых часов) в зависимости от настроек.
+    /// </summary>
     private void UpdateWindowsVisibility()
     {
         try
@@ -64,18 +67,31 @@ public partial class MainWindowViewModel
             _logger.LogError(ex, "[MainWindowViewModel.Windows] Error updating windows visibility");
         }
     }
+
+    /// <summary>
+    /// Получает сохранённую позицию главного окна.
+    /// </summary>
+    /// <returns>Кортеж с координатами Left и Top.</returns>
     public (double Left, double Top) GetWindowPosition()
     {
         return WindowPositionHelper.GetWindowPosition(_settingsService, false);
     }
+
+    /// <summary>
+    /// Сохраняет позицию главного окна.
+    /// </summary>
+    /// <param name="left">Координата Left.</param>
+    /// <param name="top">Координата Top.</param>
     public void SaveWindowPosition(double left, double top)
     {
         WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
     }
+
     private (double Left, double Top) GetAnalogClockPosition()
     {
         return WindowPositionHelper.GetWindowPosition(_settingsService, true);
     }
+
     private void UpdateAnalogClockSize()
     {
         if (_analogClockWindow != null)
@@ -84,6 +100,7 @@ public partial class MainWindowViewModel
             _analogClockWindow.Height = _analogClockSize;
         }
     }
+
     private void UpdateAnalogClockSettings(WidgetSettings settings)
     {
         if (settings == null)
