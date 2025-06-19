@@ -24,7 +24,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.BackgroundOpacity != value)
             {
-                _logger.LogInformation("Updating background opacity: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating background opacity: {Value}", value);
                 _mainViewModel.BackgroundOpacity = value;
                 OnPropertyChanged();
             }
@@ -38,7 +38,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.TextOpacity != value)
             {
-                _logger.LogInformation("Updating text opacity: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating text opacity: {Value}", value);
                 _mainViewModel.TextOpacity = value;
                 OnPropertyChanged();
             }
@@ -52,7 +52,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.FontSize != value)
             {
-                _logger.LogInformation("Updating font size: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating font size: {Value}", value);
                 _mainViewModel.FontSize = value;
                 OnPropertyChanged();
             }
@@ -66,7 +66,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.ShowSeconds != value)
             {
-                _logger.LogInformation("Updating show seconds: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating show seconds: {Value}", value);
                 _mainViewModel.ShowSeconds = value;
                 OnPropertyChanged();
             }
@@ -80,7 +80,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.ShowDigitalClock != value)
             {
-                _logger.LogInformation("Updating show digital clock: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating show digital clock: {Value}", value);
                 _mainViewModel.ShowDigitalClock = value;
                 OnPropertyChanged();
             }
@@ -94,7 +94,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.ShowAnalogClock != value)
             {
-                _logger.LogInformation("Updating show analog clock: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating show analog clock: {Value}", value);
                 _mainViewModel.ShowAnalogClock = value;
                 OnPropertyChanged();
             }
@@ -111,7 +111,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (Math.Abs(_mainViewModel.AnalogClockSize - value) > 0.001)
             {
-                _logger.LogInformation("Updating analog clock size: {Value}", value);
+                _logger.LogInformation("[SettingsWindowViewModel] Updating analog clock size: {Value}", value);
                 _mainViewModel.AnalogClockSize = value;
                 OnPropertyChanged();
             }
@@ -121,7 +121,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     public SettingsWindowViewModel(MainWindowViewModel mainViewModel)
     {
         _mainViewModel = mainViewModel;
-        _logger.LogInformation("Settings window view model initialized");
+        _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
         
         // Инициализируем значения из MainWindowViewModel
         _backgroundOpacity = _mainViewModel.BackgroundOpacity;
@@ -136,14 +136,14 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
 
     private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        _logger.LogDebug("Property changed in main view model: {Property}", e.PropertyName);
+        _logger.LogDebug("[SettingsWindowViewModel] Property changed in main view model: {Property}", e.PropertyName);
         // Пробрасываем уведомления об изменениях свойств
         OnPropertyChanged(e.PropertyName);
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
-        _logger.LogDebug("Property changed in settings view model: {Property}", propertyName);
+        _logger.LogDebug("[SettingsWindowViewModel] Property changed in settings view model: {Property}", propertyName);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 } 

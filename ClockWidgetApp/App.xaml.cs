@@ -54,11 +54,11 @@ public partial class App : System.Windows.Application
         // Глобальный обработчик необработанных исключений
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
-            _logger?.LogError(args.ExceptionObject as Exception, "Unhandled exception (AppDomain)");
+            _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
         };
         this.DispatcherUnhandledException += (sender, args) =>
         {
-            _logger?.LogError(args.Exception, "Unhandled exception (Dispatcher)");
+            _logger?.LogError(args.Exception, "[App] Unhandled exception (Dispatcher)");
             args.Handled = true;
         };
     }
@@ -67,16 +67,16 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            _logger?.LogInformation("Starting application");
+            _logger?.LogInformation("[App] Starting application");
             
             // Инициализируем сервисы
             SettingsService = new SettingsService();
             TimeService = new TimeService();
-            _logger?.LogInformation("Services initialized");
+            _logger?.LogInformation("[App] Services initialized");
             
             // Загружаем настройки
             var settings = SettingsService.CurrentSettings;
-            _logger?.LogInformation("Settings loaded: {Settings}", 
+            _logger?.LogInformation("[App] Settings loaded: {Settings}", 
                 System.Text.Json.JsonSerializer.Serialize(settings));
 
             if (settings.ShowDigitalClock)
@@ -85,18 +85,18 @@ public partial class App : System.Windows.Application
                 System.Windows.Application.Current.MainWindow = _mainWindow;
                 MainViewModel = _mainWindow.ViewModel;
                 TimeService.Start();
-                _logger?.LogInformation("Time service started");
+                _logger?.LogInformation("[App] Time service started");
                 _mainWindow.Show();
                 _mainWindow.Activate();
-                _logger?.LogInformation("Main window created, shown and activated");
+                _logger?.LogInformation("[App] Main window created, shown and activated");
             }
             else
             {
                 // Инициализируем ViewModel напрямую для работы с треем и настройками
                 MainViewModel = new MainWindowViewModel();
                 TimeService.Start();
-                _logger?.LogInformation("Time service started (no main window)");
-                _logger?.LogInformation("Main window not created (ShowDigitalClock == false)");
+                _logger?.LogInformation("[App] Time service started (no main window)");
+                _logger?.LogInformation("[App] Main window not created (ShowDigitalClock == false)");
             }
 
             // Добавляем иконку в трее
@@ -105,11 +105,11 @@ public partial class App : System.Windows.Application
             // Устанавливаем режим завершения приложения
             this.ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
             
-            _logger?.LogInformation("Application started successfully");
+            _logger?.LogInformation("[App] Application started successfully");
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error during application startup");
+            _logger?.LogError(ex, "[App] Error during application startup");
             throw;
         }
     }
@@ -157,14 +157,14 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            _logger?.LogInformation("Application shutting down");
+            _logger?.LogInformation("[App] Application shutting down");
             
             // Останавливаем и освобождаем TimeService
             if (_timeService != null)
             {
                 _timeService.Stop();
                 _timeService.Dispose();
-                _logger?.LogInformation("Time service disposed");
+                _logger?.LogInformation("[App] Time service disposed");
             }
             
             if (_notifyIcon != null)
@@ -174,14 +174,14 @@ public partial class App : System.Windows.Application
             }
             
             base.OnExit(e);
-            _logger?.LogInformation("Application shutdown completed");
+            _logger?.LogInformation("[App] Application shutdown completed");
             
             // Освобождаем ресурсы логгера
             LoggingService.Dispose();
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error during application shutdown");
+            _logger?.LogError(ex, "[App] Error during application shutdown");
             throw;
         }
     }

@@ -22,7 +22,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            _logger.LogInformation("Initializing main window");
+            _logger.LogInformation("[MainWindow] Initializing main window");
             
             InitializeComponent();
             
@@ -45,11 +45,11 @@ public partial class MainWindow : Window
             MouseRightButtonDown += MainWindow_MouseRightButtonDown;
             Closing += MainWindow_Closing;
             
-            _logger.LogInformation("Main window initialized");
+            _logger.LogInformation("[MainWindow] Main window initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error initializing main window");
+            _logger.LogError(ex, "[MainWindow] Error initializing main window");
             throw;
         }
     }
@@ -112,7 +112,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            _logger.LogInformation("Main window closing");
+            _logger.LogInformation("[MainWindow] Main window closing");
             
             // Отписываемся от событий
             PreviewMouseLeftButtonDown -= MainWindow_PreviewMouseLeftButtonDown;
@@ -137,11 +137,11 @@ public partial class MainWindow : Window
             }
             DataContext = null;
             
-            _logger.LogInformation("Main window closed");
+            _logger.LogInformation("[MainWindow] Main window closed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during window closing");
+            _logger.LogError(ex, "[MainWindow] Error during window closing");
         }
     }
 }

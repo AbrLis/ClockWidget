@@ -36,14 +36,14 @@ public class SettingsService
         if (!Directory.Exists(appDataPath))
         {
             Directory.CreateDirectory(appDataPath);
-            _logger.LogInformation("Created settings directory: {Path}", appDataPath);
+            _logger.LogInformation("[SettingsService] Created settings directory: {Path}", appDataPath);
         }
 
         _settingsPath = Path.Combine(
             appDataPath,
             Constants.FileSettings.SETTINGS_FILENAME);
             
-        _logger.LogInformation("Settings file path: {Path}", _settingsPath);
+        _logger.LogInformation("[SettingsService] Settings file path: {Path}", _settingsPath);
         _currentSettings = LoadSettings();
     }
 
@@ -55,15 +55,15 @@ public class SettingsService
     {
         try
         {
-            _logger.LogInformation("Updating settings");
+            _logger.LogInformation("[SettingsService] Updating settings");
             updateAction(_currentSettings);
             SaveSettings(_currentSettings);
-            _logger.LogInformation("Settings updated successfully: {Settings}", 
+            _logger.LogInformation("[SettingsService] Settings updated successfully: {Settings}", 
                 JsonSerializer.Serialize(_currentSettings));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating settings");
+            _logger.LogError(ex, "[SettingsService] Error updating settings");
             throw;
         }
     }
@@ -87,7 +87,7 @@ public class SettingsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при загрузке настроек");
+            _logger.LogError(ex, "[SettingsService] Ошибка при загрузке настроек");
             return WidgetSettings.ValidateSettings(new WidgetSettings());
         }
     }
@@ -121,11 +121,11 @@ public class SettingsService
 
             var json = JsonSerializer.Serialize(settings, options);
             File.WriteAllText(_settingsPath, json);
-            _logger.LogInformation("Настройки успешно сохранены");
+            _logger.LogInformation("[SettingsService] Настройки успешно сохранены");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при сохранении настроек");
+            _logger.LogError(ex, "[SettingsService] Ошибка при сохранении настроек");
             throw;
         }
     }

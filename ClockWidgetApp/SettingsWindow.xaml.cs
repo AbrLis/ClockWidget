@@ -14,18 +14,18 @@ public partial class SettingsWindow : Window
     {
         try
         {
-            _logger.LogInformation("Initializing settings window");
+            _logger.LogInformation("[SettingsWindow] Initializing settings window");
             InitializeComponent();
             _viewModel = viewModel;
             DataContext = _viewModel;
             
             // Добавляем обработчик закрытия окна
             Closing += SettingsWindow_Closing;
-            _logger.LogInformation("Settings window initialized");
+            _logger.LogInformation("[SettingsWindow] Settings window initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error initializing settings window");
+            _logger.LogError(ex, "[SettingsWindow] Error initializing settings window");
             throw;
         }
     }
@@ -34,16 +34,16 @@ public partial class SettingsWindow : Window
     {
         try
         {
-            _logger.LogInformation("Settings window closing");
+            _logger.LogInformation("[SettingsWindow] Settings window closing");
             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
                 mainWindow.IsSettingsWindowOpen = false;
             }
-            _logger.LogInformation("Settings window closed");
+            _logger.LogInformation("[SettingsWindow] Settings window closed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during settings window closing");
+            _logger.LogError(ex, "[SettingsWindow] Error during settings window closing");
         }
     }
 
@@ -51,22 +51,22 @@ public partial class SettingsWindow : Window
     {
         try
         {
-            _logger.LogInformation("Close widget button clicked");
+            _logger.LogInformation("[SettingsWindow] Close widget button clicked");
             
             // Закрываем все окна приложения
             foreach (Window window in System.Windows.Application.Current.Windows)
             {
-                _logger.LogDebug("Closing window: {WindowType}", window.GetType().Name);
+                _logger.LogDebug("[SettingsWindow] Closing window: {WindowType}", window.GetType().Name);
                 window.Close();
             }
             
             // Завершаем работу приложения
-            _logger.LogInformation("Shutting down application");
+            _logger.LogInformation("[SettingsWindow] Shutting down application");
             System.Windows.Application.Current.Shutdown();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during application shutdown");
+            _logger.LogError(ex, "[SettingsWindow] Error during application shutdown");
             // Даже в случае ошибки пытаемся завершить работу
             System.Windows.Application.Current.Shutdown();
         }

@@ -97,7 +97,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     {
         try
         {
-            _logger.LogInformation("Initializing analog clock view model");
+            _logger.LogInformation("[AnalogClockViewModel] Initializing analog clock view model");
             
             // Используем общий TimeService из App вместо создания нового
             _timeService = App.TimeService;
@@ -121,18 +121,18 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             if (App.MainViewModel != null)
             {
                 App.MainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-                _logger.LogInformation("Subscribed to MainViewModel property changes");
+                _logger.LogInformation("[AnalogClockViewModel] Subscribed to MainViewModel property changes");
             }
             else
             {
-                _logger.LogWarning("MainViewModel is not initialized");
+                _logger.LogWarning("[AnalogClockViewModel] MainViewModel is not initialized");
             }
             
-            _logger.LogInformation("Analog clock view model initialized");
+            _logger.LogInformation("[AnalogClockViewModel] Analog clock view model initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error initializing analog clock view model");
+            _logger.LogError(ex, "[AnalogClockViewModel] Error initializing analog clock view model");
             throw;
         }
     }
@@ -144,7 +144,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     {
         try
         {
-            _logger.LogInformation("Generating clock ticks");
+            _logger.LogInformation("[AnalogClockViewModel] Generating clock ticks");
             
             var ticks = new List<ClockTick>();
             
@@ -170,11 +170,11 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             }
             
             ClockTicks = ticks;
-            _logger.LogInformation("Generated {Count} clock ticks", ticks.Count);
+            _logger.LogInformation("[AnalogClockViewModel] Generated {Count} clock ticks", ticks.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating clock ticks");
+            _logger.LogError(ex, "[AnalogClockViewModel] Error generating clock ticks");
         }
     }
 
@@ -182,14 +182,14 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     {
         if (_disposed)
         {
-            _logger.LogWarning("PropertyChanged received after disposal");
+            _logger.LogWarning("[AnalogClockViewModel] PropertyChanged received after disposal");
             return;
         }
 
         if (e.PropertyName == nameof(App.MainViewModel.BackgroundOpacity) ||
             e.PropertyName == nameof(App.MainViewModel.TextOpacity))
         {
-            _logger.LogDebug("Settings changed in main view model: {Property}", e.PropertyName);
+            _logger.LogDebug("[AnalogClockViewModel] Settings changed in main view model: {Property}", e.PropertyName);
             OnPropertyChanged(e.PropertyName);
         }
     }
@@ -220,11 +220,11 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         {
             if (_disposed)
             {
-                _logger.LogWarning("TimeUpdated received after disposal");
+                _logger.LogWarning("[AnalogClockViewModel] TimeUpdated received after disposal");
                 return;
             }
 
-            _logger.LogDebug("Time updated: {Time}", time);
+            _logger.LogDebug("[AnalogClockViewModel] Time updated: {Time}", time);
             
             // Вычисляем углы для стрелок
             double hourAngle = (time.Hour % 12 + time.Minute / 60.0) * 30; // 30 градусов на час
@@ -274,7 +274,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating time");
+            _logger.LogError(ex, "[AnalogClockViewModel] Error updating time");
         }
     }
 

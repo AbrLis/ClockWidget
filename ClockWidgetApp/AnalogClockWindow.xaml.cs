@@ -19,7 +19,7 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
-            _logger.LogInformation("Initializing analog clock window");
+            _logger.LogInformation("[AnalogClockWindow] Initializing analog clock window");
             
             InitializeComponent();
             
@@ -47,11 +47,11 @@ public partial class AnalogClockWindow : Window
             // Добавляем обработчик загрузки окна
             Loaded += AnalogClockWindow_Loaded;
             
-            _logger.LogInformation("Analog clock window initialized");
+            _logger.LogInformation("[AnalogClockWindow] Analog clock window initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error initializing analog clock window");
+            _logger.LogError(ex, "[AnalogClockWindow] Error initializing analog clock window");
             throw;
         }
     }
@@ -60,11 +60,11 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
-            _logger.LogInformation("Analog clock window loaded");
+            _logger.LogInformation("[AnalogClockWindow] Analog clock window loaded");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in window loaded event");
+            _logger.LogError(ex, "[AnalogClockWindow] Error in window loaded event");
         }
     }
 
@@ -75,12 +75,12 @@ public partial class AnalogClockWindow : Window
             _dragStartPoint = e.GetPosition(this);
             _isDragging = true;
             CaptureMouse();
-            _logger.LogDebug("Mouse left button down, started dragging");
+            _logger.LogDebug("[AnalogClockWindow] Mouse left button down, started dragging");
             e.Handled = true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in mouse left button down event");
+            _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button down event");
         }
     }
 
@@ -92,13 +92,13 @@ public partial class AnalogClockWindow : Window
             {
                 _isDragging = false;
                 ReleaseMouseCapture();
-                _logger.LogDebug("Mouse left button up, stopped dragging");
+                _logger.LogDebug("[AnalogClockWindow] Mouse left button up, stopped dragging");
                 e.Handled = true;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in mouse left button up event");
+            _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button up event");
         }
     }
 
@@ -114,13 +114,13 @@ public partial class AnalogClockWindow : Window
                 Left += delta.X;
                 Top += delta.Y;
                 
-                _logger.LogDebug("Window moved: Left={Left}, Top={Top}", Left, Top);
+                _logger.LogDebug("[AnalogClockWindow] Window moved: Left={Left}, Top={Top}", Left, Top);
                 e.Handled = true;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in mouse move event");
+            _logger.LogError(ex, "[AnalogClockWindow] Error in mouse move event");
         }
     }
 
@@ -128,7 +128,7 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
-            _logger.LogInformation("Opening settings window");
+            _logger.LogInformation("[AnalogClockWindow] Opening settings window");
             // Открываем окно настроек при правом клике
             var settingsWindow = new SettingsWindow(App.MainViewModel);
             settingsWindow.Owner = this;
@@ -137,7 +137,7 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error opening settings window");
+            _logger.LogError(ex, "[AnalogClockWindow] Error opening settings window");
         }
     }
 

@@ -30,11 +30,11 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     {
         try
         {
-            _logger.LogInformation("Initializing main window view model");
+            _logger.LogInformation("[MainWindowViewModel] Initializing main window view model");
             _timeService = App.TimeService;
             _settingsService = App.SettingsService;
             var settings = _settingsService.CurrentSettings;
-            _logger.LogInformation("Loading settings for main window: {Settings}", 
+            _logger.LogInformation("[MainWindowViewModel] Loading settings for main window: {Settings}", 
                 JsonSerializer.Serialize(settings));
             // Инициализация значений и подписка на события вынесены в partial-файл
             InitializeFromSettings(settings);
@@ -43,13 +43,13 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 UpdateWindowsVisibility();
-                _logger.LogInformation("Windows visibility updated after initialization");
+                _logger.LogInformation("[MainWindowViewModel] Windows visibility updated after initialization");
             }));
-            _logger.LogInformation("Main window view model initialized");
+            _logger.LogInformation("[MainWindowViewModel] Main window view model initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error initializing main window view model");
+            _logger.LogError(ex, "[MainWindowViewModel] Error initializing main window view model");
             throw;
         }
     }
@@ -72,16 +72,16 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
         {
             try
             {
-                _logger.LogInformation("Disposing main window view model");
+                _logger.LogInformation("[MainWindowViewModel] Disposing main window view model");
                 if (_timeService != null)
                     _timeService.TimeUpdated -= OnTimeUpdated;
                 // Не вызываем _timeService.Dispose(), если это singleton из App
                 _disposed = true;
-                _logger.LogInformation("Main window view model disposed");
+                _logger.LogInformation("[MainWindowViewModel] Main window view model disposed");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error disposing main window view model");
+                _logger.LogError(ex, "[MainWindowViewModel] Error disposing main window view model");
             }
         }
     }
