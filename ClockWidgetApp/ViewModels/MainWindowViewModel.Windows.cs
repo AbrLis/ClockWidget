@@ -22,6 +22,7 @@ public partial class MainWindowViewModel
                     {
                         mainWindow.Show();
                         mainWindow.Activate();
+                        mainWindow.Topmost = _digitalClockTopmost;
                         _logger.LogInformation("Main window shown and activated");
                     }
                     else
@@ -46,6 +47,7 @@ public partial class MainWindowViewModel
                     _analogClockWindow.Top = top;
                     _analogClockWindow.Width = _analogClockSize;
                     _analogClockWindow.Height = _analogClockSize;
+                    _analogClockWindow.Topmost = _analogClockTopmost;
                     _analogClockWindow.Show();
                 }
                 else if (!_analogClockWindow.IsVisible)
@@ -104,6 +106,7 @@ public partial class MainWindowViewModel
                 _analogClockWindow.Top = top;
                 _analogClockWindow.Width = settings.AnalogClockSize;
                 _analogClockWindow.Height = settings.AnalogClockSize;
+                _analogClockWindow.Topmost = _analogClockTopmost;
                 _analogClockWindow.Show();
             }
             else if (!_analogClockWindow.IsVisible)

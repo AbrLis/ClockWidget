@@ -14,6 +14,8 @@ public partial class MainWindowViewModel
     private bool _showAnalogClock = true;
     private double _analogClockSize;
     private AnalogClockWindow? _analogClockWindow;
+    private bool _analogClockTopmost = true;
+    private bool _digitalClockTopmost = true;
 
     public string TimeText
     {
@@ -153,6 +155,49 @@ public partial class MainWindowViewModel
                     OnPropertyChanged();
                 }
             }
+        }
+    }
+    public bool AnalogClockTopmost
+    {
+        get => _analogClockTopmost;
+        set
+        {
+            if (_analogClockTopmost != value)
+            {
+                _analogClockTopmost = value;
+                OnPropertyChanged();
+                _settingsService.UpdateSettings(s => s.AnalogClockTopmost = value);
+                UpdateAnalogClockTopmost();
+            }
+        }
+    }
+    public bool DigitalClockTopmost
+    {
+        get => _digitalClockTopmost;
+        set
+        {
+            if (_digitalClockTopmost != value)
+            {
+                _digitalClockTopmost = value;
+                OnPropertyChanged();
+                _settingsService.UpdateSettings(s => s.DigitalClockTopmost = value);
+                UpdateDigitalClockTopmost();
+            }
+        }
+    }
+
+    private void UpdateAnalogClockTopmost()
+    {
+        if (_analogClockWindow != null)
+        {
+            _analogClockWindow.Topmost = _analogClockTopmost;
+        }
+    }
+    private void UpdateDigitalClockTopmost()
+    {
+        if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.Topmost = _digitalClockTopmost;
         }
     }
 } 

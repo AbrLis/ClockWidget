@@ -90,6 +90,18 @@ public class WidgetSettings
     [JsonPropertyName("showAnalogClock")]
     public bool ShowAnalogClock { get; set; } = true;
 
+    /// <summary>
+    /// Флаг "поверх всех окон" для аналоговых часов. По умолчанию: true.
+    /// </summary>
+    [JsonPropertyName("analogClockTopmost")]
+    public bool AnalogClockTopmost { get; set; } = true;
+
+    /// <summary>
+    /// Флаг "поверх всех окон" для цифровых часов. По умолчанию: true.
+    /// </summary>
+    [JsonPropertyName("digitalClockTopmost")]
+    public bool DigitalClockTopmost { get; set; } = true;
+
     public WidgetSettings()
     {
         // Значения по умолчанию уже установлены через инициализаторы свойств

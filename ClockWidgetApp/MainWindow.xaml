@@ -18,7 +18,6 @@
         ShowInTaskbar="False"
         ShowActivated="True"
         WindowStartupLocation="Manual"
-        Topmost="True"
         Visibility="Visible">
     <Window.Resources>
         <BitmapImage x:Key="WindowIcon" UriSource="/Resources/Icons/app_ico_32.ico"/>
