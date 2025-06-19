@@ -32,10 +32,6 @@ public partial class MainWindowViewModel
                     }
                 }
             }
-            else
-            {
-                _logger.LogWarning("Main window is not of type MainWindow");
-            }
             if (_showAnalogClock)
             {
                 if (_analogClockWindow == null)
