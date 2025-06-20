@@ -18,7 +18,7 @@ public partial class App : System.Windows.Application
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
-    private SettingsWindow? _traySettingsWindow;
+    public static SettingsWindow? SettingsWindowInstance { get; set; }
 
     /// <summary>
     /// Получает сервис настроек приложения.
@@ -154,23 +154,15 @@ public partial class App : System.Windows.Application
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            if (SettingsWindowInstance == null || !SettingsWindowInstance.IsVisible)
             {
-                mainWindow.OpenSettingsWindow();
+                SettingsWindowInstance = new SettingsWindow(MainViewModel);
+                SettingsWindowInstance.Closed += (s, e) => SettingsWindowInstance = null;
+                SettingsWindowInstance.Show();
             }
             else
             {
-                // Если MainWindow нет, открываем отдельное окно настроек (singleton)
-                if (_traySettingsWindow == null || !_traySettingsWindow.IsVisible)
-                {
-                    _traySettingsWindow = new SettingsWindow(MainViewModel);
-                    _traySettingsWindow.Closed += (s, e) => _traySettingsWindow = null;
-                    _traySettingsWindow.Show();
-                }
-                else
-                {
-                    _traySettingsWindow.Activate();
-                }
+                SettingsWindowInstance.Activate();
             }
         });
     }
