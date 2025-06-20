@@ -17,6 +17,7 @@ public partial class App : System.Windows.Application
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
+    private SettingsWindow? _traySettingsWindow;
 
     /// <summary>
     /// Получает сервис настроек приложения.
@@ -156,6 +157,20 @@ public partial class App : System.Windows.Application
             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
                 mainWindow.OpenSettingsWindow();
+            }
+            else
+            {
+                // Если MainWindow нет, открываем отдельное окно настроек (singleton)
+                if (_traySettingsWindow == null || !_traySettingsWindow.IsVisible)
+                {
+                    _traySettingsWindow = new SettingsWindow(MainViewModel);
+                    _traySettingsWindow.Closed += (s, e) => _traySettingsWindow = null;
+                    _traySettingsWindow.Show();
+                }
+                else
+                {
+                    _traySettingsWindow.Activate();
+                }
             }
         });
     }
