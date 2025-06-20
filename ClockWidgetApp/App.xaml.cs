@@ -211,5 +211,22 @@ public partial class App : System.Windows.Application
             throw;
         }
     }
+
+    public void ShowMainWindowIfNeeded()
+    {
+        if (_mainWindow == null)
+        {
+            _mainWindow = new MainWindow();
+            System.Windows.Application.Current.MainWindow = _mainWindow;
+            MainViewModel = _mainWindow.ViewModel;
+            _mainWindow.Show();
+            _mainWindow.Activate();
+        }
+        else if (!_mainWindow.IsVisible)
+        {
+            _mainWindow.Show();
+            _mainWindow.Activate();
+        }
+    }
 }
 
