@@ -14,6 +14,7 @@ public partial class AnalogClockWindow : Window
     private readonly ILogger<AnalogClockWindow> _logger = LoggingService.CreateLogger<AnalogClockWindow>();
     private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
+    private SettingsWindow? _settingsWindow;
 
     /// <summary>
     /// Создаёт окно с аналоговыми часами.
@@ -132,10 +133,18 @@ public partial class AnalogClockWindow : Window
         try
         {
             _logger.LogInformation("[AnalogClockWindow] Opening settings window");
-            // Открываем окно настроек при правом клике
-            var settingsWindow = new SettingsWindow(App.MainViewModel);
-            settingsWindow.Owner = this;
-            settingsWindow.Show();
+            // Открываем только одно окно настроек
+            if (_settingsWindow == null || !_settingsWindow.IsVisible)
+            {
+                _settingsWindow = new SettingsWindow(App.MainViewModel);
+                _settingsWindow.Owner = this;
+                _settingsWindow.Closed += (s, args) => _settingsWindow = null;
+                _settingsWindow.Show();
+            }
+            else
+            {
+                _settingsWindow.Activate();
+            }
             e.Handled = true;
         }
         catch (Exception ex)
