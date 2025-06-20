@@ -38,6 +38,9 @@ public partial class MainWindow : Window
             Left = left;
             Top = top;
             
+            // Применяем свойство Topmost из ViewModel
+            Topmost = _viewModel.DigitalClockTopmost;
+            
             // Отключаем контекстное меню
             ContextMenu = null;
             

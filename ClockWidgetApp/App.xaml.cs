@@ -2,6 +2,7 @@
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;
+using System.Runtime.InteropServices;
 
 namespace ClockWidgetApp;
 
@@ -143,10 +144,9 @@ public partial class App : System.Windows.Application
 
     private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
-        if (e.Button == MouseButtons.Left)
+        if (e.Button == MouseButtons.Right)
         {
-            // Показываем контекстное меню под курсором
-            _trayMenu?.Show(Cursor.Position);
+            _trayMenu?.Show();
         }
     }
 
