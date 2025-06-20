@@ -219,15 +219,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     private void OnTimeUpdated(object? sender, DateTime time)
     {
         try
-        {
-            if (_disposed)
-            {
-                _logger.LogWarning("[AnalogClockViewModel] TimeUpdated received after disposal");
-                return;
-            }
-
-            _logger.LogDebug("[AnalogClockViewModel] Time updated: {Time}", time);
-            
+        {          
             // Вычисляем углы для стрелок
             double hourAngle = (time.Hour % 12 + time.Minute / 60.0) * 30; // 30 градусов на час
             double minuteAngle = time.Minute * 6; // 6 градусов на минуту
