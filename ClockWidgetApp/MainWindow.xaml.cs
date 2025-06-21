@@ -14,7 +14,6 @@ public partial class MainWindow : Window
     private readonly ILogger<MainWindow> _logger = LoggingService.CreateLogger<MainWindow>();
     private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
-    private SettingsWindow? _settingsWindow;
     public bool IsSettingsWindowOpen { get; set; }
     public MainWindowViewModel ViewModel => _viewModel;
 
@@ -37,6 +36,9 @@ public partial class MainWindow : Window
             var (left, top) = _viewModel.GetWindowPosition();
             Left = left;
             Top = top;
+            
+            // Применяем свойство Topmost из ViewModel
+            Topmost = _viewModel.DigitalClockTopmost;
             
             // Отключаем контекстное меню
             ContextMenu = null;
@@ -99,15 +101,15 @@ public partial class MainWindow : Window
 
     public void OpenSettingsWindow()
     {
-        if (_settingsWindow == null || !_settingsWindow.IsVisible)
+        if (App.SettingsWindowInstance == null || !App.SettingsWindowInstance.IsVisible)
         {
-            _settingsWindow = new SettingsWindow(_viewModel);
-            IsSettingsWindowOpen = true;
-            _settingsWindow.Show();
+            App.SettingsWindowInstance = new SettingsWindow(_viewModel);
+            App.SettingsWindowInstance.Closed += (s, e) => App.SettingsWindowInstance = null;
+            App.SettingsWindowInstance.Show();
         }
         else
         {
-            _settingsWindow.Activate();
+            App.SettingsWindowInstance.Activate();
         }
     }
 
@@ -126,12 +128,6 @@ public partial class MainWindow : Window
             
             // Сохраняем текущую позицию окна
             _viewModel.SaveWindowPosition(Left, Top);
-            
-            // Закрываем окно настроек, если оно открыто
-            if (_settingsWindow != null && _settingsWindow.IsVisible)
-            {
-                _settingsWindow.Close();
-            }
             
             // Очищаем DataContext и освобождаем ресурсы ViewModel
             if (_viewModel is IDisposable disposable)

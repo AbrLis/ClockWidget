@@ -90,5 +90,6 @@ public partial class MainWindowViewModel
         _analogClockSize = settings.AnalogClockSize;
         _analogClockTopmost = settings.AnalogClockTopmost;
         _digitalClockTopmost = settings.DigitalClockTopmost;
+        UpdateDigitalClockTopmost();
     }
 } 

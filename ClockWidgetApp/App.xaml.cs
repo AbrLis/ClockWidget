@@ -2,6 +2,7 @@
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;
+using System.Runtime.InteropServices;
 
 namespace ClockWidgetApp;
 
@@ -17,6 +18,7 @@ public partial class App : System.Windows.Application
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
+    public static SettingsWindow? SettingsWindowInstance { get; set; }
 
     /// <summary>
     /// Получает сервис настроек приложения.
@@ -142,10 +144,9 @@ public partial class App : System.Windows.Application
 
     private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
-        if (e.Button == MouseButtons.Left)
+        if (e.Button == MouseButtons.Right)
         {
-            // Показываем контекстное меню под курсором
-            _trayMenu?.Show(Cursor.Position);
+            _trayMenu?.Show();
         }
     }
 
@@ -153,9 +154,15 @@ public partial class App : System.Windows.Application
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            if (SettingsWindowInstance == null || !SettingsWindowInstance.IsVisible)
             {
-                mainWindow.OpenSettingsWindow();
+                SettingsWindowInstance = new SettingsWindow(MainViewModel);
+                SettingsWindowInstance.Closed += (s, e) => SettingsWindowInstance = null;
+                SettingsWindowInstance.Show();
+            }
+            else
+            {
+                SettingsWindowInstance.Activate();
             }
         });
     }
@@ -194,6 +201,23 @@ public partial class App : System.Windows.Application
         {
             _logger?.LogError(ex, "[App] Error during application shutdown");
             throw;
+        }
+    }
+
+    public void ShowMainWindowIfNeeded()
+    {
+        if (_mainWindow == null)
+        {
+            _mainWindow = new MainWindow();
+            System.Windows.Application.Current.MainWindow = _mainWindow;
+            MainViewModel = _mainWindow.ViewModel;
+            _mainWindow.Show();
+            _mainWindow.Activate();
+        }
+        else if (!_mainWindow.IsVisible)
+        {
+            _mainWindow.Show();
+            _mainWindow.Activate();
         }
     }
 }
