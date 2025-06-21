@@ -2,6 +2,7 @@ using System.Windows;
 using ClockWidgetApp.ViewModels;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace ClockWidgetApp;
 
@@ -76,6 +77,42 @@ public partial class SettingsWindow : Window
             _logger.LogError(ex, "[SettingsWindow] Error during application shutdown");
             // Даже в случае ошибки пытаемся завершить работу
             System.Windows.Application.Current.Shutdown();
+        }
+    }
+
+    private void ShowLogsButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            string logsDir = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ClockWidget",
+                "logs");
+            if (!System.IO.Directory.Exists(logsDir))
+            {
+                System.Windows.MessageBox.Show("Папка с логами не найдена.", "Логи", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var logFiles = System.IO.Directory.GetFiles(logsDir, "clock-widget-*.log");
+            if (logFiles.Length == 0)
+            {
+                System.Windows.MessageBox.Show("Файлы логов не найдены.", "Логи", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var lastLog = logFiles
+                .Select(f => new System.IO.FileInfo(f))
+                .OrderByDescending(f => f.LastWriteTime)
+                .First().FullName;
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = lastLog,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[SettingsWindow] Ошибка при открытии файла логов");
+            System.Windows.MessageBox.Show($"Ошибка при открытии файла логов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 } 
