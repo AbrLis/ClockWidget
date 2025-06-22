@@ -58,6 +58,11 @@ public static class AnalogClockConstants
     public static class ClockDimensions
     {
         /// <summary>
+        /// Размер центральной точки циферблата.
+        /// </summary>
+        public const double CENTER_DOT_SIZE = 6;
+        
+        /// <summary>
         /// Ширина и высота Canvas для циферблата.
         /// </summary>
         public const double CANVAS_SIZE = 250;
@@ -66,10 +71,5 @@ public static class AnalogClockConstants
         /// Отступ от края окна до Canvas.
         /// </summary>
         public const double CANVAS_MARGIN = 25;
-        
-        /// <summary>
-        /// Размер центральной точки циферблата.
-        /// </summary>
-        public const double CENTER_DOT_SIZE = 6;
     }
 } 

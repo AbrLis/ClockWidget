@@ -46,24 +46,4 @@ public class ClockTick
     /// Толщина риски.
     /// </summary>
     public double Thickness { get; set; }
-
-    /// <summary>
-    /// X-координата начала риски.
-    /// </summary>
-    public double StartX => X1;
-
-    /// <summary>
-    /// Y-координата начала риски.
-    /// </summary>
-    public double StartY => Y1;
-
-    /// <summary>
-    /// X-координата конца риски.
-    /// </summary>
-    public double EndX => X2;
-
-    /// <summary>
-    /// Y-координата конца риски.
-    /// </summary>
-    public double EndY => Y2;
 } 
