@@ -248,10 +248,7 @@ public partial class MainWindowViewModel
     }
     private void UpdateDigitalClockTopmost()
     {
-        // Получаем текущее активное окно типа MainWindow
-        var window = System.Windows.Application.Current.Windows
-            .OfType<MainWindow>()
-            .FirstOrDefault();
+        var window = MainWindow.Instance;
         if (window != null)
         {
             window.Topmost = _digitalClockTopmost;

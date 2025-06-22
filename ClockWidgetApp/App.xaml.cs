@@ -154,9 +154,10 @@ public partial class App : System.Windows.Application
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
+            var mainWindow = ClockWidgetApp.MainWindow.Instance;
             if (SettingsWindowInstance == null || !SettingsWindowInstance.IsVisible)
             {
-                SettingsWindowInstance = new SettingsWindow(MainViewModel);
+                SettingsWindowInstance = new SettingsWindow(mainWindow?.ViewModel ?? MainViewModel);
                 SettingsWindowInstance.Closed += (s, e) => SettingsWindowInstance = null;
                 SettingsWindowInstance.Show();
             }

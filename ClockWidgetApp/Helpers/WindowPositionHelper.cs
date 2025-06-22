@@ -1,6 +1,4 @@
-using System;
 using ClockWidgetApp.Services;
-using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.Helpers;
 

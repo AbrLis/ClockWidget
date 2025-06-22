@@ -15,7 +15,8 @@ public partial class MainWindowViewModel
         try
         {
             _logger.LogInformation("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
-            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            var mainWindow = MainWindow.Instance;
+            if (mainWindow != null)
             {
                 var newVisibility = _showDigitalClock ? Visibility.Visible : Visibility.Hidden;
                 if (mainWindow.Visibility != newVisibility)
@@ -37,24 +38,22 @@ public partial class MainWindowViewModel
             }
             if (_showAnalogClock)
             {
-                if (_analogClockWindow == null)
+                var analogWindow = GetOrCreateAnalogClockWindow();
+                if (analogWindow != null)
                 {
-                    _logger.LogInformation("[MainWindowViewModel.Windows] Creating analog clock window");
-                    _analogClockWindow = new AnalogClockWindow();
                     var (left, top) = GetAnalogClockPosition();
-                    _analogClockWindow.Left = left;
-                    _analogClockWindow.Top = top;
-                    _analogClockWindow.Width = _analogClockSize;
-                    _analogClockWindow.Height = _analogClockSize;
-                    _analogClockWindow.Topmost = _analogClockTopmost;
-                    _analogClockWindow.Show();
+                    analogWindow.Left = left;
+                    analogWindow.Top = top;
+                    analogWindow.Width = _analogClockSize;
+                    analogWindow.Height = _analogClockSize;
+                    analogWindow.Topmost = _analogClockTopmost;
+                    if (!analogWindow.IsVisible)
+                    {
+                        analogWindow.Show();
+                    }
+                    analogWindow.Activate();
+                    _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", analogWindow.Left, analogWindow.Top);
                 }
-                else if (!_analogClockWindow.IsVisible)
-                {
-                    _analogClockWindow.Show();
-                }
-                _analogClockWindow.Activate();
-                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", _analogClockWindow.Left, _analogClockWindow.Top);
             }
             else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
             {
@@ -101,6 +100,21 @@ public partial class MainWindowViewModel
         }
     }
 
+    private AnalogClockWindow? GetOrCreateAnalogClockWindow()
+    {
+        if (_analogClockWindow == null)
+        {
+            _logger.LogInformation("[MainWindowViewModel.Windows] Creating analog clock window (singleton)");
+            _analogClockWindow = new AnalogClockWindow();
+            _analogClockWindow.Closed += (s, e) =>
+            {
+                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window closed, singleton reset");
+                _analogClockWindow = null;
+            };
+        }
+        return _analogClockWindow;
+    }
+
     private void UpdateAnalogClockSettings(WidgetSettings settings)
     {
         if (settings == null)
@@ -110,24 +124,22 @@ public partial class MainWindowViewModel
         settings = WidgetSettings.ValidateSettings(settings);
         if (settings.ShowAnalogClock)
         {
-            if (_analogClockWindow == null)
+            var analogWindow = GetOrCreateAnalogClockWindow();
+            if (analogWindow != null)
             {
-                _logger.LogInformation("[MainWindowViewModel.Windows] Creating analog clock window");
-                _analogClockWindow = new AnalogClockWindow();
                 var (left, top) = GetAnalogClockPosition();
-                _analogClockWindow.Left = left;
-                _analogClockWindow.Top = top;
-                _analogClockWindow.Width = settings.AnalogClockSize;
-                _analogClockWindow.Height = settings.AnalogClockSize;
-                _analogClockWindow.Topmost = _analogClockTopmost;
-                _analogClockWindow.Show();
+                analogWindow.Left = left;
+                analogWindow.Top = top;
+                analogWindow.Width = settings.AnalogClockSize;
+                analogWindow.Height = settings.AnalogClockSize;
+                analogWindow.Topmost = _analogClockTopmost;
+                if (!analogWindow.IsVisible)
+                {
+                    analogWindow.Show();
+                }
+                analogWindow.Activate();
+                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", analogWindow.Left, analogWindow.Top);
             }
-            else if (!_analogClockWindow.IsVisible)
-            {
-                _analogClockWindow.Show();
-            }
-            _analogClockWindow.Activate();
-            _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", _analogClockWindow.Left, _analogClockWindow.Top);
         }
         else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
         {

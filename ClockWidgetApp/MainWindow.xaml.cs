@@ -10,6 +10,7 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class MainWindow : Window
 {
+    public static MainWindow? Instance { get; private set; }
     private readonly MainWindowViewModel _viewModel;
     private readonly ILogger<MainWindow> _logger = LoggingService.CreateLogger<MainWindow>();
     private System.Windows.Point _dragStartPoint;
@@ -25,7 +26,7 @@ public partial class MainWindow : Window
         try
         {
             _logger.LogInformation("[MainWindow] Initializing main window");
-            
+            Instance = this;
             InitializeComponent();
             
             // Инициализируем ViewModel
@@ -49,6 +50,7 @@ public partial class MainWindow : Window
             PreviewMouseMove += MainWindow_PreviewMouseMove;
             MouseRightButtonDown += MainWindow_MouseRightButtonDown;
             Closing += MainWindow_Closing;
+            this.Closed += (s, e) => { Instance = null; };
             
             _logger.LogInformation("[MainWindow] Main window initialized");
         }
