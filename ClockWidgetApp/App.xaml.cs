@@ -2,7 +2,6 @@
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;
-using System.Runtime.InteropServices;
 
 namespace ClockWidgetApp;
 
@@ -14,7 +13,6 @@ public partial class App : System.Windows.Application
     private static SettingsService? _settingsService;
     private static MainWindowViewModel? _mainViewModel;
     private static TimeService? _timeService;
-    private MainWindow? _mainWindow;
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
@@ -69,6 +67,29 @@ public partial class App : System.Windows.Application
     }
 
     /// <summary>
+    /// Гарантирует, что главное окно приложения (MainWindow) существует в единственном экземпляре,
+    /// показывает и активирует его. Если окно уже существует, просто активирует его.
+    /// Используется для управления жизненным циклом цифрового виджета.
+    /// </summary>
+    private void EnsureMainWindow()
+    {
+        var mainWindow = ClockWidgetApp.MainWindow.Instance;
+        if (mainWindow == null)
+        {
+            mainWindow = new MainWindow();
+            System.Windows.Application.Current.MainWindow = mainWindow;
+            MainViewModel = mainWindow.ViewModel;
+        }
+        else
+        {
+            MainViewModel = mainWindow.ViewModel;
+        }
+        mainWindow.Show();
+        mainWindow.Activate();
+        _logger?.LogInformation("[App] Main window shown and activated");
+    }
+
+    /// <summary>
     /// Обработчик запуска приложения.
     /// </summary>
     /// <param name="e">Аргументы запуска.</param>
@@ -77,43 +98,31 @@ public partial class App : System.Windows.Application
         try
         {
             _logger?.LogInformation("[App] Starting application");
-            
-            // Инициализируем сервисы
+
+            // Инициализация сервисов и настроек
             SettingsService = new SettingsService();
             TimeService = new TimeService();
             _logger?.LogInformation("[App] Services initialized");
-            
-            // Загружаем настройки
+
             var settings = SettingsService.CurrentSettings;
             _logger?.LogInformation("[App] Settings loaded: {Settings}", 
                 System.Text.Json.JsonSerializer.Serialize(settings));
 
             if (settings.ShowDigitalClock)
             {
-                _mainWindow = new MainWindow();
-                System.Windows.Application.Current.MainWindow = _mainWindow;
-                MainViewModel = _mainWindow.ViewModel;
-                TimeService.Start();
-                _logger?.LogInformation("[App] Time service started");
-                _mainWindow.Show();
-                _mainWindow.Activate();
-                _logger?.LogInformation("[App] Main window created, shown and activated");
+                EnsureMainWindow();
             }
             else
             {
-                // Инициализируем ViewModel напрямую для работы с треем и настройками
                 MainViewModel = new MainWindowViewModel();
-                TimeService.Start();
-                _logger?.LogInformation("[App] Time service started (no main window)");
                 _logger?.LogInformation("[App] Main window not created (ShowDigitalClock == false)");
             }
 
-            // Добавляем иконку в трее
-            InitializeTrayIcon();
+            TimeService.Start();
+            _logger?.LogInformation("[App] Time service started");
 
-            // Устанавливаем режим завершения приложения
+            InitializeTrayIcon();
             this.ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
-            
             _logger?.LogInformation("[App] Application started successfully");
         }
         catch (Exception ex)
@@ -207,18 +216,19 @@ public partial class App : System.Windows.Application
 
     public void ShowMainWindowIfNeeded()
     {
-        if (_mainWindow == null)
+        var mainWindow = ClockWidgetApp.MainWindow.Instance;
+        if (mainWindow == null)
         {
-            _mainWindow = new MainWindow();
-            System.Windows.Application.Current.MainWindow = _mainWindow;
-            MainViewModel = _mainWindow.ViewModel;
-            _mainWindow.Show();
-            _mainWindow.Activate();
+            mainWindow = new MainWindow();
+            System.Windows.Application.Current.MainWindow = mainWindow;
+            MainViewModel = mainWindow.ViewModel;
+            mainWindow.Show();
+            mainWindow.Activate();
         }
-        else if (!_mainWindow.IsVisible)
+        else if (!mainWindow.IsVisible)
         {
-            _mainWindow.Show();
-            _mainWindow.Activate();
+            mainWindow.Show();
+            mainWindow.Activate();
         }
     }
 }
