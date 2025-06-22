@@ -114,7 +114,6 @@ public class TimeService : IDisposable
             if (_currentTime.Second != _lastSecondUpdate.Second)
             {
                 _lastSecondUpdate = _currentTime;
-                _logger.LogTrace("[TimeService] Second changed - {Time}", _currentTime);
                 
                 var handler = TimeUpdated;
                 if (handler != null)

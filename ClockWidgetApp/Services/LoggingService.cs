@@ -63,7 +63,7 @@ public static class LoggingService
             }
 
             var loggerConfiguration = new LoggerConfiguration()
-                .MinimumLevel.Is(LogEventLevel.Verbose); // Минимальный уровень для всех логов
+                .MinimumLevel.Is(LogEventLevel.Warning); // Минимальный уровень для всех логов
 
             if (logToFile)
             {

@@ -11,22 +11,22 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class SettingsWindow : Window
 {
-    private readonly MainWindowViewModel _viewModel;
+    private readonly ViewModels.SettingsWindowViewModel _viewModel;
     private readonly ILogger<SettingsWindow> _logger = LoggingService.CreateLogger<SettingsWindow>();
 
     /// <summary>
     /// Создаёт новое окно настроек.
     /// </summary>
-    /// <param name="viewModel">ViewModel главного окна.</param>
-    public SettingsWindow(MainWindowViewModel viewModel)
+    /// <param name="mainViewModel">ViewModel главного окна.</param>
+    public SettingsWindow(MainWindowViewModel mainViewModel)
     {
         try
         {
             _logger.LogInformation("[SettingsWindow] Initializing settings window");
             InitializeComponent();
-            _viewModel = viewModel;
+            _viewModel = new ViewModels.SettingsWindowViewModel(mainViewModel);
             DataContext = _viewModel;
-            
+            _logger.LogInformation($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
             // Добавляем обработчик закрытия окна
             Closing += SettingsWindow_Closing;
             _logger.LogInformation("[SettingsWindow] Settings window initialized");

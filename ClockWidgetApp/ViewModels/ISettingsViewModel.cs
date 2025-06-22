@@ -11,4 +11,5 @@ public interface ISettingsViewModel
     bool ShowSeconds { get; set; }
     bool ShowDigitalClock { get; set; }
     bool ShowAnalogClock { get; set; }
+    bool CuckooEveryHour { get; set; }
 } 

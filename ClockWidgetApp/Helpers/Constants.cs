@@ -31,6 +31,8 @@ public static class Constants
 
     public static string SETTINGS_FILENAME => FileSettings.SETTINGS_FILENAME;
 
+    public static bool DEFAULT_CUCKOO_EVERY_HOUR => CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
+
     /// <summary>
     /// Настройки окна виджета.
     /// </summary>
@@ -168,5 +170,16 @@ public static class Constants
         /// Имя файла настроек.
         /// </summary>
         public const string SETTINGS_FILENAME = "widget_settings.json";
+    }
+
+    /// <summary>
+    /// Настройки кукушки.
+    /// </summary>
+    public static class CuckooSettings
+    {
+        /// <summary>
+        /// Воспроизводить звук кукушки каждый час по умолчанию (false).
+        /// </summary>
+        public const bool DEFAULT_CUCKOO_EVERY_HOUR = false;
     }
 } 

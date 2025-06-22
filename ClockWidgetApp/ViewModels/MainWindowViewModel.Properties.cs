@@ -222,6 +222,22 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Воспроизводить звук кукушки каждый час.
+    /// </summary>
+    public bool CuckooEveryHour
+    {
+        get => _settingsService.CurrentSettings.CuckooEveryHour;
+        set
+        {
+            if (_settingsService.CurrentSettings.CuckooEveryHour != value)
+            {
+                _logger.LogInformation($"[MainWindowViewModel.Properties] Updating CuckooEveryHour: {value}");
+                _settingsService.UpdateSettings(s => s.CuckooEveryHour = value);
+                OnPropertyChanged();
+            }
+        }
+    }
 
     private void UpdateAnalogClockTopmost()
     {
@@ -232,9 +248,13 @@ public partial class MainWindowViewModel
     }
     private void UpdateDigitalClockTopmost()
     {
-        if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+        // Получаем текущее активное окно типа MainWindow
+        var window = System.Windows.Application.Current.Windows
+            .OfType<MainWindow>()
+            .FirstOrDefault();
+        if (window != null)
         {
-            mainWindow.Topmost = _digitalClockTopmost;
+            window.Topmost = _digitalClockTopmost;
         }
     }
 } 

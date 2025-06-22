@@ -38,4 +38,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Resources\Sounds\*.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

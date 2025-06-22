@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
-        Title="Настройки виджета" 
+        Title="Настройки виджета"
         MinHeight="300"
         Width="300"
         SizeToContent="Height"
@@ -17,12 +17,13 @@
         Background="White">
     <StackPanel Margin="10">
         <!-- Общие настройки -->
-        <GroupBox Header="Общие настройки" Margin="0,0,0,10">
+        <GroupBox Header="Общие настройки"
+                Margin="0,0,0,10">
             <StackPanel Margin="5">
                 <!-- Видимость фона -->
-                <TextBlock Text="Видимость фона:" 
-                          Margin="0,0,0,5"/>
-                
+                <TextBlock Text="Видимость фона:"
+                           Margin="0,0,0,5"/>
+
                 <Slider x:Name="BackgroundOpacitySlider"
                         Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
                         Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
@@ -31,16 +32,16 @@
                         IsSnapToTickEnabled="True"
                         IsMoveToPointEnabled="True"
                         ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
-                
-                <TextBlock x:Name="BackgroundOpacityValueText" 
-                          Text="{Binding BackgroundOpacity, StringFormat=P0}"
-                          HorizontalAlignment="Center" 
-                          Margin="0,0,0,10"/>
+
+                <TextBlock x:Name="BackgroundOpacityValueText"
+                           Text="{Binding BackgroundOpacity, StringFormat=P0}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
 
                 <!-- Видимость текста -->
-                <TextBlock Text="Видимость текста:" 
-                          Margin="0,0,0,5"/>
-                
+                <TextBlock Text="Видимость текста:"
+                           Margin="0,0,0,5"/>
+
                 <Slider x:Name="TextOpacitySlider"
                         Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
                         Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
@@ -49,18 +50,25 @@
                         IsSnapToTickEnabled="True"
                         IsMoveToPointEnabled="True"
                         ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
-                
-                <TextBlock x:Name="TextOpacityValueText" 
-                          Text="{Binding TextOpacity, StringFormat=P0}"
-                          HorizontalAlignment="Center" 
+
+                <TextBlock x:Name="TextOpacityValueText"
+                           Text="{Binding TextOpacity, StringFormat=P0}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+
+                <!-- Чекбокс кукушки -->
+                <CheckBox Content="Звук кукушки каждый час"
+                          IsChecked="{Binding CuckooEveryHour, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,10"/>
+
             </StackPanel>
         </GroupBox>
 
         <!-- Настройки аналоговых часов -->
-        <GroupBox Header="Настройки аналоговых часов" Margin="0,0,0,10">
+        <GroupBox Header="Настройки аналоговых часов"
+                Margin="0,0,0,10">
             <StackPanel Margin="5">
-                <CheckBox Content="Показывать аналоговые часы" 
+                <CheckBox Content="Показывать аналоговые часы"
                           IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,5"/>
                 <CheckBox Content="Поверх всех окон"
@@ -68,9 +76,9 @@
                           Margin="0,0,0,5"/>
 
                 <!-- Размер аналоговых часов -->
-                <TextBlock Text="Размер аналоговых часов:" 
-                          Margin="0,10,0,5"/>
-                
+                <TextBlock Text="Размер аналоговых часов:"
+                           Margin="0,10,0,5"/>
+
                 <Slider x:Name="AnalogClockSizeSlider"
                         Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
                         Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
@@ -79,18 +87,19 @@
                         IsSnapToTickEnabled="True"
                         IsMoveToPointEnabled="True"
                         ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
-                
-                <TextBlock x:Name="AnalogClockSizeValueText" 
-                          Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
-                          HorizontalAlignment="Center" 
-                          Margin="0,0,0,10"/>
+
+                <TextBlock x:Name="AnalogClockSizeValueText"
+                           Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
             </StackPanel>
         </GroupBox>
 
         <!-- Настройки цифровых часов -->
-        <GroupBox Header="Настройки цифровых часов" Margin="0,0,0,10">
+        <GroupBox Header="Настройки цифровых часов"
+                Margin="0,0,0,10">
             <StackPanel Margin="5">
-                <CheckBox Content="Показывать цифровые часы" 
+                <CheckBox Content="Показывать цифровые часы"
                           IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,5"/>
                 <CheckBox Content="Поверх всех окон"
@@ -104,9 +113,9 @@
                           Margin="0,0,0,5"/>
 
                 <!-- Размер шрифта -->
-                <TextBlock Text="Размер шрифта:" 
-                          Margin="0,10,0,5"/>
-                
+                <TextBlock Text="Размер шрифта:"
+                           Margin="0,10,0,5"/>
+
                 <Slider x:Name="FontSizeSlider"
                         Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
                         Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
@@ -115,13 +124,13 @@
                         IsSnapToTickEnabled="True"
                         IsMoveToPointEnabled="True"
                         ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
-                
-                <TextBlock x:Name="FontSizeValueText" 
-                          Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
-                          HorizontalAlignment="Center" 
-                          Margin="0,0,0,10"/>
 
-                
+                <TextBlock x:Name="FontSizeValueText"
+                           Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+
+
             </StackPanel>
         </GroupBox>
 
@@ -129,10 +138,11 @@
         <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="41"/> <!-- 36px кнопка + 5px отступ -->
+                <ColumnDefinition Width="41"/>
+                <!-- 36px кнопка + 5px отступ -->
             </Grid.ColumnDefinitions>
-            <Button x:Name="CloseWidgetButton" 
-                    Content="Закрыть виджет" 
+            <Button x:Name="CloseWidgetButton"
+                    Content="Закрыть виджет"
                     Padding="10,5"
                     Background="#FFE0E0"
                     Click="CloseWidgetButton_Click"

@@ -143,6 +143,57 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Воспроизводить звук кукушки каждый час.
+    /// </summary>
+    public bool CuckooEveryHour
+    {
+        get => _mainViewModel.CuckooEveryHour;
+        set
+        {
+            if (_mainViewModel.CuckooEveryHour != value)
+            {
+                _logger.LogInformation("[SettingsWindowViewModel] Updating CuckooEveryHour: {Value}", value);
+                _mainViewModel.CuckooEveryHour = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Цифровые часы поверх всех окон.
+    /// </summary>
+    public bool DigitalClockTopmost
+    {
+        get => _mainViewModel.DigitalClockTopmost;
+        set
+        {
+            if (_mainViewModel.DigitalClockTopmost != value)
+            {
+                _logger.LogInformation("[SettingsWindowViewModel] Updating DigitalClockTopmost: {Value}", value);
+                _mainViewModel.DigitalClockTopmost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Аналоговые часы поверх всех окон.
+    /// </summary>
+    public bool AnalogClockTopmost
+    {
+        get => _mainViewModel.AnalogClockTopmost;
+        set
+        {
+            if (_mainViewModel.AnalogClockTopmost != value)
+            {
+                _logger.LogInformation("[SettingsWindowViewModel] Updating AnalogClockTopmost: {Value}", value);
+                _mainViewModel.AnalogClockTopmost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
     /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
     /// </summary>
     /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
@@ -164,14 +215,11 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
 
     private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        _logger.LogDebug("[SettingsWindowViewModel] Property changed in main view model: {Property}", e.PropertyName);
-        // Пробрасываем уведомления об изменениях свойств
         OnPropertyChanged(e.PropertyName);
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
-        _logger.LogDebug("[SettingsWindowViewModel] Property changed in settings view model: {Property}", propertyName);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 } 

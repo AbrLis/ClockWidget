@@ -102,6 +102,13 @@ public class WidgetSettings
     [JsonPropertyName("digitalClockTopmost")]
     public bool DigitalClockTopmost { get; set; } = true;
 
+    /// <summary>
+    /// Воспроизводить звук кукушки каждый час.
+    /// Значение по умолчанию: <see cref="Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR"/>.
+    /// </summary>
+    [JsonPropertyName("cuckooEveryHour")]
+    public bool CuckooEveryHour { get; set; } = Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
+
     public WidgetSettings()
     {
         // Значения по умолчанию уже установлены через инициализаторы свойств
