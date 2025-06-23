@@ -144,12 +144,6 @@ public class WidgetSettings
         // Валидация размера аналоговых часов
         settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
         
-        // Убеждаемся, что хотя бы одно окно видимо
-        if (!settings.ShowDigitalClock && !settings.ShowAnalogClock)
-        {
-            settings.ShowDigitalClock = true;
-        }
-
         // Позиции окон не валидируются, так как могут быть null
         
         return settings;
