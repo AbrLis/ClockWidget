@@ -1,4 +1,4 @@
-<!-- Analog Clock Window XAML -->
+<!-- Окно с аналоговыми часами -->
 <Window x:Class="ClockWidgetApp.AnalogClockWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -21,28 +21,30 @@
         Topmost="True"
         Visibility="Collapsed">
     
+    <!-- Корневой Grid для масштабирования содержимого -->
     <Grid x:Name="RootGrid">
         <Viewbox Stretch="Uniform">
             <Grid>
-                <!-- Круглый фон, совпадающий с циферблатом -->
+                <!-- Круглый фон часов -->
                 <Ellipse
                     Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                     Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                     Fill="Black"
                     Opacity="{Binding BackgroundOpacity}"/>
+                <!-- Основной Canvas для размещения элементов часов -->
                 <Canvas x:Name="ClockCanvas" 
                         Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
                         Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                         Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_MARGIN}}">
                     
-                    <!-- Циферблат -->
+                    <!-- Контур циферблата -->
                     <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
                              Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
                              Stroke="White" 
                              StrokeThickness="2"
                              Opacity="{Binding TextOpacity}"/>
                     
-                    <!-- Риски на циферблате - генерируются программно -->
+                    <!-- Риски на циферблате (генерируются из ViewModel) -->
                     <ItemsControl ItemsSource="{Binding ClockTicks}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -60,7 +62,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     
-                    <!-- Центральная точка -->
+                    <!-- Центральная точка часов -->
                     <Ellipse Canvas.Left="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_X}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
                              Canvas.Top="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_Y}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
                              Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
@@ -68,7 +70,7 @@
                              Fill="White"
                              Opacity="{Binding TextOpacity}"/>
                     
-                    <!-- Цифры на циферблате -->
+                    <!-- Цифры на циферблате (12, 3, 6, 9) -->
                     <TextBlock Canvas.Left="115" 
                                Canvas.Top="20" 
                                Text="12" 
@@ -94,7 +96,6 @@
                                FontSize="20"
                                Opacity="{Binding TextOpacity}"/>
                     
-                    <!-- Стрелки часов -->
                     <!-- Часовая стрелка -->
                     <Path x:Name="HourHand" 
                           Stroke="White" 

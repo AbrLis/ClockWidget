@@ -10,13 +10,16 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class AnalogClockWindow : Window
 {
+    // ViewModel для аналоговых часов
     private readonly AnalogClockViewModel _viewModel;
+    // Логгер для событий окна
     private readonly ILogger<AnalogClockWindow> _logger = LoggingService.CreateLogger<AnalogClockWindow>();
+    // Переменные для логики перемещения окна мышью
     private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
 
     /// <summary>
-    /// Создаёт окно с аналоговыми часами.
+    /// Создаёт окно с аналоговыми часами и инициализирует все компоненты и обработчики событий.
     /// </summary>
     public AnalogClockWindow()
     {
@@ -26,11 +29,11 @@ public partial class AnalogClockWindow : Window
             
             InitializeComponent();
             
-            // Инициализируем ViewModel
+            // Инициализируем ViewModel и связываем с DataContext
             _viewModel = new AnalogClockViewModel();
             DataContext = _viewModel;
             
-            // Устанавливаем позицию окна
+            // Устанавливаем позицию окна из ViewModel
             var (left, top) = _viewModel.GetWindowPosition();
             Left = left;
             Top = top;
@@ -38,7 +41,7 @@ public partial class AnalogClockWindow : Window
             // Отключаем контекстное меню
             ContextMenu = null;
             
-            // Добавляем обработчики событий мыши
+            // Добавляем обработчики событий мыши для перемещения окна
             PreviewMouseLeftButtonDown += AnalogClockWindow_PreviewMouseLeftButtonDown;
             PreviewMouseLeftButtonUp += AnalogClockWindow_PreviewMouseLeftButtonUp;
             PreviewMouseMove += AnalogClockWindow_PreviewMouseMove;
@@ -59,6 +62,9 @@ public partial class AnalogClockWindow : Window
         }
     }
 
+    /// <summary>
+    /// Обработчик события загрузки окна.
+    /// </summary>
     private void AnalogClockWindow_Loaded(object sender, RoutedEventArgs e)
     {
         try
@@ -71,6 +77,9 @@ public partial class AnalogClockWindow : Window
         }
     }
 
+    /// <summary>
+    /// Начало перемещения окна мышью (запоминаем стартовую точку).
+    /// </summary>
     private void AnalogClockWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
         try
@@ -87,6 +96,9 @@ public partial class AnalogClockWindow : Window
         }
     }
 
+    /// <summary>
+    /// Завершение перемещения окна мышью.
+    /// </summary>
     private void AnalogClockWindow_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseEventArgs e)
     {
         try
@@ -105,6 +117,9 @@ public partial class AnalogClockWindow : Window
         }
     }
 
+    /// <summary>
+    /// Перемещение окна мышью (реализация drag & drop).
+    /// </summary>
     private void AnalogClockWindow_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         try
@@ -127,6 +142,9 @@ public partial class AnalogClockWindow : Window
         }
     }
 
+    /// <summary>
+    /// Открытие окна настроек по правому клику мыши.
+    /// </summary>
     private void AnalogClockWindow_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         try
@@ -151,6 +169,9 @@ public partial class AnalogClockWindow : Window
         }
     }
 
+    /// <summary>
+    /// Обработчик закрытия окна: сохраняет позицию, отписывается от событий и освобождает ресурсы.
+    /// </summary>
     private void AnalogClockWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         try
