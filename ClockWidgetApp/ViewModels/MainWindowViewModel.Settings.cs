@@ -7,6 +7,7 @@ namespace ClockWidgetApp.ViewModels;
 public partial class MainWindowViewModel
 {
     private int _lastCuckooHour = -1;
+    private readonly ClockWidgetApp.Services.SoundService _soundService = new();
 
     /// <summary>
     /// Проверяет и корректирует значение прозрачности.
@@ -83,7 +84,7 @@ public partial class MainWindowViewModel
             if (CuckooEveryHour && time.Minute == 0 && time.Second == 0 && _lastCuckooHour != time.Hour)
             {
                 _logger.LogInformation($"[MainWindowViewModel] Cuckoo: Playing sound for hour {time.Hour}");
-                PlayCuckooSound(time.Hour);
+                _soundService.PlayCuckooSound(time.Hour);
                 _lastCuckooHour = time.Hour;
             }
             else if (time.Minute != 0 || time.Second != 0)
@@ -94,48 +95,6 @@ public partial class MainWindowViewModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "[MainWindowViewModel] Error in cuckoo logic");
-        }
-    }
-
-    /// <summary>
-    /// Воспроизводит аудиофайл кукушки для указанного часа.
-    /// </summary>
-    /// <param name="hour">Час (1-12).</param>
-    public void PlayCuckooSound(int hour)
-    {
-        _logger.LogInformation($"[MainWindowViewModel] PlayCuckooSound called, hour={hour}");
-        try
-        {
-            int soundHour = hour % 12;
-            if (soundHour == 0) soundHour = 12;
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", $"{soundHour}.mp3");
-            bool fileExists = System.IO.File.Exists(soundPath);
-            _logger.LogInformation($"[MainWindowViewModel] Cuckoo sound file path: {soundPath}, Exists: {fileExists}");
-            if (!fileExists)
-            {
-                _logger.LogWarning($"[MainWindowViewModel] Cuckoo sound file not found: {soundPath}");
-                return;
-            }
-            var player = new System.Windows.Media.MediaPlayer();
-            player.Open(new System.Uri(soundPath));
-            player.Volume = 1.0;
-            player.MediaEnded += (s, e) =>
-            {
-                player.Close();
-                player.Dispatcher?.InvokeAsync(() => player = null);
-                _logger.LogInformation($"[MainWindowViewModel] Cuckoo MediaPlayer closed after playback: {soundPath}");
-            };
-            player.MediaFailed += (s, e) =>
-            {
-                _logger.LogError($"[MainWindowViewModel] MediaPlayer failed: {e.ErrorException}");
-            };
-            player.Play();
-            _logger.LogInformation($"[MainWindowViewModel] Playing cuckoo sound: {soundPath}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[MainWindowViewModel] Error playing cuckoo sound");
         }
     }
 
