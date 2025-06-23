@@ -38,12 +38,21 @@ public partial class MainWindowViewModel
             }
             if (_showAnalogClock)
             {
-                var analogWindow = GetOrCreateAnalogClockWindow();
+                bool created = false;
+                if (AnalogClockWindow.Instance == null)
+                {
+                    new AnalogClockWindow();
+                    created = true;
+                }
+                var analogWindow = AnalogClockWindow.Instance;
                 if (analogWindow != null)
                 {
-                    var (left, top) = GetAnalogClockPosition();
-                    analogWindow.Left = left;
-                    analogWindow.Top = top;
+                    if (created)
+                    {
+                        var (left, top) = GetAnalogClockPosition();
+                        analogWindow.Left = left;
+                        analogWindow.Top = top;
+                    }
                     analogWindow.Width = _analogClockSize;
                     analogWindow.Height = _analogClockSize;
                     analogWindow.Topmost = _analogClockTopmost;
@@ -55,10 +64,10 @@ public partial class MainWindowViewModel
                     _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", analogWindow.Left, analogWindow.Top);
                 }
             }
-            else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
+            else if (AnalogClockWindow.Instance != null && AnalogClockWindow.Instance.IsVisible)
             {
                 _logger.LogInformation("[MainWindowViewModel.Windows] Hiding analog clock window");
-                _analogClockWindow.Hide();
+                AnalogClockWindow.Instance.Hide();
             }
         }
         catch (Exception ex)
@@ -93,26 +102,11 @@ public partial class MainWindowViewModel
 
     private void UpdateAnalogClockSize()
     {
-        if (_analogClockWindow != null)
+        if (AnalogClockWindow.Instance != null)
         {
-            _analogClockWindow.Width = _analogClockSize;
-            _analogClockWindow.Height = _analogClockSize;
+            AnalogClockWindow.Instance.Width = _analogClockSize;
+            AnalogClockWindow.Instance.Height = _analogClockSize;
         }
-    }
-
-    private AnalogClockWindow? GetOrCreateAnalogClockWindow()
-    {
-        if (_analogClockWindow == null)
-        {
-            _logger.LogInformation("[MainWindowViewModel.Windows] Creating analog clock window (singleton)");
-            _analogClockWindow = new AnalogClockWindow();
-            _analogClockWindow.Closed += (s, e) =>
-            {
-                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window closed, singleton reset");
-                _analogClockWindow = null;
-            };
-        }
-        return _analogClockWindow;
     }
 
     private void UpdateAnalogClockSettings(WidgetSettings settings)
@@ -124,7 +118,9 @@ public partial class MainWindowViewModel
         settings = WidgetSettings.ValidateSettings(settings);
         if (settings.ShowAnalogClock)
         {
-            var analogWindow = GetOrCreateAnalogClockWindow();
+            if (AnalogClockWindow.Instance == null)
+                new AnalogClockWindow();
+            var analogWindow = AnalogClockWindow.Instance;
             if (analogWindow != null)
             {
                 var (left, top) = GetAnalogClockPosition();
@@ -141,10 +137,20 @@ public partial class MainWindowViewModel
                 _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", analogWindow.Left, analogWindow.Top);
             }
         }
-        else if (_analogClockWindow != null && _analogClockWindow.IsVisible)
+        else if (AnalogClockWindow.Instance != null && AnalogClockWindow.Instance.IsVisible)
         {
             _logger.LogInformation("[MainWindowViewModel.Windows] Hiding analog clock window");
-            _analogClockWindow.Hide();
+            AnalogClockWindow.Instance.Hide();
         }
+    }
+
+    /// <summary>
+    /// Публичный метод для показа аналоговых часов из внешних источников (например, из трея).
+    /// Гарантирует отсутствие дублирующихся окон.
+    /// </summary>
+    public void ShowAnalogClockWindow()
+    {
+        ShowAnalogClock = true;
+        UpdateWindowsVisibility();
     }
 } 

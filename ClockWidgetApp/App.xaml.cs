@@ -135,10 +135,25 @@ public partial class App : System.Windows.Application
     private void InitializeTrayIcon()
     {
         _trayMenu = new ContextMenuStrip();
+        var showDigitalItem = new ToolStripMenuItem("Показать цифровые часы");
+        showDigitalItem.Click += (s, e) =>
+        {
+            EnsureMainWindow();
+            if (MainViewModel != null)
+                MainViewModel.ShowDigitalClock = true;
+        };
+        var showAnalogItem = new ToolStripMenuItem("Показать аналоговые часы");
+        showAnalogItem.Click += (s, e) =>
+        {
+            if (MainViewModel != null)
+                MainViewModel.ShowAnalogClockWindow();
+        };
         var settingsItem = new ToolStripMenuItem("Настройки");
         settingsItem.Click += (s, e) => ShowSettingsWindow();
         var exitItem = new ToolStripMenuItem("Закрыть");
         exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
+        _trayMenu.Items.Add(showDigitalItem);
+        _trayMenu.Items.Add(showAnalogItem);
         _trayMenu.Items.Add(settingsItem);
         _trayMenu.Items.Add(exitItem);
 

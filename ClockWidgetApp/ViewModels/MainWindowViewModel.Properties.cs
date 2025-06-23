@@ -13,7 +13,6 @@ public partial class MainWindowViewModel
     private bool _showDigitalClock = true;
     private bool _showAnalogClock = true;
     private double _analogClockSize;
-    private AnalogClockWindow? _analogClockWindow;
     private bool _analogClockTopmost = true;
     private bool _digitalClockTopmost = true;
 
@@ -100,7 +99,17 @@ public partial class MainWindowViewModel
         {
             if (_showDigitalClock != value)
             {
-                ApplyClockVisibility(value, _showAnalogClock);
+                _showDigitalClock = value;
+                OnPropertyChanged(nameof(ShowDigitalClock));
+                _settingsService.UpdateSettings(s => s.ShowDigitalClock = _showDigitalClock);
+                if (_showDigitalClock)
+                {
+                    if (System.Windows.Application.Current is App app)
+                    {
+                        app.ShowMainWindowIfNeeded();
+                    }
+                }
+                UpdateWindowsVisibility();
             }
         }
     }
@@ -114,7 +123,10 @@ public partial class MainWindowViewModel
         {
             if (_showAnalogClock != value)
             {
-                ApplyClockVisibility(_showDigitalClock, value);
+                _showAnalogClock = value;
+                OnPropertyChanged(nameof(ShowAnalogClock));
+                _settingsService.UpdateSettings(s => s.ShowAnalogClock = _showAnalogClock);
+                UpdateWindowsVisibility();
             }
         }
     }
@@ -198,9 +210,9 @@ public partial class MainWindowViewModel
 
     private void UpdateAnalogClockTopmost()
     {
-        if (_analogClockWindow != null)
+        if (AnalogClockWindow.Instance != null)
         {
-            _analogClockWindow.Topmost = _analogClockTopmost;
+            AnalogClockWindow.Instance.Topmost = _analogClockTopmost;
         }
     }
     private void UpdateDigitalClockTopmost()
@@ -210,31 +222,5 @@ public partial class MainWindowViewModel
         {
             window.Topmost = _digitalClockTopmost;
         }
-    }
-
-    private void ApplyClockVisibility(bool digital, bool analog)
-    {
-        var tempSettings = new Models.WidgetSettings
-        {
-            ShowDigitalClock = digital,
-            ShowAnalogClock = analog
-        };
-        var validated = Models.WidgetSettings.ValidateSettings(tempSettings);
-        _showDigitalClock = validated.ShowDigitalClock;
-        _showAnalogClock = validated.ShowAnalogClock;
-        OnPropertyChanged(nameof(ShowDigitalClock));
-        OnPropertyChanged(nameof(ShowAnalogClock));
-        _settingsService.UpdateSettings(s => {
-            s.ShowDigitalClock = _showDigitalClock;
-            s.ShowAnalogClock = _showAnalogClock;
-        });
-        if (_showDigitalClock)
-        {
-            if (System.Windows.Application.Current is App app)
-            {
-                app.ShowMainWindowIfNeeded();
-            }
-        }
-        UpdateWindowsVisibility();
     }
 } 

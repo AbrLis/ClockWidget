@@ -10,6 +10,7 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class AnalogClockWindow : Window
 {
+    public static AnalogClockWindow? Instance { get; private set; }
     // ViewModel для аналоговых часов
     private readonly AnalogClockViewModel _viewModel;
     // Логгер для событий окна
@@ -25,6 +26,7 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
+            Instance = this;
             _logger.LogInformation("[AnalogClockWindow] Initializing analog clock window");
             
             InitializeComponent();
@@ -49,6 +51,7 @@ public partial class AnalogClockWindow : Window
 
             // Добавляем обработчик закрытия окна
             Closing += AnalogClockWindow_Closing;
+            this.Closed += (s, e) => { Instance = null; };
             
             // Добавляем обработчик загрузки окна
             Loaded += AnalogClockWindow_Loaded;

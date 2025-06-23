@@ -86,7 +86,8 @@
                         TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
                         IsSnapToTickEnabled="True"
                         IsMoveToPointEnabled="True"
-                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
+                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
+                        IsEnabled="{Binding ShowAnalogClock}"/>
 
                 <TextBlock x:Name="AnalogClockSizeValueText"
                            Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
@@ -123,7 +124,8 @@
                         TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
                         IsSnapToTickEnabled="True"
                         IsMoveToPointEnabled="True"
-                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"/>
+                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
+                        IsEnabled="{Binding ShowDigitalClock}"/>
 
                 <TextBlock x:Name="FontSizeValueText"
                            Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
