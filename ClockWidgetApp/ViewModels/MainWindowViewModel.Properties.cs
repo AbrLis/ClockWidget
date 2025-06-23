@@ -100,32 +100,7 @@ public partial class MainWindowViewModel
         {
             if (_showDigitalClock != value)
             {
-                try
-                {
-                    if (!value && !_showAnalogClock)
-                    {
-                        _logger.LogWarning("[MainWindowViewModel.Properties] Cannot hide both windows, keeping digital clock visible");
-                        return;
-                    }
-                    _logger.LogInformation($"[MainWindowViewModel.Properties] Updating show digital clock: {value}");
-                    _showDigitalClock = value;
-                    OnPropertyChanged();
-                    _settingsService.UpdateSettings(s => s.ShowDigitalClock = value);
-                    if (value)
-                    {
-                        if (System.Windows.Application.Current is App app)
-                        {
-                            app.ShowMainWindowIfNeeded();
-                        }
-                    }
-                    UpdateWindowsVisibility();
-                }
-                catch (Exception)
-                {
-                    _logger.LogError("[MainWindowViewModel.Properties] Error updating show digital clock setting");
-                    _showDigitalClock = !value;
-                    OnPropertyChanged();
-                }
+                ApplyClockVisibility(value, _showAnalogClock);
             }
         }
     }
@@ -139,25 +114,7 @@ public partial class MainWindowViewModel
         {
             if (_showAnalogClock != value)
             {
-                try
-                {
-                    if (!value && !_showDigitalClock)
-                    {
-                        _logger.LogWarning("[MainWindowViewModel.Properties] Cannot hide both windows, keeping analog clock visible");
-                        return;
-                    }
-                    _logger.LogInformation($"[MainWindowViewModel.Properties] Updating show analog clock: {value}");
-                    _showAnalogClock = value;
-                    OnPropertyChanged();
-                    _settingsService.UpdateSettings(s => s.ShowAnalogClock = value);
-                    UpdateWindowsVisibility();
-                }
-                catch (Exception)
-                {
-                    _logger.LogError("[MainWindowViewModel.Properties] Error updating show analog clock setting");
-                    _showAnalogClock = !value;
-                    OnPropertyChanged();
-                }
+                ApplyClockVisibility(_showDigitalClock, value);
             }
         }
     }
@@ -253,5 +210,31 @@ public partial class MainWindowViewModel
         {
             window.Topmost = _digitalClockTopmost;
         }
+    }
+
+    private void ApplyClockVisibility(bool digital, bool analog)
+    {
+        var tempSettings = new Models.WidgetSettings
+        {
+            ShowDigitalClock = digital,
+            ShowAnalogClock = analog
+        };
+        var validated = Models.WidgetSettings.ValidateSettings(tempSettings);
+        _showDigitalClock = validated.ShowDigitalClock;
+        _showAnalogClock = validated.ShowAnalogClock;
+        OnPropertyChanged(nameof(ShowDigitalClock));
+        OnPropertyChanged(nameof(ShowAnalogClock));
+        _settingsService.UpdateSettings(s => {
+            s.ShowDigitalClock = _showDigitalClock;
+            s.ShowAnalogClock = _showAnalogClock;
+        });
+        if (_showDigitalClock)
+        {
+            if (System.Windows.Application.Current is App app)
+            {
+                app.ShowMainWindowIfNeeded();
+            }
+        }
+        UpdateWindowsVisibility();
     }
 } 

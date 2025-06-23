@@ -41,33 +41,6 @@ public partial class MainWindowViewModel
     }
 
     /// <summary>
-    /// Обновляет настройки из объекта WidgetSettings и сохраняет их.
-    /// </summary>
-    /// <param name="settings">Объект настроек.</param>
-    public void UpdateSettings(WidgetSettings settings)
-    {
-        if (settings == null)
-        {
-            throw new ArgumentNullException(nameof(settings));
-        }
-        settings = WidgetSettings.ValidateSettings(settings);
-        if (settings.ShowDigitalClock)
-        {
-            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.Show();
-                mainWindow.Activate();
-            }
-        }
-        else
-        {
-            System.Windows.Application.Current.MainWindow?.Hide();
-        }
-        UpdateAnalogClockSettings(settings);
-        _settingsService.SaveSettings(settings);
-    }
-
-    /// <summary>
     /// Обработчик события обновления времени.
     /// </summary>
     /// <param name="sender">Источник события.</param>
@@ -86,11 +59,9 @@ public partial class MainWindowViewModel
                 _logger.LogInformation($"[MainWindowViewModel] Cuckoo: Playing sound for hour {time.Hour}");
                 _soundService.PlayCuckooSound(time.Hour);
                 _lastCuckooHour = time.Hour;
+                return;
             }
-            else if (time.Minute != 0 || time.Second != 0)
-            {
-                _lastCuckooHour = -1;
-            }
+            _lastCuckooHour = -1;
         }
         catch (Exception ex)
         {
@@ -104,15 +75,16 @@ public partial class MainWindowViewModel
     /// <param name="settings">Объект настроек.</param>
     private void InitializeFromSettings(WidgetSettings settings)
     {
-        _backgroundOpacity = settings.BackgroundOpacity;
-        _textOpacity = settings.TextOpacity;
-        _fontSize = settings.FontSize;
-        _showSeconds = settings.ShowSeconds;
-        _showDigitalClock = settings.ShowDigitalClock;
-        _showAnalogClock = settings.ShowAnalogClock;
-        _analogClockSize = settings.AnalogClockSize;
-        _analogClockTopmost = settings.AnalogClockTopmost;
-        _digitalClockTopmost = settings.DigitalClockTopmost;
+        var validated = WidgetSettings.ValidateSettings(settings);
+        _backgroundOpacity = validated.BackgroundOpacity;
+        _textOpacity = validated.TextOpacity;
+        _fontSize = validated.FontSize;
+        _showSeconds = validated.ShowSeconds;
+        _showDigitalClock = validated.ShowDigitalClock;
+        _showAnalogClock = validated.ShowAnalogClock;
+        _analogClockSize = validated.AnalogClockSize;
+        _analogClockTopmost = validated.AnalogClockTopmost;
+        _digitalClockTopmost = validated.DigitalClockTopmost;
         UpdateDigitalClockTopmost();
     }
 } 
