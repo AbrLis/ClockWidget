@@ -1,7 +1,7 @@
 # Clock Widget App
 
 ## Описание
-Clock Widget App - это десктопное приложение-виджет для Windows, отображающее текущее время в виде полупрозрачного оверлея на рабочем столе. Приложение позволяет настраивать внешний вид и поведение виджета через удобный интерфейс настроек.
+Clock Widget App — это десктопное приложение-виджет для Windows, отображающее текущее время в виде полупрозрачного оверлея на рабочем столе. Приложение позволяет настраивать внешний вид и поведение виджета через удобный интерфейс настроек.
 
 ## Основные возможности
 - Отображение текущего времени в двух режимах:
@@ -14,6 +14,7 @@ Clock Widget App - это десктопное приложение-виджет
 - Сохранение пользовательских настроек между запусками
 - Возможность перемещения виджетов по рабочему столу
 - Независимое позиционирование аналоговых и цифровых часов
+- Воспроизведение звуковых сигналов (опционально)
 
 ## Запуск проекта
 
@@ -32,34 +33,53 @@ dotnet run --project ClockWidgetApp
 ```
 ClockWidgetApp/              # Корневая директория
 ├── ClockWidgetApp.sln      # Файл решения
-├── README.md              # Документация
-├── run.ps1               # Скрипт запуска
-├── run-debug.ps1         # Скрипт запуска с отладкой
-├── build.ps1             # Скрипт сборки
-├── publish-release.ps1   # Скрипт публикации релиза
-└── ClockWidgetApp/        # Директория проекта
-    ├── Models/           # Модели данных и классы настроек
-    │   ├── WidgetSettings.cs    # Настройки виджета
-    │   └── ClockSettings.cs     # Настройки часов
-    ├── ViewModels/       # Модели представления (MVVM)
-    │   ├── MainViewModel.cs     # Основная модель представления
-    │   ├── AnalogClockViewModel.cs  # Модель аналоговых часов
-    │   └── DigitalClockViewModel.cs # Модель цифровых часов
-    ├── Views/            # Представления (XAML)
-    │   ├── MainWindow.xaml      # Главное окно
-    │   ├── AnalogClockWindow.xaml  # Окно аналоговых часов
-    │   ├── DigitalClockWindow.xaml # Окно цифровых часов
-    │   └── SettingsWindow.xaml     # Окно настроек
-    ├── Services/         # Сервисы
-    │   ├── TimeService.cs       # Сервис времени
-    │   ├── SettingsService.cs   # Сервис настроек
-    │   └── LoggingService.cs    # Сервис логирования
-    ├── Helpers/          # Вспомогательные классы
-    │   ├── Constants.cs         # Константы приложения
-    │   └── DebugHelper.cs       # Помощник отладки
-    ├── Resources/        # Ресурсы приложения
-    │   └── Styles/             # Стили и шаблоны
-    └── App.xaml          # Точка входа приложения
+├── README.md               # Документация
+├── run.ps1                 # Скрипт запуска
+├── run-debug.ps1           # Скрипт запуска с отладкой
+├── build.ps1               # Скрипт сборки
+├── publish-release.ps1     # Скрипт публикации релиза
+└── ClockWidgetApp/         # Директория проекта
+    ├── Models/             # Модели данных и классы настроек
+    │   ├── WidgetSettings.cs      # Настройки виджета
+    │   └── ClockTick.cs           # Модель тика часов
+    ├── ViewModels/         # Модели представления (MVVM)
+    │   ├── MainWindowViewModel.cs                # Основная модель представления
+    │   ├── MainWindowViewModel.Properties.cs     # Свойства основной модели
+    │   ├── MainWindowViewModel.Settings.cs       # Работа с настройками
+    │   ├── MainWindowViewModel.Windows.cs        # Работа с окнами
+    │   ├── AnalogClockViewModel.cs               # Модель аналоговых часов
+    │   ├── SettingsWindowViewModel.cs            # Модель окна настроек
+    │   └── ISettingsViewModel.cs                 # Интерфейс для ViewModel настроек
+    ├── Views/                # Представления (XAML)
+    │   ├── MainWindow.xaml           # Главное окно
+    │   ├── MainWindow.xaml.cs        # Логика главного окна
+    │   ├── AnalogClockWindow.xaml    # Окно аналоговых часов
+    │   ├── AnalogClockWindow.xaml.cs # Логика окна аналоговых часов
+    │   ├── SettingsWindow.xaml       # Окно настроек
+    │   └── SettingsWindow.xaml.cs    # Логика окна настроек
+    ├── Services/             # Сервисы
+    │   ├── TimeService.cs           # Сервис времени
+    │   ├── SettingsService.cs       # Сервис настроек
+    │   ├── LoggingService.cs        # Сервис логирования
+    │   └── SoundService.cs          # Сервис звуков
+    ├── Helpers/              # Вспомогательные классы
+    │   ├── Constants.cs                # Константы приложения
+    │   ├── AnalogClockConstants.cs     # Константы аналоговых часов
+    │   ├── WindowPositionHelper.cs     # Помощник позиционирования окон
+    │   └── CenterDotPositionConverter.cs # Конвертер для центра аналоговых часов
+    ├── Resources/            # Ресурсы приложения
+    │   ├── Icons/                    # Иконки приложения
+    │   │   ├── app.ico
+    │   │   ├── app_ico_16.ico
+    │   │   ├── app_ico_32.ico
+    │   │   ├── app_ico_64.ico
+    │   │   ├── app_ico_128.ico
+    │   │   └── app_ico_256.ico
+    │   └── Sounds/                   # Звуковые файлы для сигналов
+    │       ├── 1.mp3 ... 12.mp3
+    ├── App.xaml                # Точка входа приложения (XAML)
+    ├── App.xaml.cs             # Логика приложения
+    └── AssemblyInfo.cs         # Информация о сборке
 ```
 
 ### Используемые технологии
