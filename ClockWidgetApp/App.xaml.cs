@@ -16,6 +16,8 @@ public partial class App : System.Windows.Application
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
+    private ToolStripMenuItem? _showDigitalItem;
+    private ToolStripMenuItem? _showAnalogItem;
     public static SettingsWindow? SettingsWindowInstance { get; set; }
 
     /// <summary>
@@ -135,25 +137,24 @@ public partial class App : System.Windows.Application
     private void InitializeTrayIcon()
     {
         _trayMenu = new ContextMenuStrip();
-        var showDigitalItem = new ToolStripMenuItem("Показать цифровые часы");
-        showDigitalItem.Click += (s, e) =>
+        _showDigitalItem = new ToolStripMenuItem();
+        _showDigitalItem.Click += (s, e) =>
         {
-            EnsureMainWindow();
             if (MainViewModel != null)
-                MainViewModel.ShowDigitalClock = true;
+                MainViewModel.ShowDigitalClock = !MainViewModel.ShowDigitalClock;
         };
-        var showAnalogItem = new ToolStripMenuItem("Показать аналоговые часы");
-        showAnalogItem.Click += (s, e) =>
+        _showAnalogItem = new ToolStripMenuItem();
+        _showAnalogItem.Click += (s, e) =>
         {
             if (MainViewModel != null)
-                MainViewModel.ShowAnalogClockWindow();
+                MainViewModel.ShowAnalogClock = !MainViewModel.ShowAnalogClock;
         };
         var settingsItem = new ToolStripMenuItem("Настройки");
         settingsItem.Click += (s, e) => ShowSettingsWindow();
         var exitItem = new ToolStripMenuItem("Закрыть");
         exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
-        _trayMenu.Items.Add(showDigitalItem);
-        _trayMenu.Items.Add(showAnalogItem);
+        _trayMenu.Items.Add(_showDigitalItem);
+        _trayMenu.Items.Add(_showAnalogItem);
         _trayMenu.Items.Add(settingsItem);
         _trayMenu.Items.Add(exitItem);
 
@@ -166,10 +167,23 @@ public partial class App : System.Windows.Application
         _notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseUp);
     }
 
+    private void UpdateTrayMenuItems()
+    {
+        if (_showDigitalItem != null && MainViewModel != null)
+        {
+            _showDigitalItem.Text = MainViewModel.ShowDigitalClock ? "Скрыть цифровые часы" : "Показать цифровые часы";
+        }
+        if (_showAnalogItem != null && MainViewModel != null)
+        {
+            _showAnalogItem.Text = MainViewModel.ShowAnalogClock ? "Скрыть аналоговые часы" : "Показать аналоговые часы";
+        }
+    }
+
     private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
         if (e.Button == MouseButtons.Right)
         {
+            UpdateTrayMenuItems();
             _trayMenu?.Show();
         }
     }
