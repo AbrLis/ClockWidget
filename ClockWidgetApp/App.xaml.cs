@@ -120,7 +120,12 @@ public partial class App : System.Windows.Application
         var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
         var mainWindow = new MainWindow(mainVm, mainLogger);
         MainWindow = mainWindow;
-        mainWindow.Show();
+
+        // Показываем окно цифрового виджета только если включено в настройках
+        if (mainVm.ShowDigitalClock)
+        {
+            mainWindow.Show();
+        }
 
         // Показываем иконку в трее
         InitializeTrayIcon(mainVm);
