@@ -1,8 +1,6 @@
 using System.Windows;
 using ClockWidgetApp.ViewModels;
-using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace ClockWidgetApp;
 
@@ -11,20 +9,22 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class SettingsWindow : Window
 {
-    private readonly ViewModels.SettingsWindowViewModel _viewModel;
-    private readonly ILogger<SettingsWindow> _logger = LoggingService.CreateLogger<SettingsWindow>();
+    private readonly SettingsWindowViewModel _viewModel;
+    private readonly ILogger<SettingsWindow> _logger;
 
     /// <summary>
     /// Создаёт новое окно настроек.
     /// </summary>
-    /// <param name="mainViewModel">ViewModel главного окна.</param>
-    public SettingsWindow(MainWindowViewModel mainViewModel)
+    /// <param name="viewModel">ViewModel окна настроек.</param>
+    /// <param name="logger">ILogger<SettingsWindow> для логирования.</param>
+    public SettingsWindow(SettingsWindowViewModel viewModel, ILogger<SettingsWindow> logger)
     {
         try
         {
+            _logger = logger;
             _logger.LogInformation("[SettingsWindow] Initializing settings window");
             InitializeComponent();
-            _viewModel = new ViewModels.SettingsWindowViewModel(mainViewModel);
+            _viewModel = viewModel;
             DataContext = _viewModel;
             _logger.LogInformation($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
             // Добавляем обработчик закрытия окна
@@ -33,7 +33,8 @@ public partial class SettingsWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SettingsWindow] Error initializing settings window");
+            if (_logger != null)
+                _logger.LogError(ex, "[SettingsWindow] Error initializing settings window");
             throw;
         }
     }

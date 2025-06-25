@@ -38,21 +38,15 @@ public partial class MainWindowViewModel
             }
             if (_showAnalogClock)
             {
-                bool created = false;
-                if (AnalogClockWindow.Instance == null)
-                {
-                    new AnalogClockWindow();
-                    created = true;
-                }
                 var analogWindow = AnalogClockWindow.Instance;
+                if (analogWindow == null)
+                {
+                    // Создаём окно через DI
+                    ((App)System.Windows.Application.Current).ShowAnalogClockWindow();
+                    analogWindow = AnalogClockWindow.Instance;
+                }
                 if (analogWindow != null)
                 {
-                    if (created)
-                    {
-                        var (left, top) = GetAnalogClockPosition();
-                        analogWindow.Left = left;
-                        analogWindow.Top = top;
-                    }
                     analogWindow.Width = _analogClockSize;
                     analogWindow.Height = _analogClockSize;
                     analogWindow.Topmost = _analogClockTopmost;
@@ -95,52 +89,12 @@ public partial class MainWindowViewModel
         WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
     }
 
-    private (double Left, double Top) GetAnalogClockPosition()
-    {
-        return WindowPositionHelper.GetWindowPosition(_settingsService, true);
-    }
-
     private void UpdateAnalogClockSize()
     {
         if (AnalogClockWindow.Instance != null)
         {
             AnalogClockWindow.Instance.Width = _analogClockSize;
             AnalogClockWindow.Instance.Height = _analogClockSize;
-        }
-    }
-
-    private void UpdateAnalogClockSettings(WidgetSettings settings)
-    {
-        if (settings == null)
-        {
-            throw new ArgumentNullException(nameof(settings));
-        }
-        settings = WidgetSettings.ValidateSettings(settings);
-        if (settings.ShowAnalogClock)
-        {
-            if (AnalogClockWindow.Instance == null)
-                new AnalogClockWindow();
-            var analogWindow = AnalogClockWindow.Instance;
-            if (analogWindow != null)
-            {
-                var (left, top) = GetAnalogClockPosition();
-                analogWindow.Left = left;
-                analogWindow.Top = top;
-                analogWindow.Width = settings.AnalogClockSize;
-                analogWindow.Height = settings.AnalogClockSize;
-                analogWindow.Topmost = _analogClockTopmost;
-                if (!analogWindow.IsVisible)
-                {
-                    analogWindow.Show();
-                }
-                analogWindow.Activate();
-                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window shown and activated at position: Left={0}, Top={1}", analogWindow.Left, analogWindow.Top);
-            }
-        }
-        else if (AnalogClockWindow.Instance != null && AnalogClockWindow.Instance.IsVisible)
-        {
-            _logger.LogInformation("[MainWindowViewModel.Windows] Hiding analog clock window");
-            AnalogClockWindow.Instance.Hide();
         }
     }
 

@@ -11,11 +11,11 @@ namespace ClockWidgetApp.Services;
 /// Сервис для управления настройками виджета.
 /// Обеспечивает сохранение и загрузку настроек в JSON-файл.
 /// </summary>
-public class SettingsService
+public class SettingsService : ISettingsService
 {
     private readonly string _settingsPath;
     private WidgetSettings _currentSettings;
-    private readonly ILogger<SettingsService> _logger = LoggingService.CreateLogger<SettingsService>();
+    private readonly ILogger<SettingsService> _logger;
 
     /// <summary>
     /// Получает текущие настройки виджета.
@@ -26,8 +26,9 @@ public class SettingsService
     /// Инициализирует новый экземпляр класса <see cref="SettingsService"/>.
     /// Загружает настройки из файла или создает настройки по умолчанию.
     /// </summary>
-    public SettingsService()
+    public SettingsService(ILogger<SettingsService> logger)
     {
+        _logger = logger;
         var appDataPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "ClockWidget");

@@ -14,9 +14,10 @@ namespace ClockWidgetApp.ViewModels;
 /// </summary>
 public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
 {
-    private readonly TimeService _timeService;
-    private readonly SettingsService _settingsService;
-    private readonly ILogger<AnalogClockViewModel> _logger = LoggingService.CreateLogger<AnalogClockViewModel>();
+    private readonly ITimeService _timeService;
+    private readonly ISettingsService _settingsService;
+    private readonly MainWindowViewModel _mainViewModel;
+    private readonly ILogger<AnalogClockViewModel> _logger;
     private TransformGroup _hourHandTransform;
     private TransformGroup _minuteHandTransform;
     private TransformGroup _secondHandTransform;
@@ -31,12 +32,12 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Получает прозрачность фона.
     /// </summary>
-    public double BackgroundOpacity => App.MainViewModel.BackgroundOpacity;
+    public double BackgroundOpacity => _mainViewModel.BackgroundOpacity;
 
     /// <summary>
     /// Получает прозрачность текста и стрелок.
     /// </summary>
-    public double TextOpacity => App.MainViewModel.TextOpacity;
+    public double TextOpacity => _mainViewModel.TextOpacity;
 
     /// <summary>
     /// Получает коллекцию рисок на циферблате.
@@ -93,46 +94,29 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="AnalogClockViewModel"/>.
     /// </summary>
-    public AnalogClockViewModel()
+    public AnalogClockViewModel(ITimeService timeService, ISettingsService settingsService, MainWindowViewModel mainViewModel, ILogger<AnalogClockViewModel> logger)
     {
         try
         {
+            _logger = logger;
             _logger.LogInformation("[AnalogClockViewModel] Initializing analog clock view model");
-            
-            // Используем общий TimeService из App вместо создания нового
-            _timeService = App.TimeService;
-            _settingsService = App.SettingsService;
-            
-            // Инициализируем трансформации стрелок
+            _timeService = timeService;
+            _settingsService = settingsService;
+            _mainViewModel = mainViewModel;
             _hourHandTransform = new TransformGroup();
             _minuteHandTransform = new TransformGroup();
             _secondHandTransform = new TransformGroup();
-            
-            // Генерируем риски на циферблате
             GenerateClockTicks();
-            
-            // Подписываемся на обновление времени
             _timeService.TimeUpdated += OnTimeUpdated;
-
-            // Немедленно обновляем стрелки текущим временем
             OnTimeUpdated(this, DateTime.Now);
-
-            // Подписываемся на изменения настроек
-            if (App.MainViewModel != null)
-            {
-                App.MainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-                _logger.LogInformation("[AnalogClockViewModel] Subscribed to MainViewModel property changes");
-            }
-            else
-            {
-                _logger.LogWarning("[AnalogClockViewModel] MainViewModel is not initialized");
-            }
-            
+            _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
+            _logger.LogInformation("[AnalogClockViewModel] Subscribed to MainViewModel property changes");
             _logger.LogInformation("[AnalogClockViewModel] Analog clock view model initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockViewModel] Error initializing analog clock view model");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockViewModel] Error initializing analog clock view model");
             throw;
         }
     }
@@ -186,8 +170,8 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        if (e.PropertyName == nameof(App.MainViewModel.BackgroundOpacity) ||
-            e.PropertyName == nameof(App.MainViewModel.TextOpacity))
+        if (e.PropertyName == nameof(_mainViewModel.BackgroundOpacity) ||
+            e.PropertyName == nameof(_mainViewModel.TextOpacity))
         {
             _logger.LogDebug("[AnalogClockViewModel] Settings changed in main view model: {Property}", e.PropertyName);
             OnPropertyChanged(e.PropertyName);
@@ -288,7 +272,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         if (!_disposed)
         {
             _timeService.TimeUpdated -= OnTimeUpdated;
-            App.MainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
+            _mainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
             _disposed = true;
         }
     }

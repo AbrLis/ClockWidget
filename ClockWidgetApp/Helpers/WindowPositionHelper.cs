@@ -13,7 +13,7 @@ public static class WindowPositionHelper
     /// <param name="settingsService">Сервис настроек.</param>
     /// <param name="isAnalogClock">Признак для аналоговых часов.</param>
     /// <returns>Кортеж с координатами Left и Top.</returns>
-    public static (double Left, double Top) GetWindowPosition(SettingsService settingsService, bool isAnalogClock)
+    public static (double Left, double Top) GetWindowPosition(ISettingsService settingsService, bool isAnalogClock)
     {
         var settings = settingsService.CurrentSettings;
         if (isAnalogClock)
@@ -39,7 +39,7 @@ public static class WindowPositionHelper
     /// <param name="left">Координата Left.</param>
     /// <param name="top">Координата Top.</param>
     /// <param name="isAnalogClock">Признак для аналоговых часов.</param>
-    public static void SaveWindowPosition(SettingsService settingsService, double left, double top, bool isAnalogClock)
+    public static void SaveWindowPosition(ISettingsService settingsService, double left, double top, bool isAnalogClock)
     {
         settingsService.UpdateSettings(s =>
         {

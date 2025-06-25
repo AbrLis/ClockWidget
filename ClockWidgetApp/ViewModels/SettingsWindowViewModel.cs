@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -11,7 +10,7 @@ namespace ClockWidgetApp.ViewModels;
 public class SettingsWindowViewModel : INotifyPropertyChanged
 {
     private readonly MainWindowViewModel _mainViewModel;
-    private readonly ILogger<SettingsWindowViewModel> _logger = LoggingService.CreateLogger<SettingsWindowViewModel>();
+    private readonly ILogger<SettingsWindowViewModel> _logger;
     private double _backgroundOpacity;
     private double _textOpacity;
     private double _fontSize;
@@ -197,19 +196,17 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
     /// </summary>
     /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
-    public SettingsWindowViewModel(MainWindowViewModel mainViewModel)
+    /// <param name="logger">Логгер для SettingsWindowViewModel.</param>
+    public SettingsWindowViewModel(MainWindowViewModel mainViewModel, ILogger<SettingsWindowViewModel> logger)
     {
         _mainViewModel = mainViewModel;
+        _logger = logger;
         _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
-        
-        // Инициализируем значения из MainWindowViewModel
         _backgroundOpacity = _mainViewModel.BackgroundOpacity;
         _textOpacity = _mainViewModel.TextOpacity;
         _fontSize = _mainViewModel.FontSize;
         _analogClockSize = _mainViewModel.AnalogClockSize;
         _showSeconds = _mainViewModel.ShowSeconds;
-        
-        // Подписываемся на изменения свойств MainWindowViewModel
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
     }
 

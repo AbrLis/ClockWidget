@@ -1,8 +1,4 @@
-using System;
-using System.IO;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Windows;
 using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.Models;
@@ -108,11 +104,6 @@ public class WidgetSettings
     /// </summary>
     [JsonPropertyName("cuckooEveryHour")]
     public bool CuckooEveryHour { get; set; } = Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
-
-    public WidgetSettings()
-    {
-        // Значения по умолчанию уже установлены через инициализаторы свойств
-    }
 
     /// <summary>
     /// Проверяет и корректирует значения всех настроек.

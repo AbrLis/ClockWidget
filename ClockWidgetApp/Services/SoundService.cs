@@ -5,9 +5,14 @@ using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.Services;
 
-public class SoundService
+public class SoundService : ISoundService
 {
-    private readonly ILogger<SoundService> _logger = LoggingService.CreateLogger<SoundService>();
+    private readonly ILogger<SoundService> _logger;
+
+    public SoundService(ILogger<SoundService> logger)
+    {
+        _logger = logger;
+    }
 
     /// <summary>
     /// Воспроизводит аудиофайл по указанному пути.

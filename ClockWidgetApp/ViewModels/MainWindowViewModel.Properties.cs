@@ -102,13 +102,6 @@ public partial class MainWindowViewModel
                 _showDigitalClock = value;
                 OnPropertyChanged(nameof(ShowDigitalClock));
                 _settingsService.UpdateSettings(s => s.ShowDigitalClock = _showDigitalClock);
-                if (_showDigitalClock)
-                {
-                    if (System.Windows.Application.Current is App app)
-                    {
-                        app.ShowMainWindowIfNeeded();
-                    }
-                }
                 UpdateWindowsVisibility();
             }
         }

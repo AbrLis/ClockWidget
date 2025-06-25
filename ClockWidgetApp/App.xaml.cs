@@ -2,6 +2,9 @@
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using System.IO;
 
 namespace ClockWidgetApp;
 
@@ -10,9 +13,7 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class App : System.Windows.Application
 {
-    private static SettingsService? _settingsService;
-    private static MainWindowViewModel? _mainViewModel;
-    private static TimeService? _timeService;
+    private ServiceProvider? _serviceProvider;
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
@@ -21,41 +22,13 @@ public partial class App : System.Windows.Application
     public static SettingsWindow? SettingsWindowInstance { get; set; }
 
     /// <summary>
-    /// Получает сервис настроек приложения.
-    /// </summary>
-    public static SettingsService SettingsService
-    {
-        get => _settingsService ?? throw new InvalidOperationException("SettingsService is not initialized");
-        private set => _settingsService = value;
-    }
-
-    /// <summary>
-    /// Получает ViewModel главного окна.
-    /// </summary>
-    public static MainWindowViewModel MainViewModel
-    {
-        get => _mainViewModel ?? throw new InvalidOperationException("MainViewModel is not initialized");
-        private set => _mainViewModel = value;
-    }
-
-    /// <summary>
-    /// Получает общий сервис времени приложения.
-    /// </summary>
-    public static TimeService TimeService
-    {
-        get => _timeService ?? throw new InvalidOperationException("TimeService is not initialized");
-        private set => _timeService = value;
-    }
-
-    /// <summary>
     /// Конструктор приложения. Инициализирует логирование и обработчики ошибок.
     /// </summary>
     public App()
     {
-        // Инициализируем логирование
-        LoggingService.Initialize();
-        _logger = LoggingService.CreateLogger<App>();
-
+        ConfigureLogging();
+        ConfigureServices();
+        _logger = _serviceProvider?.GetRequiredService<ILogger<App>>();
         // Глобальный обработчик необработанных исключений
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
@@ -68,27 +41,67 @@ public partial class App : System.Windows.Application
         };
     }
 
-    /// <summary>
-    /// Гарантирует, что главное окно приложения (MainWindow) существует в единственном экземпляре,
-    /// показывает и активирует его. Если окно уже существует, просто активирует его.
-    /// Используется для управления жизненным циклом цифрового виджета.
-    /// </summary>
-    private void EnsureMainWindow()
+    private string? ParseLogLevelFromArgs(string[] args)
     {
-        var mainWindow = ClockWidgetApp.MainWindow.Instance;
-        if (mainWindow == null)
+        foreach (var arg in args)
         {
-            mainWindow = new MainWindow();
-            System.Windows.Application.Current.MainWindow = mainWindow;
-            MainViewModel = mainWindow.ViewModel;
+            if (arg.StartsWith("--log-level=", StringComparison.OrdinalIgnoreCase))
+            {
+                return arg.Substring("--log-level=".Length);
+            }
         }
-        else
+        return null;
+    }
+
+    private void ConfigureLogging(string? logLevelOverride = null)
+    {
+        var logPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ClockWidget",
+            "logs",
+            "clock-widget-.log");
+
+        var logLevel = logLevelOverride ?? "Warning";
+        var level = logLevel.ToUpperInvariant() switch
         {
-            MainViewModel = mainWindow.ViewModel;
-        }
-        mainWindow.Show();
-        mainWindow.Activate();
-        _logger?.LogInformation("[App] Main window shown and activated");
+            "TRACE" => Serilog.Events.LogEventLevel.Verbose,
+            "DEBUG" => Serilog.Events.LogEventLevel.Debug,
+            "INFO" => Serilog.Events.LogEventLevel.Information,
+            "WARNING" => Serilog.Events.LogEventLevel.Warning,
+            "ERROR" => Serilog.Events.LogEventLevel.Error,
+            "FATAL" => Serilog.Events.LogEventLevel.Fatal,
+            _ => Serilog.Events.LogEventLevel.Warning
+        };
+
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Is(level)
+            .WriteTo.File(
+                logPath,
+                rollingInterval: RollingInterval.Day,
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+                retainedFileCountLimit: 30,
+                restrictedToMinimumLevel: level)
+            .CreateLogger();
+    }
+
+    private void ConfigureServices()
+    {
+        var services = new ServiceCollection();
+        // Регистрация сервисов
+        services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<ITimeService, TimeService>();
+        services.AddSingleton<ISoundService, SoundService>();
+        // Регистрация ViewModel
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddTransient<SettingsWindowViewModel>();
+        services.AddTransient<AnalogClockViewModel>();
+        // Логгеры
+        services.AddLogging(builder =>
+        {
+            builder.ClearProviders();
+            builder.AddSerilog(Log.Logger, dispose: true);
+        });
+        _serviceProvider = services.BuildServiceProvider();
     }
 
     /// <summary>
@@ -97,68 +110,57 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
-        try
+        var logLevel = ParseLogLevelFromArgs(e.Args);
+        ConfigureLogging(logLevel);
+        base.OnStartup(e);
+        _logger?.LogInformation("[App] Application starting");
+        var timeService = _serviceProvider!.GetRequiredService<ITimeService>();
+        timeService.Start();
+        var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
+        var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
+        var mainWindow = new MainWindow(mainVm, mainLogger);
+        MainWindow = mainWindow;
+        mainWindow.Show();
+
+        // Показываем иконку в трее
+        InitializeTrayIcon(mainVm);
+
+        // Показываем аналоговые часы, если они включены в настройках
+        if (mainVm.ShowAnalogClock)
         {
-            _logger?.LogInformation("[App] Starting application");
-
-            // Инициализация сервисов и настроек
-            SettingsService = new SettingsService();
-            TimeService = new TimeService();
-            _logger?.LogInformation("[App] Services initialized");
-
-            var settings = SettingsService.CurrentSettings;
-            _logger?.LogInformation("[App] Settings loaded: {Settings}", 
-                System.Text.Json.JsonSerializer.Serialize(settings));
-
-            if (settings.ShowDigitalClock)
-            {
-                EnsureMainWindow();
-            }
-            else
-            {
-                MainViewModel = new MainWindowViewModel();
-                _logger?.LogInformation("[App] Main window not created (ShowDigitalClock == false)");
-            }
-
-            TimeService.Start();
-            _logger?.LogInformation("[App] Time service started");
-
-            InitializeTrayIcon();
-            this.ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
-            _logger?.LogInformation("[App] Application started successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError(ex, "[App] Error during application startup");
-            throw;
+            mainVm.ShowAnalogClockWindow();
         }
     }
 
-    private void InitializeTrayIcon()
+    private void InitializeTrayIcon(MainWindowViewModel mainViewModel)
     {
         _trayMenu = new ContextMenuStrip();
         _showDigitalItem = new ToolStripMenuItem();
         _showDigitalItem.Click += (s, e) =>
         {
-            if (MainViewModel != null)
-                MainViewModel.ShowDigitalClock = !MainViewModel.ShowDigitalClock;
+            if (mainViewModel != null)
+                mainViewModel.ShowDigitalClock = !mainViewModel.ShowDigitalClock;
         };
         _showAnalogItem = new ToolStripMenuItem();
         _showAnalogItem.Click += (s, e) =>
         {
-            if (MainViewModel != null)
-                MainViewModel.ShowAnalogClock = !MainViewModel.ShowAnalogClock;
+            if (mainViewModel != null)
+                mainViewModel.ShowAnalogClock = !mainViewModel.ShowAnalogClock;
         };
         var settingsItem = new ToolStripMenuItem("Настройки");
-        settingsItem.Click += (s, e) => ShowSettingsWindow();
+        settingsItem.Click += (s, e) => ShowSettingsWindow(mainViewModel);
         var exitItem = new ToolStripMenuItem("Закрыть");
         exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
         _trayMenu.Items.Add(_showDigitalItem);
         _trayMenu.Items.Add(_showAnalogItem);
         _trayMenu.Items.Add(settingsItem);
         _trayMenu.Items.Add(exitItem);
-
         string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
+        if (!File.Exists(iconPath))
+        {
+            _logger?.LogWarning("[App] Tray icon file not found: {Path}", iconPath);
+            return;
+        }
         _notifyIcon = new NotifyIcon();
         _notifyIcon.Icon = new Icon(iconPath);
         _notifyIcon.Visible = true;
@@ -167,35 +169,38 @@ public partial class App : System.Windows.Application
         _notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseUp);
     }
 
-    private void UpdateTrayMenuItems()
+    private void UpdateTrayMenuItems(MainWindowViewModel mainViewModel)
     {
-        if (_showDigitalItem != null && MainViewModel != null)
+        if (_showDigitalItem != null && mainViewModel != null)
         {
-            _showDigitalItem.Text = MainViewModel.ShowDigitalClock ? "Скрыть цифровые часы" : "Показать цифровые часы";
+            _showDigitalItem.Text = mainViewModel.ShowDigitalClock ? "Скрыть цифровые часы" : "Показать цифровые часы";
         }
-        if (_showAnalogItem != null && MainViewModel != null)
+        if (_showAnalogItem != null && mainViewModel != null)
         {
-            _showAnalogItem.Text = MainViewModel.ShowAnalogClock ? "Скрыть аналоговые часы" : "Показать аналоговые часы";
+            _showAnalogItem.Text = mainViewModel.ShowAnalogClock ? "Скрыть аналоговые часы" : "Показать аналоговые часы";
         }
     }
 
     private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
-        if (e.Button == MouseButtons.Right)
+        var mainViewModel = _serviceProvider?.GetRequiredService<MainWindowViewModel>();
+        if (e.Button == MouseButtons.Right && mainViewModel != null)
         {
-            UpdateTrayMenuItems();
+            UpdateTrayMenuItems(mainViewModel);
             _trayMenu?.Show();
         }
     }
 
-    private void ShowSettingsWindow()
+    public void ShowSettingsWindow(MainWindowViewModel mainViewModel)
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             var mainWindow = ClockWidgetApp.MainWindow.Instance;
             if (SettingsWindowInstance == null || !SettingsWindowInstance.IsVisible)
             {
-                SettingsWindowInstance = new SettingsWindow(mainWindow?.ViewModel ?? MainViewModel);
+                var settingsVm = _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
+                var logger = _serviceProvider!.GetRequiredService<ILogger<SettingsWindow>>();
+                SettingsWindowInstance = new SettingsWindow(settingsVm, logger);
                 SettingsWindowInstance.Closed += (s, e) => SettingsWindowInstance = null;
                 SettingsWindowInstance.Show();
             }
@@ -214,14 +219,14 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            _logger?.LogInformation("[App] Application shutting down");
-            // Сохраняем все буферизированные настройки перед выходом
-            SettingsService.SaveBufferedSettings();
-            // Останавливаем и освобождаем TimeService
-            if (_timeService != null)
+            var settingsService = _serviceProvider?.GetRequiredService<ISettingsService>();
+            var timeService = _serviceProvider?.GetRequiredService<ITimeService>();
+            _logger?.LogInformation("[App] Application shutting down (DI)");
+            settingsService?.SaveBufferedSettings();
+            if (timeService != null)
             {
-                _timeService.Stop();
-                _timeService.Dispose();
+                timeService.Stop();
+                timeService.Dispose();
                 _logger?.LogInformation("[App] Time service disposed");
             }
             if (_notifyIcon != null)
@@ -230,33 +235,35 @@ public partial class App : System.Windows.Application
                 _notifyIcon.Dispose();
             }
             base.OnExit(e);
-            _logger?.LogInformation("[App] Application shutdown completed");
-            // Освобождаем ресурсы логгера
-            LoggingService.Dispose();
+            _logger?.LogInformation("[App] Application shutdown completed (DI)");
+            Log.CloseAndFlush();
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "[App] Error during application shutdown");
+            _logger?.LogError(ex, "[App] Error during application shutdown (DI)");
             throw;
         }
     }
 
-    public void ShowMainWindowIfNeeded()
+    public void ShowAnalogClockWindow()
     {
-        var mainWindow = ClockWidgetApp.MainWindow.Instance;
-        if (mainWindow == null)
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            mainWindow = new MainWindow();
-            System.Windows.Application.Current.MainWindow = mainWindow;
-            MainViewModel = mainWindow.ViewModel;
-            mainWindow.Show();
-            mainWindow.Activate();
-        }
-        else if (!mainWindow.IsVisible)
-        {
-            mainWindow.Show();
-            mainWindow.Activate();
-        }
+            if (ClockWidgetApp.AnalogClockWindow.Instance == null || !ClockWidgetApp.AnalogClockWindow.Instance.IsVisible)
+            {
+                var analogVm = _serviceProvider!.GetRequiredService<AnalogClockViewModel>();
+                var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
+                var logger = _serviceProvider!.GetRequiredService<ILogger<AnalogClockWindow>>();
+                var analogWindow = new AnalogClockWindow(analogVm, mainVm, logger);
+                analogWindow.Show();
+            }
+            else
+            {
+                ClockWidgetApp.AnalogClockWindow.Instance.Activate();
+            }
+        });
     }
+
+    public IServiceProvider Services => _serviceProvider!;
 }
 

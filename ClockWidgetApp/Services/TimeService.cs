@@ -8,10 +8,10 @@ namespace ClockWidgetApp.Services;
 /// Сервис для обновления и предоставления текущего времени.
 /// Использует таймер для периодического обновления времени.
 /// </summary>
-public class TimeService : IDisposable
+public class TimeService : IDisposable, ITimeService
 {
     private readonly System.Timers.Timer _timer;
-    private readonly ILogger<TimeService> _logger = LoggingService.CreateLogger<TimeService>();
+    private readonly ILogger<TimeService> _logger;
     private DateTime _currentTime;
     private bool _isDisposed;
     private DateTime _lastSecondUpdate;
@@ -25,10 +25,11 @@ public class TimeService : IDisposable
     /// Инициализирует новый экземпляр класса <see cref="TimeService"/>.
     /// Создает таймер с интервалом в 100мс для более точного обновления.
     /// </summary>
-    public TimeService()
+    public TimeService(ILogger<TimeService> logger)
     {
         try
         {
+            _logger = logger;
             _logger.LogDebug("[TimeService] Constructor started");
             _timer = new System.Timers.Timer(100); // Обновление каждые 100мс для точности
             _timer.Elapsed += OnTimerElapsed;
@@ -38,7 +39,8 @@ public class TimeService : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[TimeService] Constructor error");
+            if (_logger != null)
+                _logger.LogError(ex, "[TimeService] Constructor error");
             throw;
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using ClockWidgetApp.ViewModels;
-using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ClockWidgetApp;
 
@@ -12,7 +12,7 @@ public partial class MainWindow : Window
 {
     public static MainWindow? Instance { get; private set; }
     private readonly MainWindowViewModel _viewModel;
-    private readonly ILogger<MainWindow> _logger = LoggingService.CreateLogger<MainWindow>();
+    private readonly ILogger<MainWindow> _logger;
     private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
     public bool IsSettingsWindowOpen { get; set; }
@@ -21,42 +21,33 @@ public partial class MainWindow : Window
     /// <summary>
     /// Создаёт главное окно приложения.
     /// </summary>
-    public MainWindow()
+    public MainWindow(MainWindowViewModel viewModel, ILogger<MainWindow> logger)
     {
         try
         {
+            _logger = logger;
             _logger.LogInformation("[MainWindow] Initializing main window");
             Instance = this;
             InitializeComponent();
-            
-            // Инициализируем ViewModel
-            _viewModel = new MainWindowViewModel();
+            _viewModel = viewModel;
             DataContext = _viewModel;
-            
-            // Устанавливаем позицию окна
             var (left, top) = _viewModel.GetWindowPosition();
             Left = left;
             Top = top;
-            
-            // Применяем свойство Topmost из ViewModel
             Topmost = _viewModel.DigitalClockTopmost;
-            
-            // Отключаем контекстное меню
             ContextMenu = null;
-            
-            // Добавляем обработчики событий мыши
             PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown;
             PreviewMouseLeftButtonUp += MainWindow_PreviewMouseLeftButtonUp;
             PreviewMouseMove += MainWindow_PreviewMouseMove;
             MouseRightButtonDown += MainWindow_MouseRightButtonDown;
             Closing += MainWindow_Closing;
             this.Closed += (s, e) => { Instance = null; };
-            
             _logger.LogInformation("[MainWindow] Main window initialized");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[MainWindow] Error initializing main window");
+            if (_logger != null)
+                _logger.LogError(ex, "[MainWindow] Error initializing main window");
             throw;
         }
     }
@@ -105,7 +96,9 @@ public partial class MainWindow : Window
     {
         if (App.SettingsWindowInstance == null || !App.SettingsWindowInstance.IsVisible)
         {
-            App.SettingsWindowInstance = new SettingsWindow(_viewModel);
+            var settingsVm = ((App)System.Windows.Application.Current).Services.GetRequiredService<SettingsWindowViewModel>();
+            var logger = ((App)System.Windows.Application.Current).Services.GetRequiredService<ILogger<SettingsWindow>>();
+            App.SettingsWindowInstance = new SettingsWindow(settingsVm, logger);
             App.SettingsWindowInstance.Closed += (s, e) => App.SettingsWindowInstance = null;
             App.SettingsWindowInstance.Show();
         }

@@ -12,9 +12,10 @@ namespace ClockWidgetApp.ViewModels;
 /// </summary>
 public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel, IDisposable
 {
-    private readonly TimeService _timeService;
-    private readonly SettingsService _settingsService;
-    private readonly ILogger<MainWindowViewModel> _logger = LoggingService.CreateLogger<MainWindowViewModel>();
+    private readonly ITimeService _timeService;
+    private readonly ISettingsService _settingsService;
+    private readonly ISoundService _soundService;
+    private readonly ILogger<MainWindowViewModel> _logger;
     private bool _disposed;
 
     /// <summary>
@@ -26,17 +27,18 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     /// Инициализирует новый экземпляр класса <see cref="MainWindowViewModel"/>.
     /// Загружает сохраненные настройки и запускает сервис обновления времени.
     /// </summary>
-    public MainWindowViewModel()
+    public MainWindowViewModel(ITimeService timeService, ISettingsService settingsService, ISoundService soundService, ILogger<MainWindowViewModel> logger)
     {
         try
         {
+            _logger = logger;
             _logger.LogInformation("[MainWindowViewModel] Initializing main window view model");
-            _timeService = App.TimeService;
-            _settingsService = App.SettingsService;
+            _timeService = timeService;
+            _settingsService = settingsService;
+            _soundService = soundService;
             var settings = _settingsService.CurrentSettings;
             _logger.LogInformation("[MainWindowViewModel] Loading settings for main window: {Settings}", 
-                JsonSerializer.Serialize(settings));
-            // Инициализация значений и подписка на события вынесены в partial-файл
+                System.Text.Json.JsonSerializer.Serialize(settings));
             InitializeFromSettings(settings);
             _timeService.TimeUpdated += OnTimeUpdated;
             OnTimeUpdated(this, DateTime.Now);
@@ -49,7 +51,8 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[MainWindowViewModel] Error initializing main window view model");
+            if (_logger != null)
+                _logger.LogError(ex, "[MainWindowViewModel] Error initializing main window view model");
             throw;
         }
     }

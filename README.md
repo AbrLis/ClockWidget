@@ -114,25 +114,30 @@ ClockWidgetApp/              # Корневая директория
 
 ## Логирование
 
-Приложение использует Serilog для логирования. Логи записываются в файл `logs/clock-widget.log`.
+Приложение использует Serilog для логирования. Все логи записываются в файл:
+```
+%APPDATA%\ClockWidget\logs\clock-widget-<дата>.log
+```
 
 ### Настройка уровня логирования
 
-Уровень логирования можно настроить через переменную окружения `FILE_LOG_LEVELS`:
+Уровень логирования можно задать через флаг командной строки `--log-level=LEVEL` при запуске приложения:
 
 ```powershell
 # Включить отладочные сообщения
-$env:FILE_LOG_LEVELS="DEBUG"
-.\ClockWidgetApp.exe
+.\ClockWidgetApp.exe --log-level=DEBUG
 
 # Или только ошибки
-$env:FILE_LOG_LEVELS="ERROR"
-.\ClockWidgetApp.exe
+.\ClockWidgetApp.exe --log-level=ERROR
+
+# Для dotnet run:
+dotnet run --project ClockWidgetApp -- --log-level=INFO
 ```
 
-Доступные уровни: `VERBOSE`, `DEBUG`, `INFORMATION`, `WARNING`, `ERROR`, `FATAL`
+Доступные уровни: `TRACE`, `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`
 
-По умолчанию логируются сообщения уровня WARNING и выше.
+- Если флаг не задан, используется уровень WARNING по умолчанию.
+- Все логи пишутся только в файл, интеграция с Microsoft.Extensions.Logging осуществляется через Serilog.
 
 ## Лицензия
 MIT License

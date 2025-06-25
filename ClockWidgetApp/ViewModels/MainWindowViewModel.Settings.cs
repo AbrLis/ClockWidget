@@ -1,13 +1,13 @@
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
 using Microsoft.Extensions.Logging;
+using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
 public partial class MainWindowViewModel
 {
     private int _lastCuckooHour = -1;
-    private readonly ClockWidgetApp.Services.SoundService _soundService = new();
 
     /// <summary>
     /// Проверяет и корректирует значение прозрачности.

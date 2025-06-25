@@ -1,6 +1,5 @@
 using System.Windows;
 using ClockWidgetApp.ViewModels;
-using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp;
@@ -14,7 +13,8 @@ public partial class AnalogClockWindow : Window
     // ViewModel для аналоговых часов
     private readonly AnalogClockViewModel _viewModel;
     // Логгер для событий окна
-    private readonly ILogger<AnalogClockWindow> _logger = LoggingService.CreateLogger<AnalogClockWindow>();
+    private readonly ILogger<AnalogClockWindow> _logger;
+    private readonly MainWindowViewModel _mainViewModel;
     // Переменные для логики перемещения окна мышью
     private System.Windows.Point _dragStartPoint;
     private bool _isDragging;
@@ -22,17 +22,19 @@ public partial class AnalogClockWindow : Window
     /// <summary>
     /// Создаёт окно с аналоговыми часами и инициализирует все компоненты и обработчики событий.
     /// </summary>
-    public AnalogClockWindow()
+    public AnalogClockWindow(AnalogClockViewModel viewModel, MainWindowViewModel mainViewModel, ILogger<AnalogClockWindow> logger)
     {
         try
         {
             Instance = this;
+            _logger = logger;
+            _mainViewModel = mainViewModel;
             _logger.LogInformation("[AnalogClockWindow] Initializing analog clock window");
             
             InitializeComponent();
             
             // Инициализируем ViewModel и связываем с DataContext
-            _viewModel = new AnalogClockViewModel();
+            _viewModel = viewModel;
             DataContext = _viewModel;
             
             // Устанавливаем позицию окна из ViewModel
@@ -60,7 +62,8 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockWindow] Error initializing analog clock window");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockWindow] Error initializing analog clock window");
             throw;
         }
     }
@@ -76,7 +79,8 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockWindow] Error in window loaded event");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockWindow] Error in window loaded event");
         }
     }
 
@@ -95,7 +99,8 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button down event");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button down event");
         }
     }
 
@@ -116,7 +121,8 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button up event");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button up event");
         }
     }
 
@@ -141,7 +147,8 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockWindow] Error in mouse move event");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockWindow] Error in mouse move event");
         }
     }
 
@@ -153,22 +160,13 @@ public partial class AnalogClockWindow : Window
         try
         {
             _logger.LogInformation("[AnalogClockWindow] Opening settings window");
-            if (App.SettingsWindowInstance == null || !App.SettingsWindowInstance.IsVisible)
-            {
-                App.SettingsWindowInstance = new SettingsWindow(App.MainViewModel);
-                App.SettingsWindowInstance.Owner = this;
-                App.SettingsWindowInstance.Closed += (s, args) => App.SettingsWindowInstance = null;
-                App.SettingsWindowInstance.Show();
-            }
-            else
-            {
-                App.SettingsWindowInstance.Activate();
-            }
+            ((App)System.Windows.Application.Current).ShowSettingsWindow(_mainViewModel);
             e.Handled = true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[AnalogClockWindow] Error opening settings window");
+            if (_logger != null)
+                _logger.LogError(ex, "[AnalogClockWindow] Error opening settings window");
         }
     }
 
@@ -203,7 +201,8 @@ public partial class AnalogClockWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during window closing");
+            if (_logger != null)
+                _logger.LogError(ex, "Error during window closing");
         }
     }
 } 
