@@ -48,24 +48,32 @@ public class SettingsService
     }
 
     /// <summary>
-    /// Обновляет настройки с помощью указанного действия и сохраняет их в файл.
+    /// Обновляет настройки с помощью указанного действия. Сохраняет только в памяти (буфер), не на диск.
+    /// Для сохранения на диск используйте <see cref="SaveBufferedSettings"/>.
     /// </summary>
     /// <param name="updateAction">Действие для обновления настроек.</param>
     public void UpdateSettings(Action<WidgetSettings> updateAction)
     {
         try
         {
-            _logger.LogInformation("[SettingsService] Updating settings");
+            _logger.LogInformation("[SettingsService] Buffering settings update");
             updateAction(_currentSettings);
-            SaveSettings(_currentSettings);
-            _logger.LogInformation("[SettingsService] Settings updated successfully: {Settings}", 
+            _logger.LogInformation("[SettingsService] Settings updated in buffer: {Settings}", 
                 JsonSerializer.Serialize(_currentSettings));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SettingsService] Error updating settings");
+            _logger.LogError(ex, "[SettingsService] Error updating settings (buffered)");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Сохраняет текущие буферизированные настройки в файл.
+    /// </summary>
+    public void SaveBufferedSettings()
+    {
+        SaveSettings(_currentSettings);
     }
 
     /// <summary>

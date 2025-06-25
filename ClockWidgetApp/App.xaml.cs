@@ -215,7 +215,8 @@ public partial class App : System.Windows.Application
         try
         {
             _logger?.LogInformation("[App] Application shutting down");
-            
+            // Сохраняем все буферизированные настройки перед выходом
+            SettingsService.SaveBufferedSettings();
             // Останавливаем и освобождаем TimeService
             if (_timeService != null)
             {
@@ -223,16 +224,13 @@ public partial class App : System.Windows.Application
                 _timeService.Dispose();
                 _logger?.LogInformation("[App] Time service disposed");
             }
-            
             if (_notifyIcon != null)
             {
                 _notifyIcon.Visible = false;
                 _notifyIcon.Dispose();
             }
-            
             base.OnExit(e);
             _logger?.LogInformation("[App] Application shutdown completed");
-            
             // Освобождаем ресурсы логгера
             LoggingService.Dispose();
         }

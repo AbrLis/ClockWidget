@@ -25,7 +25,7 @@ public partial class MainWindowViewModel
         set { _timeText = value; OnPropertyChanged(); }
     }
     /// <summary>
-    /// Прозрачность фона.
+    /// Прозрачность фона. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double BackgroundOpacity
     {
@@ -45,7 +45,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Прозрачность текста.
+    /// Прозрачность текста. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double TextOpacity
     {
@@ -65,7 +65,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Размер шрифта.
+    /// Размер шрифта. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double FontSize
     {
@@ -82,7 +82,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Показывать секунды.
+    /// Показывать секунды. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowSeconds
     {
@@ -90,7 +90,7 @@ public partial class MainWindowViewModel
         set { _showSeconds = value; OnPropertyChanged(); _settingsService.UpdateSettings(s => s.ShowSeconds = _showSeconds); }
     }
     /// <summary>
-    /// Показывать цифровые часы.
+    /// Показывать цифровые часы. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowDigitalClock
     {
@@ -114,7 +114,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Показывать аналоговые часы.
+    /// Показывать аналоговые часы. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowAnalogClock
     {
@@ -131,7 +131,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Размер аналоговых часов.
+    /// Размер аналоговых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double AnalogClockSize
     {
@@ -158,7 +158,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Аналоговые часы поверх всех окон.
+    /// Аналоговые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool AnalogClockTopmost
     {
@@ -175,7 +175,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Цифровые часы поверх всех окон.
+    /// Цифровые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool DigitalClockTopmost
     {
@@ -192,7 +192,7 @@ public partial class MainWindowViewModel
         }
     }
     /// <summary>
-    /// Воспроизводить звук кукушки каждый час.
+    /// Воспроизводить звук кукушки каждый час. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool CuckooEveryHour
     {

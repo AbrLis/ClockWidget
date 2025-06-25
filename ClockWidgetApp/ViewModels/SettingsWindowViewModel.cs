@@ -24,7 +24,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Получает или задает прозрачность фона.
+    /// Получает или задает прозрачность фона. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double BackgroundOpacity
     {
@@ -41,7 +41,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Получает или задает прозрачность текста.
+    /// Получает или задает прозрачность текста. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double TextOpacity
     {
@@ -58,7 +58,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Получает или задает размер шрифта.
+    /// Получает или задает размер шрифта. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double FontSize
     {
@@ -75,7 +75,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Получает или задает отображение секунд.
+    /// Получает или задает отображение секунд. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowSeconds
     {
@@ -92,7 +92,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Получает или задает отображение цифровых часов.
+    /// Получает или задает отображение цифровых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowDigitalClock
     {
@@ -109,7 +109,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Получает или задает отображение аналоговых часов.
+    /// Получает или задает отображение аналоговых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowAnalogClock
     {
@@ -126,7 +126,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Получает или устанавливает размер окна аналоговых часов.
+    /// Получает или устанавливает размер окна аналоговых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public double AnalogClockSize
     {
@@ -143,7 +143,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Воспроизводить звук кукушки каждый час.
+    /// Воспроизводить звук кукушки каждый час. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool CuckooEveryHour
     {
@@ -160,7 +160,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Цифровые часы поверх всех окон.
+    /// Цифровые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool DigitalClockTopmost
     {
@@ -177,7 +177,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Аналоговые часы поверх всех окон.
+    /// Аналоговые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool AnalogClockTopmost
     {
