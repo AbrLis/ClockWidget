@@ -237,16 +237,39 @@ public partial class App : System.Windows.Application
 
     /// <summary>
     /// Обработчик клика по иконке в трее.
+    /// При левом клике все активные окна приложения выводятся на передний план.
+    /// При правом клике открывается контекстное меню.
     /// </summary>
     /// <param name="sender">Источник события.</param>
     /// <param name="e">Аргументы события мыши.</param>
     private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
         var mainViewModel = _serviceProvider?.GetRequiredService<MainWindowViewModel>();
-        if (e.Button == MouseButtons.Right && mainViewModel != null)
+        if (e.Button == System.Windows.Forms.MouseButtons.Right && mainViewModel != null)
         {
             UpdateTrayMenuItems(mainViewModel);
             _trayMenu?.Show();
+            return;
+        }
+        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        {
+            // Выводим все активные окна на передний план
+            System.Windows.Application.Current.Dispatcher.Invoke(static () =>
+            {
+                void BringToFront(Window? window)
+                {
+                    if (window == null || !window.IsVisible)
+                        return;
+                    window.Show();
+                    bool wasTopmost = window.Topmost;
+                    window.Topmost = true;
+                    window.Activate();
+                    window.Topmost = wasTopmost;
+                }
+                BringToFront(ClockWidgetApp.MainWindow.Instance);
+                BringToFront(AnalogClockWindow.Instance);
+                BringToFront(SettingsWindowInstance);
+            });
         }
     }
 
