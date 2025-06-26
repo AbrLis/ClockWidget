@@ -64,4 +64,15 @@ public class SoundService : ISoundService
         string soundPath = Path.Combine(baseDir, "Resources", "Sounds", $"{soundHour}.mp3");
         PlaySound(soundPath);
     }
+
+    /// <summary>
+    /// Воспроизводит аудиофайл сигнала для половины часа (например, 12:30, 1:30 и т.д.).
+    /// </summary>
+    public void PlayHalfHourChime()
+    {
+        _logger.LogInformation("[SoundService] PlayHalfHourChime called");
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string soundPath = Path.Combine(baseDir, "Resources", "Sounds", "halfHour.mp3");
+        PlaySound(soundPath);
+    }
 } 

@@ -106,6 +106,13 @@ public class WidgetSettings
     public bool CuckooEveryHour { get; set; } = Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
 
     /// <summary>
+    /// Воспроизводить сигнал каждые полчаса (например, в 12:30, 1:30 и т.д.).
+    /// Значение по умолчанию: false.
+    /// </summary>
+    [JsonPropertyName("halfHourChimeEnabled")]
+    public bool HalfHourChimeEnabled { get; set; } = false;
+
+    /// <summary>
     /// Проверяет и корректирует значения всех настроек.
     /// </summary>
     /// <param name="settings">Объект настроек.</param>

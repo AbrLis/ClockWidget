@@ -61,6 +61,10 @@
                           IsChecked="{Binding CuckooEveryHour, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,10"/>
 
+                <CheckBox Content="Сигнал каждые полчаса"
+                          IsChecked="{Binding HalfHourChimeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="0,0,0,10"/>
+
             </StackPanel>
         </GroupBox>
 

@@ -200,6 +200,22 @@ public partial class MainWindowViewModel
             }
         }
     }
+    /// <summary>
+    /// Воспроизводить сигнал каждые полчаса. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// </summary>
+    public bool HalfHourChimeEnabled
+    {
+        get => _settingsService.CurrentSettings.HalfHourChimeEnabled;
+        set
+        {
+            if (_settingsService.CurrentSettings.HalfHourChimeEnabled != value)
+            {
+                _logger.LogInformation($"[MainWindowViewModel.Properties] Updating HalfHourChimeEnabled: {value}");
+                _settingsService.UpdateSettings(s => s.HalfHourChimeEnabled = value);
+                OnPropertyChanged();
+            }
+        }
+    }
 
     private void UpdateAnalogClockTopmost()
     {

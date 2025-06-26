@@ -16,4 +16,9 @@ public interface ISoundService
     /// </summary>
     /// <param name="hour">Час (1-12).</param>
     void PlayCuckooSound(int hour);
+
+    /// <summary>
+    /// Воспроизводит аудиофайл сигнала для половины часа (например, 12:30, 1:30 и т.д.).
+    /// </summary>
+    void PlayHalfHourChime();
 } 

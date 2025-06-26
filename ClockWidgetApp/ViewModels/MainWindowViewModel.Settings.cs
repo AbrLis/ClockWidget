@@ -8,6 +8,7 @@ namespace ClockWidgetApp.ViewModels;
 public partial class MainWindowViewModel
 {
     private int _lastCuckooHour = -1;
+    private int _lastHalfHourChimeMinute = -1;
 
     /// <summary>
     /// Проверяет и корректирует значение прозрачности.
@@ -66,6 +67,26 @@ public partial class MainWindowViewModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "[MainWindowViewModel] Error in cuckoo logic");
+        }
+
+        // Логика сигнала каждые полчаса
+        try
+        {
+            if (HalfHourChimeEnabled && time.Minute == 30 && time.Second == 0 && _lastHalfHourChimeMinute != time.Minute)
+            {
+                _logger.LogInformation($"[MainWindowViewModel] HalfHourChime: Playing half-hour chime at {time:HH:mm:ss}");
+                _soundService.PlayHalfHourChime();
+                _lastHalfHourChimeMinute = time.Minute;
+                return;
+            }
+            if (time.Minute != 30)
+            {
+                _lastHalfHourChimeMinute = -1;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[MainWindowViewModel] Error in half-hour chime logic");
         }
     }
 

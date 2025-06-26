@@ -193,6 +193,23 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Воспроизводить сигнал каждые полчаса. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// </summary>
+    public bool HalfHourChimeEnabled
+    {
+        get => _mainViewModel.HalfHourChimeEnabled;
+        set
+        {
+            if (_mainViewModel.HalfHourChimeEnabled != value)
+            {
+                _logger.LogInformation("[SettingsWindowViewModel] Updating HalfHourChimeEnabled: {Value}", value);
+                _mainViewModel.HalfHourChimeEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
     /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
     /// </summary>
     /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
