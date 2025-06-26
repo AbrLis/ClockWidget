@@ -39,8 +39,42 @@ public partial class App : System.Windows.Application
             _logger?.LogError(args.Exception, "[App] Unhandled exception (Dispatcher)");
             args.Handled = true;
         };
+        // Подписка на завершение сессии (выход из системы, завершение работы и т.д.)
+        this.SessionEnding += App_SessionEnding;
     }
 
+    /// <summary>
+    /// Обработчик события завершения сессии пользователя (выход из системы, завершение работы и т.д.).
+    /// Сохраняет настройки приложения.
+    /// </summary>
+    private void App_SessionEnding(object? sender, SessionEndingCancelEventArgs e)
+    {
+        _logger?.LogInformation("[App] Session ending: {Reason}", e.ReasonSessionEnding);
+        SaveSettingsOnShutdown();
+    }
+
+    /// <summary>
+    /// Сохраняет настройки приложения при завершении работы или сессии.
+    /// </summary>
+    private void SaveSettingsOnShutdown()
+    {
+        try
+        {
+            var settingsService = _serviceProvider?.GetRequiredService<ISettingsService>();
+            settingsService?.SaveBufferedSettings();
+            _logger?.LogInformation("[App] Settings saved on shutdown/session ending");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "[App] Error saving settings on shutdown/session ending");
+        }
+    }
+
+    /// <summary>
+    /// Разбирает уровень логирования из аргументов командной строки.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <returns>Уровень логирования или null, если не найден.</returns>
     private string? ParseLogLevelFromArgs(string[] args)
     {
         foreach (var arg in args)
@@ -53,6 +87,10 @@ public partial class App : System.Windows.Application
         return null;
     }
 
+    /// <summary>
+    /// Конфигурирует систему логирования приложения.
+    /// </summary>
+    /// <param name="logLevelOverride">Переопределение уровня логирования (опционально).</param>
     private void ConfigureLogging(string? logLevelOverride = null)
     {
         var logPath = Path.Combine(
@@ -84,6 +122,9 @@ public partial class App : System.Windows.Application
             .CreateLogger();
     }
 
+    /// <summary>
+    /// Регистрирует сервисы и ViewModel в DI-контейнере.
+    /// </summary>
     private void ConfigureServices()
     {
         var services = new ServiceCollection();
@@ -137,6 +178,10 @@ public partial class App : System.Windows.Application
         }
     }
 
+    /// <summary>
+    /// Инициализирует иконку приложения в системном трее и её меню.
+    /// </summary>
+    /// <param name="mainViewModel">Главная ViewModel для управления состоянием меню.</param>
     private void InitializeTrayIcon(MainWindowViewModel mainViewModel)
     {
         _trayMenu = new ContextMenuStrip();
@@ -174,6 +219,10 @@ public partial class App : System.Windows.Application
         _notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseUp);
     }
 
+    /// <summary>
+    /// Обновляет текст пунктов меню трея в зависимости от состояния приложения.
+    /// </summary>
+    /// <param name="mainViewModel">Главная ViewModel.</param>
     private void UpdateTrayMenuItems(MainWindowViewModel mainViewModel)
     {
         if (_showDigitalItem != null && mainViewModel != null)
@@ -186,6 +235,11 @@ public partial class App : System.Windows.Application
         }
     }
 
+    /// <summary>
+    /// Обработчик клика по иконке в трее.
+    /// </summary>
+    /// <param name="sender">Источник события.</param>
+    /// <param name="e">Аргументы события мыши.</param>
     private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
         var mainViewModel = _serviceProvider?.GetRequiredService<MainWindowViewModel>();
@@ -196,6 +250,10 @@ public partial class App : System.Windows.Application
         }
     }
 
+    /// <summary>
+    /// Открывает окно настроек приложения.
+    /// </summary>
+    /// <param name="mainViewModel">Главная ViewModel для передачи в окно настроек.</param>
     public void ShowSettingsWindow(MainWindowViewModel mainViewModel)
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -224,10 +282,9 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            var settingsService = _serviceProvider?.GetRequiredService<ISettingsService>();
-            var timeService = _serviceProvider?.GetRequiredService<ITimeService>();
             _logger?.LogInformation("[App] Application shutting down (DI)");
-            settingsService?.SaveBufferedSettings();
+            SaveSettingsOnShutdown();
+            var timeService = _serviceProvider?.GetRequiredService<ITimeService>();
             if (timeService != null)
             {
                 timeService.Stop();
@@ -250,6 +307,9 @@ public partial class App : System.Windows.Application
         }
     }
 
+    /// <summary>
+    /// Открывает окно аналоговых часов, если оно ещё не открыто.
+    /// </summary>
     public void ShowAnalogClockWindow()
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -269,6 +329,9 @@ public partial class App : System.Windows.Application
         });
     }
 
+    /// <summary>
+    /// Возвращает DI-контейнер сервисов приложения.
+    /// </summary>
     public IServiceProvider Services => _serviceProvider!;
 }
 
