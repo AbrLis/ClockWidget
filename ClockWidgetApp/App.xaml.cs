@@ -151,6 +151,9 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Прогрев сервисов и ViewModel для окна настроек
+        _serviceProvider!.GetRequiredService<ISettingsService>();
+        _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
         var logLevel = ParseLogLevelFromArgs(e.Args);
         ConfigureLogging(logLevel);
         base.OnStartup(e);
