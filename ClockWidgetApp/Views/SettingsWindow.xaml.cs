@@ -48,7 +48,10 @@ public partial class SettingsWindow : Window
             {
                 mainWindow.IsSettingsWindowOpen = false;
             }
-            _logger.LogInformation("[SettingsWindow] Settings window closed");
+            // Вместо уничтожения окна скрываем его, чтобы оно оставалось в памяти
+            e.Cancel = true;
+            this.Hide();
+            _logger.LogInformation("[SettingsWindow] Settings window hidden (not closed)");
         }
         catch (Exception ex)
         {

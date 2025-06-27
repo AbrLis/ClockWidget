@@ -20,6 +20,10 @@ public partial class App : System.Windows.Application
     private ToolStripMenuItem? _showDigitalItem;
     private ToolStripMenuItem? _showAnalogItem;
     public static SettingsWindow? SettingsWindowInstance { get; set; }
+    /// <summary>
+    /// Предзагруженное окно настроек для мгновенного показа.
+    /// </summary>
+    public static SettingsWindow? PreloadedSettingsWindow { get; private set; }
 
     /// <summary>
     /// Конструктор приложения. Инициализирует логирование и обработчики ошибок.
@@ -153,7 +157,11 @@ public partial class App : System.Windows.Application
     {
         // Прогрев сервисов и ViewModel для окна настроек
         _serviceProvider!.GetRequiredService<ISettingsService>();
-        _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
+        var settingsVm = _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
+        var logger = _serviceProvider!.GetRequiredService<ILogger<SettingsWindow>>();
+        PreloadedSettingsWindow = new SettingsWindow(settingsVm, logger);
+        PreloadedSettingsWindow.UpdateLayout();
+        PreloadedSettingsWindow.Hide();
         var logLevel = ParseLogLevelFromArgs(e.Args);
         ConfigureLogging(logLevel);
         base.OnStartup(e);
@@ -164,21 +172,14 @@ public partial class App : System.Windows.Application
         var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
         var mainWindow = new MainWindow(mainVm, mainLogger);
         MainWindow = mainWindow;
-
         // Показываем окно цифрового виджета только если включено в настройках
         if (mainVm.ShowDigitalClock)
-        {
             mainWindow.Show();
-        }
-
         // Показываем иконку в трее
         InitializeTrayIcon(mainVm);
-
         // Показываем аналоговые часы, если они включены в настройках
         if (mainVm.ShowAnalogClock)
-        {
             mainVm.ShowAnalogClockWindow();
-        }
     }
 
     /// <summary>
@@ -284,16 +285,14 @@ public partial class App : System.Windows.Application
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            var mainWindow = ClockWidgetApp.MainWindow.Instance;
-            if (SettingsWindowInstance == null || !SettingsWindowInstance.IsVisible)
+            if (PreloadedSettingsWindow != null && !PreloadedSettingsWindow.IsVisible)
             {
-                var settingsVm = _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
-                var logger = _serviceProvider!.GetRequiredService<ILogger<SettingsWindow>>();
-                SettingsWindowInstance = new SettingsWindow(settingsVm, logger);
+                SettingsWindowInstance = PreloadedSettingsWindow;
                 SettingsWindowInstance.Closed += (s, e) => SettingsWindowInstance = null;
                 SettingsWindowInstance.Show();
+                SettingsWindowInstance.Activate();
             }
-            else
+            else if (SettingsWindowInstance != null && SettingsWindowInstance.IsVisible)
             {
                 SettingsWindowInstance.Activate();
             }
@@ -321,6 +320,11 @@ public partial class App : System.Windows.Application
             {
                 _notifyIcon.Visible = false;
                 _notifyIcon.Dispose();
+            }
+            if (PreloadedSettingsWindow != null)
+            {
+                PreloadedSettingsWindow.Close();
+                PreloadedSettingsWindow = null;
             }
             base.OnExit(e);
             _logger?.LogInformation("[App] Application shutdown completed (DI)");
