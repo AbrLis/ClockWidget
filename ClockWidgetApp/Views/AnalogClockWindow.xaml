@@ -16,7 +16,6 @@
         ShowInTaskbar="False"
         ShowActivated="True"
         WindowStartupLocation="Manual"
-        Topmost="True"
         Visibility="Collapsed">
     
     <!-- Корневой Grid для масштабирования содержимого -->

@@ -106,5 +106,6 @@ public partial class MainWindowViewModel
         _analogClockTopmost = validated.AnalogClockTopmost;
         _digitalClockTopmost = validated.DigitalClockTopmost;
         UpdateDigitalClockTopmost();
+        UpdateAnalogClockTopmost();
     }
 } 
