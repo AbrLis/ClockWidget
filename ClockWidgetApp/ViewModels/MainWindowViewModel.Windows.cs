@@ -1,4 +1,3 @@
-using System.Windows;
 using ClockWidgetApp.Helpers;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.Services;

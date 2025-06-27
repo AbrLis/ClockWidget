@@ -1,5 +1,3 @@
-using System;
-using System.Timers;
 using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.Services;

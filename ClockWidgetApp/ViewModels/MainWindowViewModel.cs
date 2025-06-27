@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace ClockWidgetApp.ViewModels;
 

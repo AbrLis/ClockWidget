@@ -90,13 +90,6 @@ public partial class MainWindow : Window
         e.Handled = true; // Предотвращаем появление контекстного меню
     }
 
-    public void OpenSettingsWindow()
-    {
-        // Открытие окна настроек теперь централизовано через IWindowService
-        var windowService = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
-        windowService?.OpenSettingsWindow();
-    }
-
     private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         try

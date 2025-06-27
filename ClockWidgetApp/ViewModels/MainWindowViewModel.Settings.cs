@@ -1,7 +1,6 @@
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
 using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
