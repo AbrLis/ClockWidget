@@ -52,6 +52,8 @@ namespace ClockWidgetApp.Services
                 var mainVm = services.GetRequiredService<ClockWidgetApp.ViewModels.MainWindowViewModel>();
                 var logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AnalogClockWindow>>();
                 _analogClockWindow = new AnalogClockWindow(analogVm, mainVm, logger);
+                _analogClockWindow.Width = mainVm.AnalogClockSize;
+                _analogClockWindow.Height = mainVm.AnalogClockSize;
                 // При попытке закрытия окна — скрываем его, не уничтожая
                 _analogClockWindow.Closing += (s, e) => { e.Cancel = true; _analogClockWindow.Hide(); };
                 _analogClockWindow.Closed += (s, e) => _analogClockWindow = null;

@@ -21,19 +21,12 @@ public partial class MainWindowViewModel
             // --- Цифровое окно ---
             if (_showDigitalClock)
             {
-                if (mainWindow == null)
-                    _windowService?.OpenMainWindow();
-                else if (!mainWindow.IsVisible)
-                    mainWindow.Show();
-                mainWindow = MainWindow;
-                mainWindow?.Activate();
-                if (mainWindow != null)
-                    mainWindow.Topmost = _digitalClockTopmost;
+                _windowService?.OpenMainWindow();
                 _logger.LogInformation("[MainWindowViewModel.Windows] Main window ensured visible and activated");
             }
-            else if (mainWindow != null && mainWindow.IsVisible)
+            else
             {
-                mainWindow.Hide();
+                _windowService?.HideMainWindow();
                 _logger.LogInformation("[MainWindowViewModel.Windows] Main window hidden");
             }
 
@@ -41,22 +34,12 @@ public partial class MainWindowViewModel
             if (_showAnalogClock)
             {
                 _windowService?.OpenAnalogClockWindow();
-                var analogWindow = AnalogClockWindow;
-                if (analogWindow != null)
-                {
-                    analogWindow.Width = _analogClockSize;
-                    analogWindow.Height = _analogClockSize;
-                    analogWindow.Topmost = _analogClockTopmost;
-                    if (!analogWindow.IsVisible)
-                        analogWindow.Show();
-                    analogWindow.Activate();
-                    _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated at position: Left={0}, Top={1}", analogWindow.Left, analogWindow.Top);
-                }
+                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated");
             }
-            else if (AnalogClockWindow != null && AnalogClockWindow.IsVisible)
+            else
             {
-                _logger.LogInformation("[MainWindowViewModel.Windows] Hiding analog clock window");
                 _windowService?.HideAnalogClockWindow();
+                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window hidden");
             }
         }
         catch (Exception ex)

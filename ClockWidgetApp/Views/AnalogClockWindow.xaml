@@ -9,8 +9,6 @@
         xmlns:converters="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
         Title="Analog Clock" 
-        Height="300" 
-        Width="300"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
