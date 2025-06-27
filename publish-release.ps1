@@ -12,7 +12,6 @@ dotnet publish ClockWidgetApp `
     -p:SelfContained=true `
     -p:DebugType=None `
     -p:DebugSymbols=false `
-    -p:IncludeNativeLibrariesForSelfExtract=true `
     -p:EnableCompressionInSingleFile=true `
     -r win-x64 `
     --nologo
