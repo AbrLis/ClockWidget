@@ -19,7 +19,6 @@ public partial class App : System.Windows.Application
     private ContextMenuStrip? _trayMenu = null;
     private ToolStripMenuItem? _showDigitalItem;
     private ToolStripMenuItem? _showAnalogItem;
-    public static SettingsWindow? SettingsWindowInstance { get; set; }
     /// <summary>
     /// Предзагруженное окно настроек для мгновенного показа.
     /// </summary>
@@ -30,7 +29,8 @@ public partial class App : System.Windows.Application
     /// </summary>
     public App()
     {
-        ConfigureLogging();
+        var logLevel = ParseLogLevelFromArgs(Environment.GetCommandLineArgs());
+        ConfigureLogging(logLevel);
         ConfigureServices();
         _logger = _serviceProvider?.GetRequiredService<ILogger<App>>();
         // Глобальный обработчик необработанных исключений
@@ -136,6 +136,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<ITimeService, TimeService>();
         services.AddSingleton<ISoundService, SoundService>();
+        services.AddSingleton<IWindowService, WindowService>();
         // Регистрация ViewModel
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
@@ -162,24 +163,26 @@ public partial class App : System.Windows.Application
         PreloadedSettingsWindow = new SettingsWindow(settingsVm, logger);
         PreloadedSettingsWindow.UpdateLayout();
         PreloadedSettingsWindow.Hide();
-        var logLevel = ParseLogLevelFromArgs(e.Args);
-        ConfigureLogging(logLevel);
         base.OnStartup(e);
         _logger?.LogInformation("[App] Application starting");
         var timeService = _serviceProvider!.GetRequiredService<ITimeService>();
         timeService.Start();
         var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
         var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
-        var mainWindow = new MainWindow(mainVm, mainLogger);
-        MainWindow = mainWindow;
-        // Показываем окно цифрового виджета только если включено в настройках
+        if (_serviceProvider == null)
+            throw new InvalidOperationException("DI ServiceProvider is not initialized.");
+        var windowService = _serviceProvider.GetRequiredService<IWindowService>();
         if (mainVm.ShowDigitalClock)
-            mainWindow.Show();
+            windowService.OpenMainWindow();
         // Показываем иконку в трее
         InitializeTrayIcon(mainVm);
-        // Показываем аналоговые часы, если они включены в настройках
+        // Показываем аналоговые часы, если они включены в настройках через сервис
         if (mainVm.ShowAnalogClock)
-            mainVm.ShowAnalogClockWindow();
+        {
+            if (_serviceProvider == null)
+                throw new InvalidOperationException("DI ServiceProvider is not initialized.");
+            windowService.OpenAnalogClockWindow();
+        }
     }
 
     /// <summary>
@@ -270,9 +273,10 @@ public partial class App : System.Windows.Application
                     window.Activate();
                     window.Topmost = wasTopmost;
                 }
-                BringToFront(ClockWidgetApp.MainWindow.Instance);
-                BringToFront(AnalogClockWindow.Instance);
-                BringToFront(SettingsWindowInstance);
+                var ws = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
+                BringToFront(ws?.GetMainWindow());
+                BringToFront(ws?.GetAnalogClockWindow());
+                BringToFront(ws?.GetSettingsWindow());
             });
         }
     }
@@ -285,16 +289,22 @@ public partial class App : System.Windows.Application
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            if (PreloadedSettingsWindow != null && !PreloadedSettingsWindow.IsVisible)
+            var ws = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
+            var settingsWindow = ws?.GetSettingsWindow();
+            if (PreloadedSettingsWindow != null && (settingsWindow == null || !settingsWindow.IsVisible))
             {
-                SettingsWindowInstance = PreloadedSettingsWindow;
-                SettingsWindowInstance.Closed += (s, e) => SettingsWindowInstance = null;
-                SettingsWindowInstance.Show();
-                SettingsWindowInstance.Activate();
+                ws?.OpenSettingsWindow();
+                var win = ws?.GetSettingsWindow();
+                if (win != null)
+                {
+                    win.Closed += (s, e) => { /* no-op, WindowService сам сбрасывает ссылку */ };
+                    win.Show();
+                    win.Activate();
+                }
             }
-            else if (SettingsWindowInstance != null && SettingsWindowInstance.IsVisible)
+            else if (settingsWindow != null && settingsWindow.IsVisible)
             {
-                SettingsWindowInstance.Activate();
+                settingsWindow.Activate();
             }
         });
     }
@@ -342,21 +352,11 @@ public partial class App : System.Windows.Application
     /// </summary>
     public void ShowAnalogClockWindow()
     {
-        System.Windows.Application.Current.Dispatcher.Invoke(() =>
-        {
-            if (ClockWidgetApp.AnalogClockWindow.Instance == null || !ClockWidgetApp.AnalogClockWindow.Instance.IsVisible)
-            {
-                var analogVm = _serviceProvider!.GetRequiredService<AnalogClockViewModel>();
-                var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
-                var logger = _serviceProvider!.GetRequiredService<ILogger<AnalogClockWindow>>();
-                var analogWindow = new AnalogClockWindow(analogVm, mainVm, logger);
-                analogWindow.Show();
-            }
-            else
-            {
-                ClockWidgetApp.AnalogClockWindow.Instance.Activate();
-            }
-        });
+        // Теперь используется сервис для открытия окна аналоговых часов
+        if (_serviceProvider == null)
+            throw new InvalidOperationException("DI ServiceProvider is not initialized.");
+        var windowService = _serviceProvider.GetRequiredService<IWindowService>();
+        windowService.OpenAnalogClockWindow();
     }
 
     /// <summary>

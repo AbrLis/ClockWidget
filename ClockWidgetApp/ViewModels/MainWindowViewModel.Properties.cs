@@ -1,5 +1,6 @@
 using ClockWidgetApp.Helpers;
 using Microsoft.Extensions.Logging;
+using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -15,6 +16,9 @@ public partial class MainWindowViewModel
     private double _analogClockSize;
     private bool _analogClockTopmost = true;
     private bool _digitalClockTopmost = true;
+
+    private MainWindow? MainWindow => ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) is IWindowService ws ? ws.GetMainWindow() : null;
+    private AnalogClockWindow? AnalogClockWindow => ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) is IWindowService ws ? ws.GetAnalogClockWindow() : null;
 
     /// <summary>
     /// Текст времени для отображения.
@@ -97,6 +101,7 @@ public partial class MainWindowViewModel
         get => _showDigitalClock;
         set
         {
+            _logger.LogInformation("[ShowDigitalClock SET] old={0}, new={1} (property changed)", _showDigitalClock, value);
             if (_showDigitalClock != value)
             {
                 _showDigitalClock = value;
@@ -219,14 +224,14 @@ public partial class MainWindowViewModel
 
     private void UpdateAnalogClockTopmost()
     {
-        if (AnalogClockWindow.Instance != null)
+        if (AnalogClockWindow != null)
         {
-            AnalogClockWindow.Instance.Topmost = _analogClockTopmost;
+            AnalogClockWindow.Topmost = _analogClockTopmost;
         }
     }
     private void UpdateDigitalClockTopmost()
     {
-        var window = MainWindow.Instance;
+        var window = MainWindow;
         if (window != null)
         {
             window.Topmost = _digitalClockTopmost;
