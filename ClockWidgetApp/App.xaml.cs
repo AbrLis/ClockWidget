@@ -253,23 +253,11 @@ public partial class App : System.Windows.Application
         }
         if (e.Button == System.Windows.Forms.MouseButtons.Left)
         {
-            // Выводим все активные окна на передний план
+            // Выводим все активные окна на передний план через WindowService
             System.Windows.Application.Current.Dispatcher.Invoke(static () =>
             {
-                void BringToFront(Window? window)
-                {
-                    if (window == null || !window.IsVisible)
-                        return;
-                    window.Show();
-                    bool wasTopmost = window.Topmost;
-                    window.Topmost = true;
-                    window.Activate();
-                    window.Topmost = wasTopmost;
-                }
                 var ws = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
-                BringToFront(ws?.GetMainWindow());
-                BringToFront(ws?.GetAnalogClockWindow());
-                BringToFront(ws?.GetSettingsWindow());
+                ws?.BringAllToFront();
             });
         }
     }

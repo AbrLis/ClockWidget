@@ -121,5 +121,25 @@ namespace ClockWidgetApp.Services
         /// Возвращает текущий экземпляр окна настроек (SettingsWindow), если он открыт.
         /// </summary>
         public SettingsWindow? GetSettingsWindow() => _settingsWindow;
+
+        /// <summary>
+        /// Активирует все окна приложения (выводит на передний план).
+        /// </summary>
+        public void BringAllToFront()
+        {
+            void BringToFront(System.Windows.Window? window)
+            {
+                if (window == null || !window.IsVisible)
+                    return;
+                window.Show();
+                bool wasTopmost = window.Topmost;
+                window.Topmost = true;
+                window.Activate();
+                window.Topmost = wasTopmost;
+            }
+            BringToFront(_mainWindow);
+            BringToFront(_analogClockWindow);
+            BringToFront(_settingsWindow);
+        }
     }
 } 

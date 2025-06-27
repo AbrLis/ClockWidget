@@ -49,5 +49,10 @@ namespace ClockWidgetApp.Services
         /// Возвращает текущий экземпляр окна настроек (SettingsWindow), если он открыт.
         /// </summary>
         SettingsWindow? GetSettingsWindow();
+
+        /// <summary>
+        /// Активирует все окна приложения (выводит на передний план).
+        /// </summary>
+        void BringAllToFront();
     }
 } 
