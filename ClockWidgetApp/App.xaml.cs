@@ -19,10 +19,6 @@ public partial class App : System.Windows.Application
     private ContextMenuStrip? _trayMenu = null;
     private ToolStripMenuItem? _showDigitalItem;
     private ToolStripMenuItem? _showAnalogItem;
-    /// <summary>
-    /// Предзагруженное окно настроек для мгновенного показа.
-    /// </summary>
-    public static SettingsWindow? PreloadedSettingsWindow { get; private set; }
 
     /// <summary>
     /// Конструктор приложения. Инициализирует логирование и обработчики ошибок.
@@ -160,9 +156,6 @@ public partial class App : System.Windows.Application
         _serviceProvider!.GetRequiredService<ISettingsService>();
         var settingsVm = _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
         var logger = _serviceProvider!.GetRequiredService<ILogger<SettingsWindow>>();
-        PreloadedSettingsWindow = new SettingsWindow(settingsVm, logger);
-        PreloadedSettingsWindow.UpdateLayout();
-        PreloadedSettingsWindow.Hide();
         base.OnStartup(e);
         _logger?.LogInformation("[App] Application starting");
         var timeService = _serviceProvider!.GetRequiredService<ITimeService>();
@@ -290,22 +283,7 @@ public partial class App : System.Windows.Application
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             var ws = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
-            var settingsWindow = ws?.GetSettingsWindow();
-            if (PreloadedSettingsWindow != null && (settingsWindow == null || !settingsWindow.IsVisible))
-            {
-                ws?.OpenSettingsWindow();
-                var win = ws?.GetSettingsWindow();
-                if (win != null)
-                {
-                    win.Closed += (s, e) => { /* no-op, WindowService сам сбрасывает ссылку */ };
-                    win.Show();
-                    win.Activate();
-                }
-            }
-            else if (settingsWindow != null && settingsWindow.IsVisible)
-            {
-                settingsWindow.Activate();
-            }
+            ws?.OpenSettingsWindow();
         });
     }
 
@@ -330,11 +308,6 @@ public partial class App : System.Windows.Application
             {
                 _notifyIcon.Visible = false;
                 _notifyIcon.Dispose();
-            }
-            if (PreloadedSettingsWindow != null)
-            {
-                PreloadedSettingsWindow.Close();
-                PreloadedSettingsWindow = null;
             }
             base.OnExit(e);
             _logger?.LogInformation("[App] Application shutdown completed (DI)");
