@@ -200,10 +200,12 @@ public partial class App : System.Windows.Application
         var settingsItem = new ToolStripMenuItem("Настройки");
         settingsItem.Click += (s, e) => ShowSettingsWindow(mainViewModel);
         var exitItem = new ToolStripMenuItem("Закрыть");
+        var separator = new ToolStripSeparator();
         exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
         _trayMenu.Items.Add(_showDigitalItem);
         _trayMenu.Items.Add(_showAnalogItem);
         _trayMenu.Items.Add(settingsItem);
+        _trayMenu.Items.Add(separator);
         _trayMenu.Items.Add(exitItem);
         string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
         if (!File.Exists(iconPath))
