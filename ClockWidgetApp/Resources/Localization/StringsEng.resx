@@ -40,6 +40,7 @@
   <data name="SettingsWindow_CloseWidget" xml:space="preserve"><value>Close widget</value></data>
   <data name="SettingsWindow_Logs" xml:space="preserve"><value>logs</value></data>
   <data name="SettingsWindow_LogsNotFound" xml:space="preserve"><value>Log files not found.</value></data>
+  <data name="Language_Label" xml:space="preserve"><value>Language:</value></data>
   <!-- MainWindow.xaml -->
   <data name="MainWindow_Title" xml:space="preserve"><value>Clock Widget</value></data>
   <!-- AnalogClockWindow.xaml -->

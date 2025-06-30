@@ -22,7 +22,7 @@
             <StackPanel Margin="5">
                 <!-- Язык интерфейса -->
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <TextBlock Text="{Binding Localized.Language}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBlock Text="{Binding Localized.LanguageLabel}" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <ComboBox Width="120"
                               SelectedValue="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValuePath="Tag">
@@ -118,14 +118,15 @@
                 <CheckBox Content="{Binding Localized.SettingsWindow_ShowDigitalClock}"
                           IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,5"/>
-                <CheckBox Content="{Binding Localized.SettingsWindow_DigitalClockTopmost}"
-                          IsChecked="{Binding DigitalClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,0,0,5"/>
 
                 <!-- Чекбокс отображения секунд -->
                 <CheckBox x:Name="ShowSecondsCheckBox"
                           Content="{Binding Localized.SettingsWindow_ShowSeconds}"
                           IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
+                          Margin="0,0,0,5"/>
+                          
+                <CheckBox Content="{Binding Localized.SettingsWindow_DigitalClockTopmost}"
+                          IsChecked="{Binding DigitalClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,5"/>
 
                 <!-- Размер шрифта -->

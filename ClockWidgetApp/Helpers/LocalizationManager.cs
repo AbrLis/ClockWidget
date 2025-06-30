@@ -75,7 +75,7 @@ public class LocalizedStrings
     public string SettingsWindow_CloseWidgetButton => LocalizationManager.GetString("SettingsWindow_CloseWidget", _lang);
     public string SettingsWindow_Logs => LocalizationManager.GetString("SettingsWindow_Logs", _lang);
     public string SettingsWindow_LogsNotFound => LocalizationManager.GetString("SettingsWindow_LogsNotFound", _lang);
-    public string Language => _lang == "en" ? "Language:" : "Язык:";
+    public string LanguageLabel => LocalizationManager.GetString("Language_Label", _lang);
     public string MainWindow_Title => LocalizationManager.GetString("MainWindow_Title", _lang);
     public string AnalogClockWindow_Title => LocalizationManager.GetString("AnalogClockWindow_Title", _lang);
 } 
