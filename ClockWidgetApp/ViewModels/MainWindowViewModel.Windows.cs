@@ -15,30 +15,30 @@ public partial class MainWindowViewModel
     {
         try
         {
-            _logger.LogInformation("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
+            _logger.LogDebug("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
             var mainWindow = MainWindow;
             // --- Цифровое окно ---
             if (_showDigitalClock)
             {
                 _windowService?.OpenMainWindow();
-                _logger.LogInformation("[MainWindowViewModel.Windows] Main window ensured visible and activated");
+                _logger.LogDebug("[MainWindowViewModel.Windows] Main window ensured visible and activated");
             }
             else
             {
                 _windowService?.HideMainWindow();
-                _logger.LogInformation("[MainWindowViewModel.Windows] Main window hidden");
+                _logger.LogDebug("[MainWindowViewModel.Windows] Main window hidden");
             }
 
             // --- Аналоговое окно ---
             if (_showAnalogClock)
             {
                 _windowService?.OpenAnalogClockWindow();
-                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated");
+                _logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated");
             }
             else
             {
                 _windowService?.HideAnalogClockWindow();
-                _logger.LogInformation("[MainWindowViewModel.Windows] Analog clock window hidden");
+                _logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window hidden");
             }
         }
         catch (Exception ex)

@@ -56,7 +56,7 @@ public partial class MainWindowViewModel
         {
             if (CuckooEveryHour && time.Minute == 0 && time.Second == 0 && _lastCuckooHour != time.Hour)
             {
-                _logger.LogInformation($"[MainWindowViewModel] Cuckoo: Playing sound for hour {time.Hour}");
+                _logger.LogDebug($"[MainWindowViewModel] Cuckoo: Playing sound for hour {time.Hour}");
                 _soundService.PlayCuckooSound(time.Hour);
                 _lastCuckooHour = time.Hour;
                 return;
@@ -73,7 +73,7 @@ public partial class MainWindowViewModel
         {
             if (HalfHourChimeEnabled && time.Minute == 30 && time.Second == 0 && _lastHalfHourChimeMinute != time.Minute)
             {
-                _logger.LogInformation($"[MainWindowViewModel] HalfHourChime: Playing half-hour chime at {time:HH:mm:ss}");
+                _logger.LogDebug($"[MainWindowViewModel] HalfHourChime: Playing half-hour chime at {time:HH:mm:ss}");
                 _soundService.PlayHalfHourChime();
                 _lastHalfHourChimeMinute = time.Minute;
                 return;

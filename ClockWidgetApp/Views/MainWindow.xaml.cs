@@ -25,7 +25,7 @@ public partial class MainWindow : Window
         try
         {
             _logger = logger;
-            _logger.LogInformation("[MainWindow] Initializing main window");
+            _logger.LogDebug("[MainWindow] Initializing main window");
             InitializeComponent();
             _viewModel = viewModel;
             DataContext = _viewModel;
@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             PreviewMouseMove += MainWindow_PreviewMouseMove;
             MouseRightButtonDown += MainWindow_MouseRightButtonDown;
             Closing += MainWindow_Closing;
-            _logger.LogInformation("[MainWindow] Main window initialized");
+            _logger.LogDebug("[MainWindow] Main window initialized");
         }
         catch (Exception ex)
         {
@@ -100,7 +100,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            _logger.LogInformation("[MainWindow] Main window closing");
+            _logger.LogDebug("[MainWindow] Main window closing");
             // Вместо закрытия — скрываем окно, чтобы оно могло быть показано повторно
             e.Cancel = true;
             this.Hide();
@@ -112,7 +112,7 @@ public partial class MainWindow : Window
                 disposable.Dispose();
             }
             DataContext = null;
-            _logger.LogInformation("[MainWindow] Main window hidden (not closed)");
+            _logger.LogDebug("[MainWindow] Main window hidden (not closed)");
         }
         catch (Exception ex)
         {

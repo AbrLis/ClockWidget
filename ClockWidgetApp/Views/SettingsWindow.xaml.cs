@@ -25,10 +25,10 @@ public partial class SettingsWindow : Window
         _logger = logger;
         try
         {
-            _logger.LogInformation("[SettingsWindow] Initializing settings window");
+            _logger.LogDebug("[SettingsWindow] Initializing settings window");
             InitializeComponent();
             DataContext = _viewModel;
-            _logger.LogInformation($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
+            _logger.LogDebug($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
             LocalizationManager.LanguageChanged += (s, e) =>
             {
                 DataContext = null;
@@ -36,7 +36,7 @@ public partial class SettingsWindow : Window
             };
             // Добавляем обработчик закрытия окна
             Closing += SettingsWindow_Closing;
-            _logger.LogInformation("[SettingsWindow] Settings window initialized");
+            _logger.LogDebug("[SettingsWindow] Settings window initialized");
         }
         catch (Exception ex)
         {
@@ -50,7 +50,7 @@ public partial class SettingsWindow : Window
     {
         try
         {
-            _logger.LogInformation("[SettingsWindow] Settings window closing");
+            _logger.LogDebug("[SettingsWindow] Settings window closing");
             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
                 mainWindow.IsSettingsWindowOpen = false;
@@ -58,7 +58,7 @@ public partial class SettingsWindow : Window
             // Вместо уничтожения окна скрываем его, чтобы оно оставалось в памяти
             e.Cancel = true;
             this.Hide();
-            _logger.LogInformation("[SettingsWindow] Settings window hidden (not closed)");
+            _logger.LogDebug("[SettingsWindow] Settings window hidden (not closed)");
         }
         catch (Exception ex)
         {
@@ -70,7 +70,7 @@ public partial class SettingsWindow : Window
     {
         try
         {
-            _logger.LogInformation("[SettingsWindow] Close widget button clicked");
+            _logger.LogDebug("[SettingsWindow] Close widget button clicked");
             
             // Закрываем все окна приложения
             foreach (Window window in System.Windows.Application.Current.Windows)
@@ -80,7 +80,7 @@ public partial class SettingsWindow : Window
             }
             
             // Завершаем работу приложения
-            _logger.LogInformation("[SettingsWindow] Shutting down application");
+            _logger.LogDebug("[SettingsWindow] Shutting down application");
             System.Windows.Application.Current.Shutdown();
         }
         catch (Exception ex)

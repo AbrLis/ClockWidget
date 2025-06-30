@@ -22,7 +22,7 @@ public class SoundService : ISoundService
         try
         {
             bool fileExists = File.Exists(soundPath);
-            _logger.LogInformation($"[SoundService] Sound file path: {soundPath}, Exists: {fileExists}");
+            _logger.LogDebug($"[SoundService] Sound file path: {soundPath}, Exists: {fileExists}");
             if (!fileExists)
             {
                 _logger.LogWarning($"[SoundService] Sound file not found: {soundPath}");
@@ -35,14 +35,14 @@ public class SoundService : ISoundService
             {
                 player.Close();
                 player.Dispatcher?.InvokeAsync(() => player = null);
-                _logger.LogInformation($"[SoundService] MediaPlayer closed after playback: {soundPath}");
+                _logger.LogDebug($"[SoundService] MediaPlayer closed after playback: {soundPath}");
             };
             player.MediaFailed += (s, e) =>
             {
                 _logger.LogError($"[SoundService] MediaPlayer failed: {e.ErrorException}");
             };
             player.Play();
-            _logger.LogInformation($"[SoundService] Playing sound: {soundPath}");
+            _logger.LogDebug($"[SoundService] Playing sound: {soundPath}");
         }
         catch (Exception ex)
         {
@@ -56,7 +56,7 @@ public class SoundService : ISoundService
     /// <param name="hour">Час (1-12).</param>
     public void PlayCuckooSound(int hour)
     {
-        _logger.LogInformation($"[SoundService] PlayCuckooSound called, hour={hour}");
+        _logger.LogDebug($"[SoundService] PlayCuckooSound called, hour={hour}");
         int soundHour = hour % 12;
         if (soundHour == 0) soundHour = 12;
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -69,7 +69,7 @@ public class SoundService : ISoundService
     /// </summary>
     public void PlayHalfHourChime()
     {
-        _logger.LogInformation("[SoundService] PlayHalfHourChime called");
+        _logger.LogDebug("[SoundService] PlayHalfHourChime called");
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         string soundPath = Path.Combine(baseDir, "Resources", "Sounds", "halfHour.mp3");
         PlaySound(soundPath);

@@ -101,7 +101,7 @@ public partial class MainWindowViewModel
         get => _showDigitalClock;
         set
         {
-            _logger.LogInformation("[ShowDigitalClock SET] old={0}, new={1} (property changed)", _showDigitalClock, value);
+            _logger.LogDebug("[ShowDigitalClock SET] old={0}, new={1} (property changed)", _showDigitalClock, value);
             if (_showDigitalClock != value)
             {
                 _showDigitalClock = value;
@@ -140,7 +140,7 @@ public partial class MainWindowViewModel
             {
                 try
                 {
-                    _logger.LogInformation($"[MainWindowViewModel.Properties] Updating analog clock size: {value}");
+                    _logger.LogDebug($"[MainWindowViewModel.Properties] Updating analog clock size: {value}");
                     _analogClockSize = value;
                     OnPropertyChanged();
                     _settingsService.UpdateSettings(s => s.AnalogClockSize = value);
@@ -199,7 +199,7 @@ public partial class MainWindowViewModel
         {
             if (_settingsService.CurrentSettings.CuckooEveryHour != value)
             {
-                _logger.LogInformation($"[MainWindowViewModel.Properties] Updating CuckooEveryHour: {value}");
+                _logger.LogDebug($"[MainWindowViewModel.Properties] Updating CuckooEveryHour: {value}");
                 _settingsService.UpdateSettings(s => s.CuckooEveryHour = value);
                 OnPropertyChanged();
             }
@@ -215,7 +215,7 @@ public partial class MainWindowViewModel
         {
             if (_settingsService.CurrentSettings.HalfHourChimeEnabled != value)
             {
-                _logger.LogInformation($"[MainWindowViewModel.Properties] Updating HalfHourChimeEnabled: {value}");
+                _logger.LogDebug($"[MainWindowViewModel.Properties] Updating HalfHourChimeEnabled: {value}");
                 _settingsService.UpdateSettings(s => s.HalfHourChimeEnabled = value);
                 OnPropertyChanged();
             }

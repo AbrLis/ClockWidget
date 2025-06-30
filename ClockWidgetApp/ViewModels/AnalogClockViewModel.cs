@@ -99,7 +99,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         try
         {
             _logger = logger;
-            _logger.LogInformation("[AnalogClockViewModel] Initializing analog clock view model");
+            _logger.LogDebug("[AnalogClockViewModel] Initializing analog clock view model");
             _timeService = timeService;
             _settingsService = settingsService;
             _mainViewModel = mainViewModel;
@@ -110,8 +110,8 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             _timeService.TimeUpdated += OnTimeUpdated;
             OnTimeUpdated(this, DateTime.Now);
             _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-            _logger.LogInformation("[AnalogClockViewModel] Subscribed to MainViewModel property changes");
-            _logger.LogInformation("[AnalogClockViewModel] Analog clock view model initialized");
+            _logger.LogDebug("[AnalogClockViewModel] Subscribed to MainViewModel property changes");
+            _logger.LogDebug("[AnalogClockViewModel] Analog clock view model initialized");
         }
         catch (Exception ex)
         {
@@ -128,7 +128,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     {
         try
         {
-            _logger.LogInformation("[AnalogClockViewModel] Generating clock ticks");
+            _logger.LogDebug("[AnalogClockViewModel] Generating clock ticks");
             
             var ticks = new List<ClockTick>();
             
@@ -154,7 +154,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             }
             
             ClockTicks = ticks;
-            _logger.LogInformation("[AnalogClockViewModel] Generated {Count} clock ticks", ticks.Count);
+            _logger.LogDebug("[AnalogClockViewModel] Generated {Count} clock ticks", ticks.Count);
         }
         catch (Exception ex)
         {

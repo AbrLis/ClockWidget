@@ -28,7 +28,7 @@ public partial class AnalogClockWindow : Window
         {
             _logger = logger;
             _mainViewModel = mainViewModel;
-            _logger.LogInformation("[AnalogClockWindow] Initializing analog clock window");
+            _logger.LogDebug("[AnalogClockWindow] Initializing analog clock window");
             
             InitializeComponent();
             
@@ -62,7 +62,7 @@ public partial class AnalogClockWindow : Window
                 DataContext = _viewModel;
             };
             
-            _logger.LogInformation("[AnalogClockWindow] Analog clock window initialized");
+            _logger.LogDebug("[AnalogClockWindow] Analog clock window initialized");
         }
         catch (Exception ex)
         {
@@ -79,7 +79,7 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
-            _logger.LogInformation("[AnalogClockWindow] Analog clock window loaded");
+            _logger.LogDebug("[AnalogClockWindow] Analog clock window loaded");
         }
         catch (Exception ex)
         {
@@ -163,7 +163,7 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
-            _logger.LogInformation("[AnalogClockWindow] Opening settings window");
+            _logger.LogDebug("[AnalogClockWindow] Opening settings window");
             var windowService = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
             windowService?.OpenSettingsWindow();
             e.Handled = true;
@@ -182,7 +182,7 @@ public partial class AnalogClockWindow : Window
     {
         try
         {
-            _logger.LogInformation("Analog clock window closing");
+            _logger.LogDebug("Analog clock window closing");
             
             // Сохраняем позицию окна при закрытии
             _viewModel.SaveWindowPosition(Left, Top);
@@ -202,7 +202,7 @@ public partial class AnalogClockWindow : Window
             }
             DataContext = null;
             
-            _logger.LogInformation("Analog clock window closed");
+            _logger.LogDebug("Analog clock window closed");
         }
         catch (Exception ex)
         {

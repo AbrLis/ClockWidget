@@ -36,14 +36,14 @@ public class SettingsService : ISettingsService
         if (!Directory.Exists(appDataPath))
         {
             Directory.CreateDirectory(appDataPath);
-            _logger.LogInformation("[SettingsService] Created settings directory: {Path}", appDataPath);
+            _logger.LogDebug("[SettingsService] Created settings directory: {Path}", appDataPath);
         }
 
         _settingsPath = Path.Combine(
             appDataPath,
             Constants.FileSettings.SETTINGS_FILENAME);
             
-        _logger.LogInformation("[SettingsService] Settings file path: {Path}", _settingsPath);
+        _logger.LogDebug("[SettingsService] Settings file path: {Path}", _settingsPath);
         _currentSettings = LoadSettings();
     }
 
@@ -56,9 +56,8 @@ public class SettingsService : ISettingsService
     {
         try
         {
-            _logger.LogInformation("[SettingsService] Buffering settings update");
             updateAction(_currentSettings);
-            _logger.LogInformation("[SettingsService] Settings updated in buffer: {Settings}", 
+            _logger.LogDebug("[SettingsService] Settings updated in buffer: {Settings}", 
                 JsonSerializer.Serialize(_currentSettings));
         }
         catch (Exception ex)
@@ -129,7 +128,7 @@ public class SettingsService : ISettingsService
 
             var json = JsonSerializer.Serialize(settings, options);
             File.WriteAllText(_settingsPath, json);
-            _logger.LogInformation("[SettingsService] Настройки успешно сохранены");
+            _logger.LogDebug("[SettingsService] Настройки успешно сохранены");
         }
         catch (Exception ex)
         {

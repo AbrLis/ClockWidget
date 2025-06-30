@@ -28,7 +28,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.BackgroundOpacity != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating background opacity: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating background opacity: {Value}", value);
                 _mainViewModel.BackgroundOpacity = value;
                 OnPropertyChanged();
             }
@@ -45,7 +45,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.TextOpacity != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating text opacity: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating text opacity: {Value}", value);
                 _mainViewModel.TextOpacity = value;
                 OnPropertyChanged();
             }
@@ -62,7 +62,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.FontSize != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating font size: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating font size: {Value}", value);
                 _mainViewModel.FontSize = value;
                 OnPropertyChanged();
             }
@@ -79,7 +79,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.ShowSeconds != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating show seconds: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating show seconds: {Value}", value);
                 _mainViewModel.ShowSeconds = value;
                 OnPropertyChanged();
             }
@@ -96,7 +96,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.ShowDigitalClock != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating show digital clock: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating show digital clock: {Value}", value);
                 _mainViewModel.ShowDigitalClock = value;
                 OnPropertyChanged();
             }
@@ -113,7 +113,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.ShowAnalogClock != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating show analog clock: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating show analog clock: {Value}", value);
                 _mainViewModel.ShowAnalogClock = value;
                 OnPropertyChanged();
             }
@@ -130,7 +130,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (Math.Abs(_mainViewModel.AnalogClockSize - value) > 0.001)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating analog clock size: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating analog clock size: {Value}", value);
                 _mainViewModel.AnalogClockSize = value;
                 OnPropertyChanged();
             }
@@ -147,7 +147,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.CuckooEveryHour != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating CuckooEveryHour: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating CuckooEveryHour: {Value}", value);
                 _mainViewModel.CuckooEveryHour = value;
                 OnPropertyChanged();
             }
@@ -164,7 +164,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.DigitalClockTopmost != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating DigitalClockTopmost: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating DigitalClockTopmost: {Value}", value);
                 _mainViewModel.DigitalClockTopmost = value;
                 OnPropertyChanged();
             }
@@ -181,7 +181,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.AnalogClockTopmost != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating AnalogClockTopmost: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating AnalogClockTopmost: {Value}", value);
                 _mainViewModel.AnalogClockTopmost = value;
                 OnPropertyChanged();
             }
@@ -198,7 +198,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             if (_mainViewModel.HalfHourChimeEnabled != value)
             {
-                _logger.LogInformation("[SettingsWindowViewModel] Updating HalfHourChimeEnabled: {Value}", value);
+                _logger.LogDebug("[SettingsWindowViewModel] Updating HalfHourChimeEnabled: {Value}", value);
                 _mainViewModel.HalfHourChimeEnabled = value;
                 OnPropertyChanged();
             }
@@ -232,7 +232,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         _mainViewModel = mainViewModel;
         _logger = logger;
-        _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
+        _logger.LogDebug("[SettingsWindowViewModel] Settings window view model initialized");
         Localized = LocalizationManager.GetLocalizedStrings();
         LocalizationManager.LanguageChanged += (s, e) =>
         {

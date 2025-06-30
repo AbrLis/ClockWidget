@@ -31,13 +31,12 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
         try
         {
             _logger = logger;
-            _logger.LogInformation("[MainWindowViewModel] Initializing main window view model");
+            _logger.LogDebug("[MainWindowViewModel] Initializing main window view model");
             _timeService = timeService;
             _settingsService = settingsService;
             _soundService = soundService;
             var settings = _settingsService.CurrentSettings;
-            _logger.LogInformation("[MainWindowViewModel] Loading settings for main window: {Settings}", 
-                System.Text.Json.JsonSerializer.Serialize(settings));
+            _logger.LogDebug("[MainWindowViewModel] Loading settings for main window: {Settings}", settings);
             InitializeFromSettings(settings);
             SubscribeToLanguageChanges();
             _timeService.TimeUpdated += OnTimeUpdated;
@@ -45,9 +44,9 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 UpdateWindowsVisibility();
-                _logger.LogInformation("[MainWindowViewModel] Windows visibility updated after initialization");
+                _logger.LogDebug("[MainWindowViewModel] Windows visibility updated after initialization");
             }));
-            _logger.LogInformation("[MainWindowViewModel] Main window view model initialized");
+            _logger.LogDebug("[MainWindowViewModel] Main window view model initialized");
         }
         catch (Exception ex)
         {
@@ -75,12 +74,12 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
         {
             try
             {
-                _logger.LogInformation("[MainWindowViewModel] Disposing main window view model");
+                _logger.LogDebug("[MainWindowViewModel] Disposing main window view model");
                 if (_timeService != null)
                     _timeService.TimeUpdated -= OnTimeUpdated;
                 // Не вызываем _timeService.Dispose(), если это singleton из App
                 _disposed = true;
-                _logger.LogInformation("[MainWindowViewModel] Main window view model disposed");
+                _logger.LogDebug("[MainWindowViewModel] Main window view model disposed");
             }
             catch (Exception ex)
             {
