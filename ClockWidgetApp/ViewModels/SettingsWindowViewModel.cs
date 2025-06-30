@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -210,6 +211,24 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Текущий язык интерфейса ("ru" или "en").
+    /// </summary>
+    public string Language
+    {
+        get => LocalizationManager.CurrentLanguage;
+        set
+        {
+            if (LocalizationManager.CurrentLanguage != value)
+            {
+                LocalizationManager.SetLanguage(value);
+                _mainViewModel.SettingsService.UpdateSettings(s => s.Language = value);
+                _mainViewModel.SettingsService.SaveBufferedSettings();
+            }
+        }
+    }
+    public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
+
+    /// <summary>
     /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
     /// </summary>
     /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
@@ -224,12 +243,28 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         _fontSize = _mainViewModel.FontSize;
         _analogClockSize = _mainViewModel.AnalogClockSize;
         _showSeconds = _mainViewModel.ShowSeconds;
+        Localized = LocalizationManager.GetLocalizedStrings();
+        LocalizationManager.LanguageChanged += (s, e) =>
+        {
+            Localized = LocalizationManager.GetLocalizedStrings();
+            OnPropertyChanged(nameof(Language));
+            OnPropertyChanged(nameof(Localized));
+        };
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
     }
 
     private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        OnPropertyChanged(e.PropertyName);
+        if (e.PropertyName == nameof(LocalizationManager.CurrentLanguage))
+        {
+            Localized = LocalizationManager.GetLocalizedStrings();
+            OnPropertyChanged(nameof(Language));
+            OnPropertyChanged(nameof(Localized));
+        }
+        else
+        {
+            OnPropertyChanged(e.PropertyName);
+        }
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

@@ -1,6 +1,7 @@
 using System.Windows;
 using ClockWidgetApp.ViewModels;
 using Microsoft.Extensions.Logging;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp;
 
@@ -9,7 +10,7 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class SettingsWindow : Window
 {
-    private readonly SettingsWindowViewModel _viewModel;
+    private readonly SettingsWindowViewModel _viewModel = null!;
     private readonly ILogger<SettingsWindow> _logger;
 
     /// <summary>
@@ -18,15 +19,21 @@ public partial class SettingsWindow : Window
     /// <param name="viewModel">ViewModel окна настроек.</param>
     /// <param name="logger">ILogger<SettingsWindow> для логирования.</param>
     public SettingsWindow(SettingsWindowViewModel viewModel, ILogger<SettingsWindow> logger)
+        : base()
     {
+        _viewModel = viewModel;
+        _logger = logger;
         try
         {
-            _logger = logger;
             _logger.LogInformation("[SettingsWindow] Initializing settings window");
             InitializeComponent();
-            _viewModel = viewModel;
             DataContext = _viewModel;
             _logger.LogInformation($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
+            LocalizationManager.LanguageChanged += (s, e) =>
+            {
+                DataContext = null;
+                DataContext = _viewModel;
+            };
             // Добавляем обработчик закрытия окна
             Closing += SettingsWindow_Closing;
             _logger.LogInformation("[SettingsWindow] Settings window initialized");
@@ -94,13 +101,13 @@ public partial class SettingsWindow : Window
                 "logs");
             if (!System.IO.Directory.Exists(logsDir))
             {
-                System.Windows.MessageBox.Show("Папка с логами не найдена.", "Логи", MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show(_viewModel.Localized.SettingsWindow_LogsNotFound, _viewModel.Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var logFiles = System.IO.Directory.GetFiles(logsDir, "clock-widget-*.log");
             if (logFiles.Length == 0)
             {
-                System.Windows.MessageBox.Show("Файлы логов не найдены.", "Логи", MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show(_viewModel.Localized.SettingsWindow_LogsNotFound, _viewModel.Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var lastLog = logFiles

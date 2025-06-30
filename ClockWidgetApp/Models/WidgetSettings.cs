@@ -113,6 +113,12 @@ public class WidgetSettings
     public bool HalfHourChimeEnabled { get; set; } = false;
 
     /// <summary>
+    /// Язык интерфейса ("ru" или "en"). По умолчанию: "en".
+    /// </summary>
+    [JsonPropertyName("language")]
+    public string Language { get; set; } = "en";
+
+    /// <summary>
     /// Проверяет и корректирует значения всех настроек.
     /// </summary>
     /// <param name="settings">Объект настроек.</param>
@@ -143,6 +149,9 @@ public class WidgetSettings
         settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
         
         // Позиции окон не валидируются, так как могут быть null
+        
+        // Валидация языка
+        settings.Language = ValidateLanguage(settings.Language);
         
         return settings;
     }
@@ -192,5 +201,15 @@ public class WidgetSettings
         }
         return Math.Round(value / Constants.WindowSettings.ANALOG_CLOCK_SIZE_STEP) * 
                Constants.WindowSettings.ANALOG_CLOCK_SIZE_STEP;
+    }
+
+    /// <summary>
+    /// Проверяет и корректирует значение языка интерфейса.
+    /// </summary>
+    /// <param name="value">Проверяемое значение.</param>
+    /// <returns>Корректное значение языка ('ru' или 'en').</returns>
+    public static string ValidateLanguage(string value)
+    {
+        return value == "en" ? "en" : "ru";
     }
 } 

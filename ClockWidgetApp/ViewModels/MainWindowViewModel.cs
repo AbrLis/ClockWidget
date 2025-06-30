@@ -39,6 +39,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             _logger.LogInformation("[MainWindowViewModel] Loading settings for main window: {Settings}", 
                 System.Text.Json.JsonSerializer.Serialize(settings));
             InitializeFromSettings(settings);
+            SubscribeToLanguageChanges();
             _timeService.TimeUpdated += OnTimeUpdated;
             OnTimeUpdated(this, DateTime.Now);
             System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>

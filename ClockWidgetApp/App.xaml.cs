@@ -19,6 +19,8 @@ public partial class App : System.Windows.Application
     private ContextMenuStrip? _trayMenu = null;
     private ToolStripMenuItem? _showDigitalItem;
     private ToolStripMenuItem? _showAnalogItem;
+    private ToolStripMenuItem? _settingsItem;
+    private ToolStripMenuItem? _exitItem;
 
     /// <summary>
     /// Конструктор приложения. Инициализирует логирование и обработчики ошибок.
@@ -152,16 +154,16 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Прогрев сервисов и ViewModel для окна настроек
+        // Прогрев сервисов и ViewModel для главного окна
         _serviceProvider!.GetRequiredService<ISettingsService>();
+        var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
+        var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
         var settingsVm = _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
         var logger = _serviceProvider!.GetRequiredService<ILogger<SettingsWindow>>();
         base.OnStartup(e);
         _logger?.LogInformation("[App] Application starting");
         var timeService = _serviceProvider!.GetRequiredService<ITimeService>();
         timeService.Start();
-        var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
-        var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
         if (_serviceProvider == null)
             throw new InvalidOperationException("DI ServiceProvider is not initialized.");
         var windowService = _serviceProvider.GetRequiredService<IWindowService>();
@@ -185,28 +187,33 @@ public partial class App : System.Windows.Application
     private void InitializeTrayIcon(MainWindowViewModel mainViewModel)
     {
         _trayMenu = new ContextMenuStrip();
+        string lang = ClockWidgetApp.Helpers.LocalizationManager.CurrentLanguage;
         _showDigitalItem = new ToolStripMenuItem();
+        _showAnalogItem = new ToolStripMenuItem();
+        _settingsItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Settings", lang));
+        _exitItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Exit", lang));
         _showDigitalItem.Click += (s, e) =>
         {
             if (mainViewModel != null)
                 mainViewModel.ShowDigitalClock = !mainViewModel.ShowDigitalClock;
         };
-        _showAnalogItem = new ToolStripMenuItem();
         _showAnalogItem.Click += (s, e) =>
         {
             if (mainViewModel != null)
                 mainViewModel.ShowAnalogClock = !mainViewModel.ShowAnalogClock;
         };
-        var settingsItem = new ToolStripMenuItem("Настройки");
-        settingsItem.Click += (s, e) => ShowSettingsWindow(mainViewModel);
-        var exitItem = new ToolStripMenuItem("Закрыть");
-        var separator = new ToolStripSeparator();
-        exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
+        _settingsItem.Click += (s, e) =>
+        {
+            if (mainViewModel != null)
+            {
+                ShowSettingsWindow(mainViewModel);
+            }
+        };
+        _exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
         _trayMenu.Items.Add(_showDigitalItem);
         _trayMenu.Items.Add(_showAnalogItem);
-        _trayMenu.Items.Add(settingsItem);
-        _trayMenu.Items.Add(separator);
-        _trayMenu.Items.Add(exitItem);
+        _trayMenu.Items.Add(_settingsItem);
+        _trayMenu.Items.Add(_exitItem);
         string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
         if (!File.Exists(iconPath))
         {
@@ -216,7 +223,7 @@ public partial class App : System.Windows.Application
         _notifyIcon = new NotifyIcon();
         _notifyIcon.Icon = new Icon(iconPath);
         _notifyIcon.Visible = true;
-        _notifyIcon.Text = "Clock Widget App";
+        _notifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
         _notifyIcon.ContextMenuStrip = _trayMenu;
         _notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseUp);
     }
@@ -227,13 +234,30 @@ public partial class App : System.Windows.Application
     /// <param name="mainViewModel">Главная ViewModel.</param>
     private void UpdateTrayMenuItems(MainWindowViewModel mainViewModel)
     {
+        string lang = ClockWidgetApp.Helpers.LocalizationManager.CurrentLanguage;
         if (_showDigitalItem != null && mainViewModel != null)
         {
-            _showDigitalItem.Text = mainViewModel.ShowDigitalClock ? "Скрыть цифровые часы" : "Показать цифровые часы";
+            _showDigitalItem.Text = mainViewModel.ShowDigitalClock
+                ? Helpers.LocalizationManager.GetString("Tray_HideDigital", lang)
+                : Helpers.LocalizationManager.GetString("Tray_ShowDigital", lang);
         }
         if (_showAnalogItem != null && mainViewModel != null)
         {
-            _showAnalogItem.Text = mainViewModel.ShowAnalogClock ? "Скрыть аналоговые часы" : "Показать аналоговые часы";
+            _showAnalogItem.Text = mainViewModel.ShowAnalogClock
+                ? Helpers.LocalizationManager.GetString("Tray_HideAnalog", lang)
+                : Helpers.LocalizationManager.GetString("Tray_ShowAnalog", lang);
+        }
+        if (_settingsItem != null)
+        {
+            _settingsItem.Text = Helpers.LocalizationManager.GetString("Tray_Settings", lang);
+        }
+        if (_exitItem != null)
+        {
+            _exitItem.Text = Helpers.LocalizationManager.GetString("Tray_Exit", lang);
+        }
+        if (_notifyIcon != null)
+        {
+            _notifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
         }
     }
 

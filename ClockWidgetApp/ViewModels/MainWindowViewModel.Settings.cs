@@ -105,6 +105,7 @@ public partial class MainWindowViewModel
         _analogClockSize = validated.AnalogClockSize;
         _analogClockTopmost = validated.AnalogClockTopmost;
         _digitalClockTopmost = validated.DigitalClockTopmost;
+        LocalizationManager.SetLanguage(validated.Language);
         UpdateDigitalClockTopmost();
         UpdateAnalogClockTopmost();
     }

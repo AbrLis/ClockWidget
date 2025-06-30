@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
-        Title="Clock Widget" 
+        Title="{Binding Localized.MainWindow_Title}" 
         Height="450" 
         Width="800"
         Icon="/Resources/Icons/app_ico_32.ico"

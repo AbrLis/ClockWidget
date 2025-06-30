@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    All UI strings for English localization. 
+    Example:
+    <data name="WindowTitle" xml:space="preserve">
+      <value>Window Title</value>
+    </data>
+  -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, ...</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, ...</value>
+  </resheader>
+  <!-- SettingsWindow.xaml -->
+  <data name="SettingsWindow_Title" xml:space="preserve"><value>Widget Settings</value></data>
+  <data name="SettingsWindow_CommonSettings" xml:space="preserve"><value>General Settings</value></data>
+  <data name="SettingsWindow_BackgroundOpacity" xml:space="preserve"><value>Background opacity:</value></data>
+  <data name="SettingsWindow_TextOpacity" xml:space="preserve"><value>Text opacity:</value></data>
+  <data name="SettingsWindow_CuckooEveryHour" xml:space="preserve"><value>Cuckoo sound every hour</value></data>
+  <data name="SettingsWindow_HalfHourChime" xml:space="preserve"><value>Chime every half hour</value></data>
+  <data name="SettingsWindow_AnalogSettings" xml:space="preserve"><value>Analog Clock Settings</value></data>
+  <data name="SettingsWindow_ShowAnalog" xml:space="preserve"><value>Show analog clock</value></data>
+  <data name="SettingsWindow_AnalogTopmost" xml:space="preserve"><value>Always on top</value></data>
+  <data name="SettingsWindow_AnalogSize" xml:space="preserve"><value>Analog clock size:</value></data>
+  <data name="SettingsWindow_DigitalSettings" xml:space="preserve"><value>Digital Clock Settings</value></data>
+  <data name="SettingsWindow_ShowDigital" xml:space="preserve"><value>Show digital clock</value></data>
+  <data name="SettingsWindow_DigitalTopmost" xml:space="preserve"><value>Always on top</value></data>
+  <data name="SettingsWindow_ShowSeconds" xml:space="preserve"><value>Show seconds</value></data>
+  <data name="SettingsWindow_FontSize" xml:space="preserve"><value>Font size:</value></data>
+  <data name="SettingsWindow_CloseWidget" xml:space="preserve"><value>Close widget</value></data>
+  <data name="SettingsWindow_Logs" xml:space="preserve"><value>logs</value></data>
+  <data name="SettingsWindow_LogsNotFound" xml:space="preserve"><value>Log files not found.</value></data>
+  <!-- MainWindow.xaml -->
+  <data name="MainWindow_Title" xml:space="preserve"><value>Clock Widget</value></data>
+  <!-- AnalogClockWindow.xaml -->
+  <data name="AnalogClockWindow_Title" xml:space="preserve"><value>Analog Clock</value></data>
+  <data name="AnalogClockWindow_12" xml:space="preserve"><value>12</value></data>
+  <data name="AnalogClockWindow_3" xml:space="preserve"><value>3</value></data>
+  <data name="AnalogClockWindow_6" xml:space="preserve"><value>6</value></data>
+  <data name="AnalogClockWindow_9" xml:space="preserve"><value>9</value></data>
+  <!-- App.xaml.cs (tray) -->
+  <data name="Tray_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="Tray_ShowDigital" xml:space="preserve"><value>Show digital clock</value></data>
+  <data name="Tray_HideDigital" xml:space="preserve"><value>Hide digital clock</value></data>
+  <data name="Tray_ShowAnalog" xml:space="preserve"><value>Show analog clock</value></data>
+  <data name="Tray_HideAnalog" xml:space="preserve"><value>Hide analog clock</value></data>
+  <data name="Tray_IconText" xml:space="preserve"><value>Clock Widget App</value></data>
+</root> 

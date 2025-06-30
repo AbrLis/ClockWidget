@@ -29,6 +29,12 @@ public partial class MainWindow : Window
             InitializeComponent();
             _viewModel = viewModel;
             DataContext = _viewModel;
+            ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged += (s, e) =>
+            {
+                // Принудительно обновляем DataContext, чтобы обновить все привязки
+                DataContext = null;
+                DataContext = _viewModel;
+            };
             var (left, top) = _viewModel.GetWindowPosition();
             Left = left;
             Top = top;

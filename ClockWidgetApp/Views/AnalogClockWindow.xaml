@@ -8,7 +8,7 @@
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         xmlns:converters="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
-        Title="Analog Clock" 
+        Title="{Binding Localized.AnalogClockWindow_Title}" 
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"

@@ -56,6 +56,12 @@ public partial class AnalogClockWindow : Window
             // Добавляем обработчик загрузки окна
             Loaded += AnalogClockWindow_Loaded;
             
+            ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged += (s, e) =>
+            {
+                DataContext = null;
+                DataContext = _viewModel;
+            };
+            
             _logger.LogInformation("[AnalogClockWindow] Analog clock window initialized");
         }
         catch (Exception ex)

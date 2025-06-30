@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         mc:Ignorable="d"
-        Title="Настройки виджета"
+        Title="{Binding Localized.SettingsWindow_Title}"
         MinHeight="300"
         Width="300"
         SizeToContent="Height"
@@ -17,11 +17,22 @@
         Background="White">
     <StackPanel Margin="10">
         <!-- Общие настройки -->
-        <GroupBox Header="Общие настройки"
+        <GroupBox Header="{Binding Localized.SettingsWindow_CommonSettings}"
                 Margin="0,0,0,10">
             <StackPanel Margin="5">
+                <!-- Язык интерфейса -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="{Binding Localized.Language}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <ComboBox Width="120"
+                              SelectedValue="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValuePath="Tag">
+                        <ComboBoxItem Content="Русский" Tag="ru"/>
+                        <ComboBoxItem Content="English" Tag="en"/>
+                    </ComboBox>
+                </StackPanel>
+
                 <!-- Видимость фона -->
-                <TextBlock Text="Видимость фона:"
+                <TextBlock Text="{Binding Localized.SettingsWindow_BackgroundOpacity}"
                            Margin="0,0,0,5"/>
 
                 <Slider x:Name="BackgroundOpacitySlider"
@@ -39,7 +50,7 @@
                            Margin="0,0,0,10"/>
 
                 <!-- Видимость текста -->
-                <TextBlock Text="Видимость текста:"
+                <TextBlock Text="{Binding Localized.SettingsWindow_TextOpacity}"
                            Margin="0,0,0,5"/>
 
                 <Slider x:Name="TextOpacitySlider"
@@ -57,11 +68,11 @@
                            Margin="0,0,0,10"/>
 
                 <!-- Чекбокс кукушки -->
-                <CheckBox Content="Звук кукушки каждый час"
+                <CheckBox Content="{Binding Localized.SettingsWindow_CuckooEveryHour}"
                           IsChecked="{Binding CuckooEveryHour, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,10"/>
 
-                <CheckBox Content="Сигнал каждые полчаса"
+                <CheckBox Content="{Binding Localized.SettingsWindow_HalfHourChimeEnabled}"
                           IsChecked="{Binding HalfHourChimeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,10"/>
 
@@ -69,18 +80,18 @@
         </GroupBox>
 
         <!-- Настройки аналоговых часов -->
-        <GroupBox Header="Настройки аналоговых часов"
+        <GroupBox Header="{Binding Localized.SettingsWindow_AnalogSettings}"
                 Margin="0,0,0,10">
             <StackPanel Margin="5">
-                <CheckBox Content="Показывать аналоговые часы"
+                <CheckBox Content="{Binding Localized.SettingsWindow_ShowAnalogClock}"
                           IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,5"/>
-                <CheckBox Content="Поверх всех окон"
+                <CheckBox Content="{Binding Localized.SettingsWindow_AnalogClockTopmost}"
                           IsChecked="{Binding AnalogClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,5"/>
 
                 <!-- Размер аналоговых часов -->
-                <TextBlock Text="Размер аналоговых часов:"
+                <TextBlock Text="{Binding Localized.SettingsWindow_AnalogClockSize}"
                            Margin="0,10,0,5"/>
 
                 <Slider x:Name="AnalogClockSizeSlider"
@@ -101,24 +112,24 @@
         </GroupBox>
 
         <!-- Настройки цифровых часов -->
-        <GroupBox Header="Настройки цифровых часов"
+        <GroupBox Header="{Binding Localized.SettingsWindow_DigitalSettings}"
                 Margin="0,0,0,10">
             <StackPanel Margin="5">
-                <CheckBox Content="Показывать цифровые часы"
+                <CheckBox Content="{Binding Localized.SettingsWindow_ShowDigitalClock}"
                           IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,5"/>
-                <CheckBox Content="Поверх всех окон"
+                <CheckBox Content="{Binding Localized.SettingsWindow_DigitalClockTopmost}"
                           IsChecked="{Binding DigitalClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="0,0,0,5"/>
 
                 <!-- Чекбокс отображения секунд -->
                 <CheckBox x:Name="ShowSecondsCheckBox"
-                          Content="Показывать секунды"
+                          Content="{Binding Localized.SettingsWindow_ShowSeconds}"
                           IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
                           Margin="0,0,0,5"/>
 
                 <!-- Размер шрифта -->
-                <TextBlock Text="Размер шрифта:"
+                <TextBlock Text="{Binding Localized.SettingsWindow_FontSize}"
                            Margin="0,10,0,5"/>
 
                 <Slider x:Name="FontSizeSlider"
@@ -148,7 +159,7 @@
                 <!-- 36px кнопка + 5px отступ -->
             </Grid.ColumnDefinitions>
             <Button x:Name="CloseWidgetButton"
-                    Content="Закрыть виджет"
+                    Content="{Binding Localized.SettingsWindow_CloseWidgetButton}"
                     Padding="10,5"
                     Background="#FFE0E0"
                     Click="CloseWidgetButton_Click"
@@ -156,7 +167,7 @@
                     VerticalAlignment="Center"
                     Grid.Column="0"/>
             <Button x:Name="ShowLogsButton"
-                    Content="logs"
+                    Content="{Binding Localized.SettingsWindow_Logs}"
                     Width="36"
                     Height="24"
                     FontSize="12"

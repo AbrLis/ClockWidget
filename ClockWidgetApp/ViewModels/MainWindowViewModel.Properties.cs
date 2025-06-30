@@ -221,6 +221,9 @@ public partial class MainWindowViewModel
             }
         }
     }
+    public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
+
+    public ISettingsService SettingsService => _settingsService;
 
     private void UpdateAnalogClockTopmost()
     {
@@ -236,5 +239,14 @@ public partial class MainWindowViewModel
         {
             window.Topmost = _digitalClockTopmost;
         }
+    }
+
+    private void SubscribeToLanguageChanges()
+    {
+        LocalizationManager.LanguageChanged += (s, e) =>
+        {
+            Localized = LocalizationManager.GetLocalizedStrings();
+            OnPropertyChanged(nameof(Localized));
+        };
     }
 } 
