@@ -12,11 +12,6 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
 {
     private readonly MainWindowViewModel _mainViewModel;
     private readonly ILogger<SettingsWindowViewModel> _logger;
-    private double _backgroundOpacity;
-    private double _textOpacity;
-    private double _fontSize;
-    private double _analogClockSize;
-    private bool _showSeconds;
 
     /// <summary>
     /// Событие, возникающее при изменении значения свойства.
@@ -238,11 +233,6 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         _mainViewModel = mainViewModel;
         _logger = logger;
         _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
-        _backgroundOpacity = _mainViewModel.BackgroundOpacity;
-        _textOpacity = _mainViewModel.TextOpacity;
-        _fontSize = _mainViewModel.FontSize;
-        _analogClockSize = _mainViewModel.AnalogClockSize;
-        _showSeconds = _mainViewModel.ShowSeconds;
         Localized = LocalizationManager.GetLocalizedStrings();
         LocalizationManager.LanguageChanged += (s, e) =>
         {

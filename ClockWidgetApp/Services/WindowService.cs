@@ -56,6 +56,7 @@ namespace ClockWidgetApp.Services
                 _analogClockWindow = new AnalogClockWindow(analogVm, mainVm, logger);
                 _analogClockWindow.Width = mainVm.AnalogClockSize;
                 _analogClockWindow.Height = mainVm.AnalogClockSize;
+                _analogClockWindow.Topmost = mainVm.AnalogClockTopmost;
                 // При попытке закрытия окна — скрываем его, не уничтожая
                 _analogClockWindow.Closing += (s, e) => { e.Cancel = true; _analogClockWindow.Hide(); };
                 _analogClockWindow.Closed += (s, e) => _analogClockWindow = null;
