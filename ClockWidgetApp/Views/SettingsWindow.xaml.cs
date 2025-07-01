@@ -142,4 +142,16 @@ public partial class SettingsWindow : Window
             }
         }
     }
+
+    // Обработчик клика по таймеру для редактирования
+    private void TimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        // Найти DataContext таймера
+        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is ClockWidgetApp.ViewModels.TimerEntryViewModel timer)
+        {
+            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
+            if (vm.EditTimerCommand.CanExecute(timer))
+                vm.EditTimerCommand.Execute(timer);
+        }
+    }
 } 

@@ -115,6 +115,45 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     public ICommand CancelAlarmInputCommand { get; }
 
+    // --- Режим редактирования таймера ---
+    private TimerEntryViewModel? _editingTimer;
+    public ICommand EditTimerCommand { get; }
+    public ICommand ApplyEditTimerCommand { get; }
+    public bool IsEditingTimer => _editingTimer != null;
+
+    private void EditTimer(TimerEntryViewModel? timer)
+    {
+        if (timer == null) return;
+        _editingTimer = timer;
+        NewTimerHours = timer.Duration.Hours.ToString("D2");
+        NewTimerMinutes = timer.Duration.Minutes.ToString("D2");
+        NewTimerSeconds = timer.Duration.Seconds.ToString("D2");
+        IsTimerInputVisible = true;
+        OnPropertyChanged(nameof(IsEditingTimer));
+    }
+
+    private void ApplyEditTimer()
+    {
+        if (_editingTimer != null && IsNewTimerValid)
+        {
+            TryParseOrZero(NewTimerHours, out int h);
+            TryParseOrZero(NewTimerMinutes, out int m);
+            TryParseOrZero(NewTimerSeconds, out int s);
+            var ts = new TimeSpan(h, m, s);
+            _editingTimer.Duration = ts;
+            _editingTimer.Remaining = ts;
+            _editingTimer.OnPropertyChanged(nameof(_editingTimer.Duration));
+            _editingTimer.OnPropertyChanged(nameof(_editingTimer.Remaining));
+            _editingTimer.OnPropertyChanged(nameof(_editingTimer.DisplayTime));
+            _editingTimer = null;
+            IsTimerInputVisible = false;
+            NewTimerHours = "";
+            NewTimerMinutes = "";
+            NewTimerSeconds = "";
+            OnPropertyChanged(nameof(IsEditingTimer));
+        }
+    }
+
     private TimersAndAlarmsViewModel()
     {
         Localized = LocalizationManager.GetLocalizedStrings();
@@ -141,6 +180,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         AddAlarmCommand = new RelayCommand(_ => AddAlarm(), _ => IsNewAlarmValid);
         CancelTimerInputCommand = new RelayCommand(_ => CancelTimerInput());
         CancelAlarmInputCommand = new RelayCommand(_ => CancelAlarmInput());
+        EditTimerCommand = new RelayCommand(t =>
+        {
+            if (t is TimerEntryViewModel timer && timer != null)
+                EditTimer(timer);
+        });
+        ApplyEditTimerCommand = new RelayCommand(_ => ApplyEditTimer(), _ => IsEditingTimer && IsNewTimerValid);
     }
 
     /// <summary>
@@ -218,7 +263,10 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    /// <summary>
+    /// Уведомляет об изменении свойства для биндинга.
+    /// </summary>
+    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
@@ -230,7 +278,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Длительность таймера.
     /// </summary>
-    public TimeSpan Duration { get; }
+    public TimeSpan Duration { get; set; }
     private TimeSpan _remaining;
     /// <summary>
     /// Оставшееся время таймера.
@@ -384,7 +432,10 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         }
     }
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    /// <summary>
+    /// Уведомляет об изменении свойства для биндинга.
+    /// </summary>
+    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
@@ -436,7 +487,10 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
         IsWidgetVisible = !IsWidgetVisible;
     }
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    /// <summary>
+    /// Уведомляет об изменении свойства для биндинга.
+    /// </summary>
+    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
