@@ -28,6 +28,9 @@ public partial class SettingsWindow : Window
             _logger.LogDebug("[SettingsWindow] Initializing settings window");
             InitializeComponent();
             DataContext = _viewModel;
+            // Устанавливаем DataContext для вкладки 'Alarms & Timers' на Singleton-экземпляр
+            if (TimersAlarmsGrid != null)
+                TimersAlarmsGrid.DataContext = TimersAndAlarmsViewModel.Instance;
             _logger.LogDebug($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
             LocalizationManager.LanguageChanged += (s, e) =>
             {
@@ -124,6 +127,19 @@ public partial class SettingsWindow : Window
         {
             _logger.LogError(ex, "[SettingsWindow] Ошибка при открытии файла логов");
             System.Windows.MessageBox.Show($"Ошибка при открытии файла логов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    // Обработчик для разрешения только числового ввода в TextBox
+    private void NumberOnly_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+    {
+        foreach (char c in e.Text)
+        {
+            if (!char.IsDigit(c))
+            {
+                e.Handled = true;
+                return;
+            }
         }
     }
 } 

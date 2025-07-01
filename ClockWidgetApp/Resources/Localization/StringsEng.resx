@@ -80,4 +80,7 @@
   <data name="WidgetSettings_SizeTooltip" xml:space="preserve"><value>Change the size of the floating window</value></data>
   <data name="WidgetSettings_Topmost" xml:space="preserve"><value>Show on top of all windows</value></data>
   <data name="WidgetSettings_TopmostTooltip" xml:space="preserve"><value>Show above all programs when triggered</value></data>
+  <data name="Timer_Hours" xml:space="preserve"><value>h</value></data>
+  <data name="Timer_Minutes" xml:space="preserve"><value>m</value></data>
+  <data name="Timer_Seconds" xml:space="preserve"><value>s</value></data>
 </root> 

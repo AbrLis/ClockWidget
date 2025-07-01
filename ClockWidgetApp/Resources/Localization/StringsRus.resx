@@ -80,4 +80,7 @@
   <data name="WidgetSettings_SizeTooltip" xml:space="preserve"><value>Измените размер плавающего окна</value></data>
   <data name="WidgetSettings_Topmost" xml:space="preserve"><value>Отображать поверх всех окон</value></data>
   <data name="WidgetSettings_TopmostTooltip" xml:space="preserve"><value>Показывать при срабатывании поверх всех программ</value></data>
+  <data name="Timer_Hours" xml:space="preserve"><value>ч</value></data>
+  <data name="Timer_Minutes" xml:space="preserve"><value>м</value></data>
+  <data name="Timer_Seconds" xml:space="preserve"><value>с</value></data>
 </root>

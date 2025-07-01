@@ -101,4 +101,7 @@ public class LocalizedStrings
     public string WidgetSettings_SizeTooltip => LocalizationManager.GetString("WidgetSettings_SizeTooltip", _lang);
     public string WidgetSettings_Topmost => LocalizationManager.GetString("WidgetSettings_Topmost", _lang);
     public string WidgetSettings_TopmostTooltip => LocalizationManager.GetString("WidgetSettings_TopmostTooltip", _lang);
+    public string Timer_Hours => LocalizationManager.GetString("Timer_Hours", _lang);
+    public string Timer_Minutes => LocalizationManager.GetString("Timer_Minutes", _lang);
+    public string Timer_Seconds => LocalizationManager.GetString("Timer_Seconds", _lang);
 } 
