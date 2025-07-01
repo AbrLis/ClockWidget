@@ -258,6 +258,9 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     private bool _isWidgetVisible = true;
     public bool IsWidgetVisible { get => _isWidgetVisible; set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); } }
 
+    public bool IsRepeatAvailable => Remaining == TimeSpan.Zero;
+    public ICommand RepeatCommand { get; }
+
     public event Action<TimerEntryViewModel>? RequestDelete;
     public event Action<TimerEntryViewModel>? RequestDeactivate;
 
@@ -274,6 +277,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         DeleteCommand = new RelayCommand(_ => RequestDelete?.Invoke(this));
         DeactivateCommand = new RelayCommand(_ => { if (IsHideAvailable) Deactivate(); });
         ToggleWidgetVisibilityCommand = new RelayCommand(_ => ToggleWidgetVisibility());
+        RepeatCommand = new RelayCommand(_ => Repeat());
     }
 
     /// <summary>
@@ -282,9 +286,12 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public void Start()
     {
         if (IsRunning) return;
+        if (Remaining == TimeSpan.Zero)
+            Repeat();
         IsRunning = true;
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
+        OnPropertyChanged(nameof(IsRepeatAvailable));
         if (_timer == null)
         {
             _timer = new System.Timers.Timer(1000);
@@ -313,6 +320,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
             {
                 Remaining = TimeSpan.Zero;
                 Stop();
+                OnPropertyChanged(nameof(IsRepeatAvailable));
             }
         }
         else
@@ -337,6 +345,13 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public void ToggleWidgetVisibility()
     {
         IsWidgetVisible = !IsWidgetVisible;
+    }
+    public void Repeat()
+    {
+        Remaining = Duration;
+        OnPropertyChanged(nameof(IsRepeatAvailable));
+        OnPropertyChanged(nameof(IsStartAvailable));
+        OnPropertyChanged(nameof(DisplayTime));
     }
     public void Dispose()
     {
