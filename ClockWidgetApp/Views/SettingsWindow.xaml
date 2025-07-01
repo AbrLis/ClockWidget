@@ -228,6 +228,7 @@
                                 <TextBox Width="32" Text="{Binding NewTimerSeconds, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center"/>
                                 <TextBlock Text="{Binding Localized.Timer_Seconds}" Margin="2,0,8,0" VerticalAlignment="Center"/>
                                 <Button Content="OK" Command="{Binding AddTimerCommand}" IsEnabled="{Binding IsNewTimerValid}"/>
+                                <Button Content="✖️" Command="{Binding CancelTimerInputCommand}" Margin="4,0,0,0"/>
                             </StackPanel>
                         </Border>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
@@ -254,10 +255,10 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Timers_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                                <Button Content="▶️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Start, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding StartCommand}" ToolTipService.ShowOnDisabled="True" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="⏸️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Status, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding StopCommand}" ToolTipService.ShowOnDisabled="True" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Delete, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding DeleteCommand}" ToolTipService.ShowOnDisabled="True"/>
-                                                <Button Content="👁️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_HideWidget, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding ToggleWidgetVisibilityCommand}" ToolTipService.ShowOnDisabled="True" Opacity="{Binding IsWidgetVisible, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                <Button Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                <Button Content="👁️" Width="28" Height="28" Margin="4,0" Command="{Binding ToggleWidgetVisibilityCommand}" Opacity="{Binding IsWidgetVisible, Converter={StaticResource BooleanToOpacityConverter}}"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -293,6 +294,7 @@
                                 <TextBox Width="32" Text="{Binding NewAlarmSeconds, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center"/>
                                 <TextBlock Text="{Binding Localized.Timer_Seconds}" Margin="2,0,8,0" VerticalAlignment="Center"/>
                                 <Button Content="OK" Command="{Binding AddAlarmCommand}" IsEnabled="{Binding IsNewAlarmValid}"/>
+                                <Button Content="✖️" Command="{Binding CancelAlarmInputCommand}" Margin="4,0,0,0"/>
                             </StackPanel>
                         </Border>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
@@ -319,10 +321,10 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                                <Button Content="▶️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Start, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding StartCommand}" ToolTipService.ShowOnDisabled="True" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="⏸️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Status, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding StopCommand}" ToolTipService.ShowOnDisabled="True" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Alarms_Delete, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding DeleteCommand}" ToolTipService.ShowOnDisabled="True"/>
-                                                <Button Content="👁️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_HideWidget, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding ToggleWidgetVisibilityCommand}" ToolTipService.ShowOnDisabled="True" Opacity="{Binding IsWidgetVisible, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                <Button Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                <Button Content="👁️" Width="28" Height="28" Margin="4,0" Command="{Binding ToggleWidgetVisibilityCommand}" Opacity="{Binding IsWidgetVisible, Converter={StaticResource BooleanToOpacityConverter}}"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>

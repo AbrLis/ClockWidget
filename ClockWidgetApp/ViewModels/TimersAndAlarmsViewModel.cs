@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Data;
 using ClockWidgetApp.Helpers;
 using System.Globalization;
+using System.Timers;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -102,6 +103,14 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// Команда для добавления будильника.
     /// </summary>
     public ICommand AddAlarmCommand { get; }
+    /// <summary>
+    /// Команда для отмены ввода времени для таймера.
+    /// </summary>
+    public ICommand CancelTimerInputCommand { get; }
+    /// <summary>
+    /// Команда для отмены ввода времени для будильника.
+    /// </summary>
+    public ICommand CancelAlarmInputCommand { get; }
 
     private TimersAndAlarmsViewModel()
     {
@@ -127,6 +136,8 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         ShowAlarmInputCommand = new RelayCommand(_ => IsAlarmInputVisible = true);
         AddTimerCommand = new RelayCommand(_ => AddTimer(), _ => IsNewTimerValid);
         AddAlarmCommand = new RelayCommand(_ => AddAlarm(), _ => IsNewAlarmValid);
+        CancelTimerInputCommand = new RelayCommand(_ => CancelTimerInput());
+        CancelAlarmInputCommand = new RelayCommand(_ => CancelAlarmInput());
     }
 
     /// <summary>
@@ -187,6 +198,22 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         return int.TryParse(value, out result);
     }
 
+    private void CancelTimerInput()
+    {
+        IsTimerInputVisible = false;
+        NewTimerHours = "";
+        NewTimerMinutes = "";
+        NewTimerSeconds = "";
+    }
+
+    private void CancelAlarmInput()
+    {
+        IsAlarmInputVisible = false;
+        NewAlarmHours = "";
+        NewAlarmMinutes = "";
+        NewAlarmSeconds = "";
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -236,6 +263,8 @@ public class TimerEntryViewModel : INotifyPropertyChanged
 
     public ICommand ToggleWidgetVisibilityCommand { get; }
 
+    private System.Timers.Timer? _timer;
+
     public TimerEntryViewModel(TimeSpan duration)
     {
         Duration = duration;
@@ -252,18 +281,46 @@ public class TimerEntryViewModel : INotifyPropertyChanged
     /// </summary>
     public void Start()
     {
+        if (IsRunning) return;
         IsRunning = true;
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
+        if (_timer == null)
+        {
+            _timer = new System.Timers.Timer(1000);
+            _timer.Elapsed += Timer_Elapsed;
+            _timer.AutoReset = true;
+        }
+        _timer.Start();
     }
     /// <summary>
     /// Останавливает таймер.
     /// </summary>
     public void Stop()
     {
+        if (!IsRunning) return;
         IsRunning = false;
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
+        _timer?.Stop();
+    }
+    private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+        if (Remaining.TotalSeconds > 0)
+        {
+            Remaining = Remaining - TimeSpan.FromSeconds(1);
+            if (Remaining.TotalSeconds <= 0)
+            {
+                Remaining = TimeSpan.Zero;
+                Stop();
+            }
+        }
+        else
+        {
+            Stop();
+        }
+        // Обновляем DisplayTime
+        OnPropertyChanged(nameof(DisplayTime));
     }
     /// <summary>
     /// Деактивирует таймер (например, скрывает его виджет).
