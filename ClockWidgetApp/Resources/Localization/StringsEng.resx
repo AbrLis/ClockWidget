@@ -64,15 +64,17 @@
   <data name="Timers_DeleteAll" xml:space="preserve"><value>Delete all</value></data>
   <data name="Timers_ActivateAll" xml:space="preserve"><value>Activate all</value></data>
   <data name="Timers_Delete" xml:space="preserve"><value>Delete timer</value></data>
-  <data name="Timers_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Timers_Status" xml:space="preserve"><value>Pause</value></data>
   <data name="Timers_Disable" xml:space="preserve"><value>Disable timer</value></data>
   <data name="Timers_Time" xml:space="preserve"><value>Time</value></data>
   <data name="Timers_Active" xml:space="preserve"><value>Active</value></data>
   <data name="Timers_Inactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="Timers_Start" xml:space="preserve"><value>Start timer</value></data>
+  <data name="Timers_HideWidget" xml:space="preserve"><value>Visibility widget</value></data>
   <data name="Alarms_Title" xml:space="preserve"><value>Alarms</value></data>
   <data name="Alarms_Add" xml:space="preserve"><value>Add alarm</value></data>
   <data name="Alarms_Delete" xml:space="preserve"><value>Delete alarm</value></data>
-  <data name="Alarms_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Alarms_Status" xml:space="preserve"><value>Pause</value></data>
   <data name="Alarms_Enable" xml:space="preserve"><value>Enable/Disable alarm</value></data>
   <data name="Alarms_Time" xml:space="preserve"><value>Time</value></data>
   <data name="WidgetSettings_Title" xml:space="preserve"><value>Widget Display Settings</value></data>
