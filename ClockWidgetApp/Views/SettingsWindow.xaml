@@ -15,169 +15,182 @@
         WindowStyle="ToolWindow"
         Topmost="True"
         Background="White">
-    <StackPanel Margin="10">
-        <!-- Общие настройки -->
-        <GroupBox Header="{Binding Localized.SettingsWindow_CommonSettings}"
-                Margin="0,0,0,10">
-            <StackPanel Margin="5">
-                <!-- Язык интерфейса -->
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <TextBlock Text="{Binding Localized.LanguageLabel}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                    <ComboBox Width="120"
-                              SelectedValue="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValuePath="Tag">
-                        <ComboBoxItem Content="Русский" Tag="ru"/>
-                        <ComboBoxItem Content="English" Tag="en"/>
-                    </ComboBox>
-                </StackPanel>
+    <TabControl>
+        <!-- Вкладка настроек -->
+        <TabItem Header="{Binding Localized.SettingsWindow_CommonSettings}">
+            <StackPanel Margin="10">
+                <!-- Общие настройки -->
+                <GroupBox Header="{Binding Localized.SettingsWindow_CommonSettings}"
+                          Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <!-- Язык интерфейса -->
+                        <StackPanel Orientation="Horizontal"
+                                Margin="0,0,0,10">
+                            <TextBlock Text="{Binding Localized.LanguageLabel}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,5,0"/>
+                            <ComboBox Width="120"
+                                      SelectedValue="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Tag">
+                                <ComboBoxItem Content="Русский"
+                                        Tag="ru"/>
+                                <ComboBoxItem Content="English"
+                                        Tag="en"/>
+                            </ComboBox>
+                        </StackPanel>
 
-                <!-- Видимость фона -->
-                <TextBlock Text="{Binding Localized.SettingsWindow_BackgroundOpacity}"
-                           Margin="0,0,0,5"/>
+                        <!-- Видимость фона -->
+                        <TextBlock Text="{Binding Localized.SettingsWindow_BackgroundOpacity}"
+                                   Margin="0,0,0,5"/>
 
-                <Slider x:Name="BackgroundOpacitySlider"
-                        Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
-                        Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
-                        Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
-                        TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
-                        IsSnapToTickEnabled="True"
-                        IsMoveToPointEnabled="True"
-                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
+                        <Slider x:Name="BackgroundOpacitySlider"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
+                                Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
+                                IsSnapToTickEnabled="True"
+                                IsMoveToPointEnabled="True"
+                                ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
 
-                <TextBlock x:Name="BackgroundOpacityValueText"
-                           Text="{Binding BackgroundOpacity, StringFormat=P0}"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,10"/>
+                        <TextBlock x:Name="BackgroundOpacityValueText"
+                                   Text="{Binding BackgroundOpacity, StringFormat=P0}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
 
-                <!-- Видимость текста -->
-                <TextBlock Text="{Binding Localized.SettingsWindow_TextOpacity}"
-                           Margin="0,0,0,5"/>
+                        <!-- Видимость текста -->
+                        <TextBlock Text="{Binding Localized.SettingsWindow_TextOpacity}"
+                                   Margin="0,0,0,5"/>
 
-                <Slider x:Name="TextOpacitySlider"
-                        Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
-                        Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
-                        Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
-                        TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
-                        IsSnapToTickEnabled="True"
-                        IsMoveToPointEnabled="True"
-                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
+                        <Slider x:Name="TextOpacitySlider"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
+                                Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
+                                IsSnapToTickEnabled="True"
+                                IsMoveToPointEnabled="True"
+                                ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
 
-                <TextBlock x:Name="TextOpacityValueText"
-                           Text="{Binding TextOpacity, StringFormat=P0}"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,10"/>
+                        <TextBlock x:Name="TextOpacityValueText"
+                                   Text="{Binding TextOpacity, StringFormat=P0}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
 
-                <!-- Чекбокс кукушки -->
-                <CheckBox Content="{Binding Localized.SettingsWindow_CuckooEveryHour}"
-                          IsChecked="{Binding CuckooEveryHour, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,0,0,10"/>
+                        <!-- Чекбокс кукушки -->
+                        <CheckBox Content="{Binding Localized.SettingsWindow_CuckooEveryHour}"
+                                  IsChecked="{Binding CuckooEveryHour, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="0,0,0,10"/>
 
-                <CheckBox Content="{Binding Localized.SettingsWindow_HalfHourChimeEnabled}"
-                          IsChecked="{Binding HalfHourChimeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,0,0,10"/>
+                        <CheckBox Content="{Binding Localized.SettingsWindow_HalfHourChimeEnabled}"
+                                  IsChecked="{Binding HalfHourChimeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="0,0,0,10"/>
 
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Настройки аналоговых часов -->
+                <GroupBox Header="{Binding Localized.SettingsWindow_AnalogSettings}"
+                          Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <CheckBox Content="{Binding Localized.SettingsWindow_ShowAnalogClock}"
+                                  IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="0,5"/>
+                        <CheckBox Content="{Binding Localized.SettingsWindow_AnalogClockTopmost}"
+                                  IsChecked="{Binding AnalogClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="0,0,0,5"/>
+
+                        <!-- Размер аналоговых часов -->
+                        <TextBlock Text="{Binding Localized.SettingsWindow_AnalogClockSize}"
+                                   Margin="0,10,0,5"/>
+
+                        <Slider x:Name="AnalogClockSizeSlider"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
+                                Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
+                                IsSnapToTickEnabled="True"
+                                IsMoveToPointEnabled="True"
+                                ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
+                                IsEnabled="{Binding ShowAnalogClock}"/>
+
+                        <TextBlock x:Name="AnalogClockSizeValueText"
+                                   Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Настройки цифровых часов -->
+                <GroupBox Header="{Binding Localized.SettingsWindow_DigitalSettings}"
+                          Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <CheckBox Content="{Binding Localized.SettingsWindow_ShowDigitalClock}"
+                                  IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="0,5"/>
+
+                        <!-- Чекбокс отображения секунд -->
+                        <CheckBox x:Name="ShowSecondsCheckBox"
+                                  Content="{Binding Localized.SettingsWindow_ShowSeconds}"
+                                  IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
+                                  Margin="0,0,0,5"/>
+
+                        <CheckBox Content="{Binding Localized.SettingsWindow_DigitalClockTopmost}"
+                                  IsChecked="{Binding DigitalClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="0,0,0,5"/>
+
+                        <!-- Размер шрифта -->
+                        <TextBlock Text="{Binding Localized.SettingsWindow_FontSize}"
+                                   Margin="0,10,0,5"/>
+
+                        <Slider x:Name="FontSizeSlider"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
+                                Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
+                                IsSnapToTickEnabled="True"
+                                IsMoveToPointEnabled="True"
+                                ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
+                                IsEnabled="{Binding ShowDigitalClock}"/>
+
+                        <TextBlock x:Name="FontSizeValueText"
+                                   Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Кнопка закрытия и мини-кнопка логов -->
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="41"/>
+                        <!-- 36px кнопка + 5px отступ -->
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="CloseWidgetButton"
+                            Content="{Binding Localized.SettingsWindow_CloseWidgetButton}"
+                            Padding="10,5"
+                            Background="#FFE0E0"
+                            Click="CloseWidgetButton_Click"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Grid.Column="0"/>
+                    <Button x:Name="ShowLogsButton"
+                            Content="{Binding Localized.SettingsWindow_Logs}"
+                            Width="36"
+                            Height="24"
+                            FontSize="12"
+                            Padding="0"
+                            Background="#E0E0FF"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Click="ShowLogsButton_Click"
+                            Grid.Column="1"/>
+                </Grid>
             </StackPanel>
-        </GroupBox>
-
-        <!-- Настройки аналоговых часов -->
-        <GroupBox Header="{Binding Localized.SettingsWindow_AnalogSettings}"
-                Margin="0,0,0,10">
-            <StackPanel Margin="5">
-                <CheckBox Content="{Binding Localized.SettingsWindow_ShowAnalogClock}"
-                          IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,5"/>
-                <CheckBox Content="{Binding Localized.SettingsWindow_AnalogClockTopmost}"
-                          IsChecked="{Binding AnalogClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,0,0,5"/>
-
-                <!-- Размер аналоговых часов -->
-                <TextBlock Text="{Binding Localized.SettingsWindow_AnalogClockSize}"
-                           Margin="0,10,0,5"/>
-
-                <Slider x:Name="AnalogClockSizeSlider"
-                        Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
-                        Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
-                        Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
-                        TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
-                        IsSnapToTickEnabled="True"
-                        IsMoveToPointEnabled="True"
-                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
-                        IsEnabled="{Binding ShowAnalogClock}"/>
-
-                <TextBlock x:Name="AnalogClockSizeValueText"
-                           Text="{Binding AnalogClockSize, StringFormat='{}{0:F0}px'}"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,10"/>
-            </StackPanel>
-        </GroupBox>
-
-        <!-- Настройки цифровых часов -->
-        <GroupBox Header="{Binding Localized.SettingsWindow_DigitalSettings}"
-                Margin="0,0,0,10">
-            <StackPanel Margin="5">
-                <CheckBox Content="{Binding Localized.SettingsWindow_ShowDigitalClock}"
-                          IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,5"/>
-
-                <!-- Чекбокс отображения секунд -->
-                <CheckBox x:Name="ShowSecondsCheckBox"
-                          Content="{Binding Localized.SettingsWindow_ShowSeconds}"
-                          IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
-                          Margin="0,0,0,5"/>
-                          
-                <CheckBox Content="{Binding Localized.SettingsWindow_DigitalClockTopmost}"
-                          IsChecked="{Binding DigitalClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,0,0,5"/>
-
-                <!-- Размер шрифта -->
-                <TextBlock Text="{Binding Localized.SettingsWindow_FontSize}"
-                           Margin="0,10,0,5"/>
-
-                <Slider x:Name="FontSizeSlider"
-                        Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
-                        Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
-                        Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
-                        TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
-                        IsSnapToTickEnabled="True"
-                        IsMoveToPointEnabled="True"
-                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
-                        IsEnabled="{Binding ShowDigitalClock}"/>
-
-                <TextBlock x:Name="FontSizeValueText"
-                           Text="{Binding FontSize, StringFormat='{}{0:F0}px'}"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,10"/>
-
-
-            </StackPanel>
-        </GroupBox>
-
-        <!-- Кнопка закрытия и мини-кнопка логов -->
-        <Grid Margin="0,10,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="41"/>
-                <!-- 36px кнопка + 5px отступ -->
-            </Grid.ColumnDefinitions>
-            <Button x:Name="CloseWidgetButton"
-                    Content="{Binding Localized.SettingsWindow_CloseWidgetButton}"
-                    Padding="10,5"
-                    Background="#FFE0E0"
-                    Click="CloseWidgetButton_Click"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Grid.Column="0"/>
-            <Button x:Name="ShowLogsButton"
-                    Content="{Binding Localized.SettingsWindow_Logs}"
-                    Width="36"
-                    Height="24"
-                    FontSize="12"
-                    Padding="0"
-                    Background="#E0E0FF"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Click="ShowLogsButton_Click"
-                    Grid.Column="1"/>
-        </Grid>
-    </StackPanel>
+        </TabItem>
+        <!-- Пустая вкладка -->
+        <TabItem Header="Вкладка 2">
+            <!-- Здесь будет содержимое второй вкладки -->
+        </TabItem>
+    </TabControl>
 </Window> 
