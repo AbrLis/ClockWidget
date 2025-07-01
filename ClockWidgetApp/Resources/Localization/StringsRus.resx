@@ -57,4 +57,27 @@
   <data name="Tray_ShowAnalog" xml:space="preserve"><value>Показать аналоговые часы</value></data>
   <data name="Tray_HideAnalog" xml:space="preserve"><value>Скрыть аналоговые часы</value></data>
   <data name="Tray_IconText" xml:space="preserve"><value>Clock Widget App</value></data>
+  <data name="TimersAndAlarms_Tab" xml:space="preserve"><value>Будильники и таймеры</value></data>
+  <data name="Timers_Title" xml:space="preserve"><value>Таймеры</value></data>
+  <data name="Timers_Add" xml:space="preserve"><value>Добавить таймер</value></data>
+  <data name="Timers_DisableAll" xml:space="preserve"><value>Отключить все</value></data>
+  <data name="Timers_DeleteAll" xml:space="preserve"><value>Удалить все</value></data>
+  <data name="Timers_ActivateAll" xml:space="preserve"><value>Активировать все</value></data>
+  <data name="Timers_Delete" xml:space="preserve"><value>Удалить таймер</value></data>
+  <data name="Timers_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Timers_Disable" xml:space="preserve"><value>Отключить таймер</value></data>
+  <data name="Timers_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Timers_Active" xml:space="preserve"><value>Активен</value></data>
+  <data name="Timers_Inactive" xml:space="preserve"><value>Неактивен</value></data>
+  <data name="Alarms_Title" xml:space="preserve"><value>Будильники</value></data>
+  <data name="Alarms_Add" xml:space="preserve"><value>Добавить будильник</value></data>
+  <data name="Alarms_Delete" xml:space="preserve"><value>Удалить будильник</value></data>
+  <data name="Alarms_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Alarms_Enable" xml:space="preserve"><value>Вкл/Выкл будильник</value></data>
+  <data name="Alarms_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="WidgetSettings_Title" xml:space="preserve"><value>Настройки отображения</value></data>
+  <data name="WidgetSettings_Size" xml:space="preserve"><value>Размер виджета</value></data>
+  <data name="WidgetSettings_SizeTooltip" xml:space="preserve"><value>Измените размер плавающего окна</value></data>
+  <data name="WidgetSettings_Topmost" xml:space="preserve"><value>Отображать поверх всех окон</value></data>
+  <data name="WidgetSettings_TopmostTooltip" xml:space="preserve"><value>Показывать при срабатывании поверх всех программ</value></data>
 </root>

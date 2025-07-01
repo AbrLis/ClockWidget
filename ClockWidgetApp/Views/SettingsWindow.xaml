@@ -189,8 +189,93 @@
             </StackPanel>
         </TabItem>
         <!-- Пустая вкладка -->
-        <TabItem Header="Вкладка 2">
-            <!-- Здесь будет содержимое второй вкладки -->
+        <TabItem Header="{Binding Localized.TimersAndAlarms_Tab}">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" /> <!-- Таймеры -->
+                    <RowDefinition Height="Auto" /> <!-- Separator -->
+                    <RowDefinition Height="*" /> <!-- Будильники -->
+                    <RowDefinition Height="Auto" /> <!-- Настройки виджета -->
+                </Grid.RowDefinitions>
+
+                <!-- === Таймеры === -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                    <TextBlock Text="{Binding Localized.Timers_Title}" FontWeight="Bold" FontSize="16"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                        <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Timers_Add}"/>
+                    </StackPanel>
+                    <!-- Список таймеров -->
+                    <ItemsControl x:Name="TimersList" Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFF9E79F" Margin="0,0,0,8" Background="#FFFFFDE7">
+                                    <DockPanel VerticalAlignment="Center" Margin="6">
+                                        <!-- Время таймера -->
+                                        <TextBlock Text="00:10:00" FontSize="15" VerticalAlignment="Center" ToolTip="{Binding DataContext.Localized.Timers_Time, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                        <!-- Иконки управления -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right" >
+                                            <Button Content="🗑️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Delete, RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed"/>
+                                            <Button Content="👁️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Status, RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed"/>
+                                            <Button Content="🔕" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Timers_Disable, RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!-- Кнопки управления таймерами -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0" Visibility="Collapsed">
+                        <Button Content="{Binding Localized.Timers_DisableAll}" Margin="0,0,5,0" ToolTip="{Binding Localized.Timers_DisableAll}"/>
+                        <Button Content="{Binding Localized.Timers_DeleteAll}" Margin="0,0,5,0" ToolTip="{Binding Localized.Timers_DeleteAll}"/>
+                        <Button Content="{Binding Localized.Timers_ActivateAll}" ToolTip="{Binding Localized.Timers_ActivateAll}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- === Разделитель === -->
+                <Separator Grid.Row="1" Margin="0,0,0,0"/>
+
+                <!-- === Будильники === -->
+                <StackPanel Grid.Row="2" Margin="0,10,0,10">
+                    <TextBlock Text="{Binding Localized.Alarms_Title}" FontWeight="Bold" FontSize="16"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                        <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Alarms_Add}"/>
+                    </StackPanel>
+                    <!-- Список будильников -->
+                    <ItemsControl x:Name="AlarmsList" Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFB3E5FC" Margin="0,0,0,8" Background="#FFE3F2FD">
+                                    <DockPanel VerticalAlignment="Center" Margin="6">
+                                        <!-- Время будильника -->
+                                        <TextBlock Text="06:45" FontSize="15" VerticalAlignment="Center" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                        <!-- Иконки управления -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right" >
+                                            <Button Content="🗑️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Alarms_Delete, RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed"/>
+                                            <Button Content="👁️" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Alarms_Status, RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed"/>
+                                            <Button Content="🔔" Width="28" Height="28" Margin="4,0" ToolTip="{Binding DataContext.Localized.Alarms_Enable, RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!-- Кнопки управления будильниками -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0" Visibility="Collapsed">
+                        <Button Content="{Binding Localized.Timers_DisableAll}" Margin="0,0,5,0" ToolTip="{Binding Localized.Timers_DisableAll}"/>
+                        <Button Content="{Binding Localized.Timers_DeleteAll}" Margin="0,0,5,0" ToolTip="{Binding Localized.Timers_DeleteAll}"/>
+                        <Button Content="{Binding Localized.Timers_ActivateAll}" ToolTip="{Binding Localized.Timers_ActivateAll}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- === Настройки виджета === -->
+                <GroupBox Grid.Row="3" Header="{Binding Localized.WidgetSettings_Title}" Margin="0,0,0,0">
+                    <StackPanel Margin="8">
+                        <TextBlock Text="{Binding Localized.WidgetSettings_Size}" Margin="0,0,0,4"/>
+                        <Slider Minimum="0.5" Maximum="2.0" Value="1.0" TickFrequency="0.1" IsSnapToTickEnabled="True" ToolTip="{Binding Localized.WidgetSettings_SizeTooltip}"/>
+                        <CheckBox Content="{Binding Localized.WidgetSettings_Topmost}" Margin="0,8,0,0" ToolTip="{Binding Localized.WidgetSettings_TopmostTooltip}"/>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
         </TabItem>
     </TabControl>
 </Window> 
