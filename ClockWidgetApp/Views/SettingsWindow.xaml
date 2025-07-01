@@ -22,7 +22,7 @@
         <viewModels:StringNotEmptyToBoolConverter x:Key="StringNotEmptyToBoolConverter"/>
         <viewModels:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
     </Window.Resources>
-    <TabControl>
+    <TabControl x:Name="MainTabControl">
         <!-- Вкладка настроек -->
         <TabItem Header="{Binding Localized.SettingsWindow_CommonSettings}">
             <StackPanel Margin="10">

@@ -184,4 +184,24 @@ public partial class SettingsWindow : Window
                 vm.EditAlarmCommand.Execute(alarm);
         }
     }
+
+    /// <summary>
+    /// Программно выбирает вкладку 'Будильники и таймеры'.
+    /// </summary>
+    public void SelectTimersTab()
+    {
+        // Вкладка с таймерами и будильниками — вторая (индекс 1)
+        if (MainTabControl != null && MainTabControl.Items.Count > 1)
+            MainTabControl.SelectedIndex = 1;
+    }
+
+    /// <summary>
+    /// Программно выбирает вкладку 'Общие настройки'.
+    /// </summary>
+    public void SelectGeneralTab()
+    {
+        // Первая вкладка — индекс 0
+        if (MainTabControl != null && MainTabControl.Items.Count > 0)
+            MainTabControl.SelectedIndex = 0;
+    }
 } 

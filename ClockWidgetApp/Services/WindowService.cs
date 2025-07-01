@@ -144,5 +144,17 @@ namespace ClockWidgetApp.Services
             BringToFront(_analogClockWindow);
             BringToFront(_settingsWindow);
         }
+
+        public void OpenSettingsWindow(bool selectTimersTab)
+        {
+            OpenSettingsWindow();
+            if (_settingsWindow != null)
+            {
+                if (selectTimersTab)
+                    _settingsWindow.SelectTimersTab();
+                else
+                    _settingsWindow.SelectGeneralTab();
+            }
+        }
     }
 } 

@@ -107,4 +107,8 @@ public class LocalizedStrings
     public string TimerNotification_Title => LocalizationManager.GetString("TimerNotification_Title", _lang);
     public string TimerNotification_StopButton => LocalizationManager.GetString("TimerNotification_StopButton", _lang);
     public string AlarmNotification_Title => LocalizationManager.GetString("AlarmNotification_Title", _lang);
+    /// <summary>
+    /// Локализованная строка для пункта меню трея 'Настройка таймера/будильника'.
+    /// </summary>
+    public string Tray_TimerAlarmSettings => LocalizationManager.GetString("Tray_TimerAlarmSettings", _lang);
 } 

@@ -20,6 +20,7 @@ public partial class App : System.Windows.Application
     private ToolStripMenuItem? _showDigitalItem;
     private ToolStripMenuItem? _showAnalogItem;
     private ToolStripMenuItem? _settingsItem;
+    private ToolStripMenuItem? _timerAlarmSettingsItem;
     private ToolStripMenuItem? _exitItem;
 
     /// <summary>
@@ -191,7 +192,9 @@ public partial class App : System.Windows.Application
         _showDigitalItem = new ToolStripMenuItem();
         _showAnalogItem = new ToolStripMenuItem();
         _settingsItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Settings", lang));
+        _timerAlarmSettingsItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_TimerAlarmSettings", lang));
         _exitItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Exit", lang));
+        var separator = new ToolStripSeparator();
         _showDigitalItem.Click += (s, e) =>
         {
             if (mainViewModel != null)
@@ -204,15 +207,33 @@ public partial class App : System.Windows.Application
         };
         _settingsItem.Click += (s, e) =>
         {
-            if (mainViewModel != null)
+            if (_serviceProvider != null)
             {
-                ShowSettingsWindow(mainViewModel);
+                var ws = _serviceProvider.GetRequiredService<IWindowService>();
+                if (ws is WindowService windowService)
+                    windowService.OpenSettingsWindow(false);
+                else
+                    ws.OpenSettingsWindow();
+            }
+        };
+        _timerAlarmSettingsItem.Click += (s, e) =>
+        {
+            if (_serviceProvider != null)
+            {
+                var ws = _serviceProvider.GetRequiredService<IWindowService>();
+                // Открыть окно настроек и сразу выбрать вкладку таймеров/будильников
+                if (ws is WindowService windowService)
+                    windowService.OpenSettingsWindow(true);
+                else
+                    ws.OpenSettingsWindow(); // fallback
             }
         };
         _exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
         _trayMenu.Items.Add(_showDigitalItem);
         _trayMenu.Items.Add(_showAnalogItem);
         _trayMenu.Items.Add(_settingsItem);
+        _trayMenu.Items.Add(_timerAlarmSettingsItem);
+        _trayMenu.Items.Add(separator);
         _trayMenu.Items.Add(_exitItem);
         string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
         if (!File.Exists(iconPath))
@@ -250,6 +271,10 @@ public partial class App : System.Windows.Application
         if (_settingsItem != null)
         {
             _settingsItem.Text = Helpers.LocalizationManager.GetString("Tray_Settings", lang);
+        }
+        if (_timerAlarmSettingsItem != null)
+        {
+            _timerAlarmSettingsItem.Text = Helpers.LocalizationManager.GetString("Tray_TimerAlarmSettings", lang);
         }
         if (_exitItem != null)
         {
