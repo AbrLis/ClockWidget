@@ -7,6 +7,9 @@ using System.Windows.Data;
 using ClockWidgetApp.Helpers;
 using System.Globalization;
 using System.Timers;
+using System.Windows;
+using ClockWidgetApp.Views;
+using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -281,13 +284,13 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>
-    /// Запускает таймер (логика для примера, без реального отсчёта времени).
+    /// Запускает таймер.
     /// </summary>
     public void Start()
     {
         if (IsRunning) return;
-        if (Remaining == TimeSpan.Zero)
-            Repeat();
+        if (Remaining <= TimeSpan.Zero)
+            return;
         IsRunning = true;
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
@@ -321,6 +324,24 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
                 Remaining = TimeSpan.Zero;
                 Stop();
                 OnPropertyChanged(nameof(IsRepeatAvailable));
+                // --- Воспроизведение звука и показ окна уведомления ---
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var app = System.Windows.Application.Current as App;
+                    if (app?.Services is not { } services)
+                        return;
+                    var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
+                    if (soundService == null)
+                        return;
+                    var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    if (string.IsNullOrEmpty(baseDir))
+                        return;
+                    string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "timer.mp3");
+                    var soundHandle = soundService.PlaySoundInstance(soundPath, true);
+                    var notification = new TimerNotificationWindow(soundHandle, Duration.ToString(@"hh\:mm\:ss"));
+                    notification.Show();
+                });
+                // --- конец ---
             }
         }
         else

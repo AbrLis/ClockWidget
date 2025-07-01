@@ -1,0 +1,44 @@
+<Window x:Class="ClockWidgetApp.Views.TimerNotificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
+        Title="{Binding Localized.TimerNotification_Title}"
+        Height="180" Width="340"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        Topmost="True"
+        Background="White">
+    <!-- Окно оповещения о сработавшем таймере -->
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!-- Заголовок -->
+        <TextBlock x:Name="TitleTextBlock"
+                   Text="{Binding Localized.TimerNotification_Title}"
+                   FontWeight="Bold"
+                   FontSize="18"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,10"/>
+        <!-- Описание таймера -->
+        <TextBlock x:Name="DescriptionTextBlock"
+                   Grid.Row="1"
+                   Text="{Binding DescriptionText}"
+                   TextWrapping="Wrap"
+                   FontSize="14"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,10"/>
+        <!-- Кнопка Stop -->
+        <Button x:Name="StopButton"
+                Grid.Row="2"
+                Content="{Binding Localized.TimerNotification_StopButton}"
+                Width="100"
+                Height="32"
+                HorizontalAlignment="Center"
+                Margin="0,10,0,0"
+                Click="StopButton_Click"/>
+    </Grid>
+</Window> 
