@@ -152,7 +152,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             TryParseOrZero(NewTimerSeconds, out int s);
             var ts = new TimeSpan(h, m, s);
             var timer = new TimerEntryViewModel(ts);
-            timer.RequestDelete += t => Timers.Remove(t);
+            timer.RequestDelete += t => { t.Dispose(); Timers.Remove(t); };
             timer.RequestDeactivate += t => t.IsActive = false;
             Timers.Insert(0, timer);
             IsTimerInputVisible = false;
@@ -222,7 +222,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 /// <summary>
 /// ViewModel для отдельного таймера.
 /// </summary>
-public class TimerEntryViewModel : INotifyPropertyChanged
+public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
 {
     /// <summary>
     /// Длительность таймера.
@@ -337,6 +337,15 @@ public class TimerEntryViewModel : INotifyPropertyChanged
     public void ToggleWidgetVisibility()
     {
         IsWidgetVisible = !IsWidgetVisible;
+    }
+    public void Dispose()
+    {
+        if (_timer != null)
+        {
+            _timer.Stop();
+            _timer.Dispose();
+            _timer = null;
+        }
     }
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
