@@ -170,4 +170,18 @@ public partial class SettingsWindow : Window
     {
         TimersAndAlarmsViewModel.Instance.CorrectAlarmTime();
     }
+
+    /// <summary>
+    /// Обрабатывает клик по строке будильника для редактирования.
+    /// </summary>
+    private void AlarmItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        // Найти DataContext будильника
+        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
+        {
+            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
+            if (vm.EditAlarmCommand.CanExecute(alarm))
+                vm.EditAlarmCommand.Execute(alarm);
+        }
+    }
 } 

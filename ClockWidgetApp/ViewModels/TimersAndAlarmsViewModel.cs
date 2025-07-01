@@ -152,6 +152,55 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         }
     }
 
+    // --- Режим редактирования будильника ---
+    private AlarmEntryViewModel? _editingAlarm;
+    /// <summary>
+    /// Команда для начала редактирования будильника.
+    /// </summary>
+    public ICommand EditAlarmCommand { get; }
+    /// <summary>
+    /// Команда для применения изменений будильника.
+    /// </summary>
+    public ICommand ApplyEditAlarmCommand { get; }
+    /// <summary>
+    /// Находится ли ViewModel в режиме редактирования будильника.
+    /// </summary>
+    public bool IsEditingAlarm => _editingAlarm != null;
+
+    /// <summary>
+    /// Переводит ViewModel в режим редактирования выбранного будильника.
+    /// </summary>
+    private void EditAlarm(AlarmEntryViewModel? alarm)
+    {
+        if (alarm == null) return;
+        _editingAlarm = alarm;
+        NewAlarmHours = alarm.AlarmTime.Hours.ToString("D2");
+        NewAlarmMinutes = alarm.AlarmTime.Minutes.ToString("D2");
+        IsAlarmInputVisible = true;
+        OnPropertyChanged(nameof(IsEditingAlarm));
+    }
+
+    /// <summary>
+    /// Применяет изменения к редактируемому будильнику.
+    /// </summary>
+    private void ApplyEditAlarm()
+    {
+        if (_editingAlarm != null && IsNewAlarmValid)
+        {
+            TryParseOrZero(NewAlarmHours, out int h);
+            TryParseOrZero(NewAlarmMinutes, out int m);
+            var ts = new TimeSpan(h, m, 0);
+            _editingAlarm.AlarmTime = ts;
+            _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.AlarmTime));
+            _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.DisplayTime));
+            _editingAlarm = null;
+            IsAlarmInputVisible = false;
+            NewAlarmHours = "";
+            NewAlarmMinutes = "";
+            OnPropertyChanged(nameof(IsEditingAlarm));
+        }
+    }
+
     // В TimersAndAlarmsViewModel добавить таймер для проверки будильников
     private System.Timers.Timer? _alarmCheckTimer;
 
@@ -185,6 +234,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
                 EditTimer(timer);
         });
         ApplyEditTimerCommand = new RelayCommand(_ => ApplyEditTimer(), _ => IsEditingTimer && IsNewTimerValid);
+        EditAlarmCommand = new RelayCommand(a =>
+        {
+            if (a is AlarmEntryViewModel alarm && alarm != null)
+                EditAlarm(alarm);
+        });
+        ApplyEditAlarmCommand = new RelayCommand(_ => ApplyEditAlarm(), _ => IsEditingAlarm && IsNewAlarmValid);
         _alarmCheckTimer = new System.Timers.Timer(1000);
         _alarmCheckTimer.Elapsed += AlarmCheckTimer_Elapsed;
         _alarmCheckTimer.AutoReset = true;
@@ -501,7 +556,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
 /// </summary>
 public class AlarmEntryViewModel : INotifyPropertyChanged
 {
-    public TimeSpan AlarmTime { get; }
+    public TimeSpan AlarmTime { get; set; }
     public bool IsActive { get; set; } = true;
     public string DisplayTime => AlarmTime.ToString(@"hh\:mm\:ss");
 

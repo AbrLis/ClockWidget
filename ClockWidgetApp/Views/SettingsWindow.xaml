@@ -326,7 +326,30 @@
                                 <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
                                 <TextBox Width="32" Text="{Binding NewAlarmMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
                                 <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <Button Content="OK" Command="{Binding AddAlarmCommand}" IsEnabled="{Binding IsNewAlarmValid}"/>
+                                <Button Content="OK" Command="{Binding AddAlarmCommand}" IsEnabled="{Binding IsNewAlarmValid}">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingAlarm}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Content="OK" Command="{Binding ApplyEditAlarmCommand}" IsEnabled="{Binding IsNewAlarmValid}">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingAlarm}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                                 <Button Content="✖️" Command="{Binding CancelAlarmInputCommand}" Margin="4,0,0,0"/>
                             </StackPanel>
                         </Border>
@@ -357,12 +380,12 @@
                                                 </BeginStoryboard>
                                             </EventTrigger>
                                         </Border.Triggers>
-                                        <Grid>
+                                        <Grid MouseLeftButtonDown="AlarmItem_MouseLeftButtonDown">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+                                            <TextBlock Text="{Binding AlarmTime, StringFormat='{}{0:hh\\:mm}'}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
                                                 <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
                                                 <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
