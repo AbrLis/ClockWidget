@@ -154,4 +154,20 @@ public partial class SettingsWindow : Window
                 vm.EditTimerCommand.Execute(timer);
         }
     }
+
+    /// <summary>
+    /// Автоматически корректирует значения времени таймера при потере фокуса.
+    /// </summary>
+    private void TimerTimeBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        TimersAndAlarmsViewModel.Instance.CorrectTimerTime();
+    }
+
+    /// <summary>
+    /// Автоматически корректирует значения времени будильника при потере фокуса.
+    /// </summary>
+    private void AlarmTimeBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        TimersAndAlarmsViewModel.Instance.CorrectAlarmTime();
+    }
 } 

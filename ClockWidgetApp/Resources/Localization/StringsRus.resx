@@ -81,6 +81,6 @@
   <data name="Timer_Minutes" xml:space="preserve"><value>м</value></data>
   <data name="Timer_Seconds" xml:space="preserve"><value>с</value></data>
   <data name="TimerNotification_Title" xml:space="preserve"><value>Таймер сработал!</value></data>
-  <data name="TimerNotification_Description" xml:space="preserve"><value>Таймер завершён:</value></data>
   <data name="TimerNotification_StopButton" xml:space="preserve"><value>Стоп</value></data>
+  <data name="AlarmNotification_Title" xml:space="preserve"><value>Будильник сработал!</value></data>
 </root>

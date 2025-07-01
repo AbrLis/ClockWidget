@@ -5,7 +5,7 @@ using ClockWidgetApp.Helpers;
 namespace ClockWidgetApp.Views
 {
     /// <summary>
-    /// Окно оповещения о сработавшем таймере.
+    /// Окно оповещения о сработавшем таймере или будильнике.
     /// </summary>
     public partial class TimerNotificationWindow : Window
     {
@@ -14,9 +14,13 @@ namespace ClockWidgetApp.Views
         /// </summary>
         private readonly ISoundHandle _soundHandle;
         /// <summary>
-        /// Описание или имя таймера.
+        /// Описание или имя таймера или будильника.
         /// </summary>
         private readonly string _timerDescription;
+        /// <summary>
+        /// Тип уведомления: "timer" или "alarm".
+        /// </summary>
+        private readonly string _notificationType;
 
         /// <summary>
         /// Локализованные строки для окна.
@@ -24,26 +28,33 @@ namespace ClockWidgetApp.Views
         public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
 
         /// <summary>
-        /// Текст описания таймера для вывода.
+        /// Локализованный заголовок окна.
         /// </summary>
-        public string DescriptionText => $"{Localized.TimerNotification_Description} {_timerDescription}";
+        public string TitleText => _notificationType == "alarm" ? Localized.AlarmNotification_Title : Localized.TimerNotification_Title;
 
         /// <summary>
-        /// Конструктор окна оповещения о сработавшем таймере.
+        /// Текст времени для отображения в окне.
+        /// </summary>
+        public string TimeText => _timerDescription;
+
+        /// <summary>
+        /// Конструктор окна оповещения о сработавшем таймере или будильнике.
         /// </summary>
         /// <param name="soundHandle">Handle для управления звуком.</param>
-        /// <param name="timerDescription">Описание или имя таймера.</param>
-        public TimerNotificationWindow(ISoundHandle soundHandle, string timerDescription)
+        /// <param name="description">Описание или имя таймера/будильника.</param>
+        /// <param name="notificationType">Тип: "timer" или "alarm".</param>
+        public TimerNotificationWindow(ISoundHandle soundHandle, string description, string notificationType = "timer")
         {
             InitializeComponent();
             _soundHandle = soundHandle;
-            _timerDescription = timerDescription;
+            _timerDescription = description;
+            _notificationType = notificationType;
             this.DataContext = this;
             LocalizationManager.LanguageChanged += (s, e) =>
             {
                 Localized = LocalizationManager.GetLocalizedStrings();
                 OnPropertyChanged(nameof(Localized));
-                OnPropertyChanged(nameof(DescriptionText));
+                OnPropertyChanged(nameof(TitleText));
             };
         }
 

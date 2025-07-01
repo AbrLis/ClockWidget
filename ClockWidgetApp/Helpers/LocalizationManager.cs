@@ -105,6 +105,6 @@ public class LocalizedStrings
     public string Timer_Minutes => LocalizationManager.GetString("Timer_Minutes", _lang);
     public string Timer_Seconds => LocalizationManager.GetString("Timer_Seconds", _lang);
     public string TimerNotification_Title => LocalizationManager.GetString("TimerNotification_Title", _lang);
-    public string TimerNotification_Description => LocalizationManager.GetString("TimerNotification_Description", _lang);
     public string TimerNotification_StopButton => LocalizationManager.GetString("TimerNotification_StopButton", _lang);
+    public string AlarmNotification_Title => LocalizationManager.GetString("AlarmNotification_Title", _lang);
 } 

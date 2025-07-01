@@ -81,14 +81,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     public string NewAlarmHours { get => _newAlarmHours; set { _newAlarmHours = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsNewAlarmValid)); } }
     private string _newAlarmMinutes = "";
     public string NewAlarmMinutes { get => _newAlarmMinutes; set { _newAlarmMinutes = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsNewAlarmValid)); } }
-    private string _newAlarmSeconds = "";
-    public string NewAlarmSeconds { get => _newAlarmSeconds; set { _newAlarmSeconds = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsNewAlarmValid)); } }
     public bool IsNewAlarmValid =>
+        (!string.IsNullOrWhiteSpace(NewAlarmHours) || !string.IsNullOrWhiteSpace(NewAlarmMinutes)) &&
         TryParseOrZero(NewAlarmHours, out var h) &&
         TryParseOrZero(NewAlarmMinutes, out var m) &&
-        TryParseOrZero(NewAlarmSeconds, out var s) &&
-        (h > 0 || m > 0 || s > 0) &&
-        h >= 0 && m >= 0 && m < 60 && s >= 0 && s < 60;
+        (h > 0 || m > 0) &&
+        h >= 0 && m >= 0 && m < 60;
 
     /// <summary>
     /// Команда для отображения поля ввода таймера.
@@ -154,6 +152,9 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         }
     }
 
+    // В TimersAndAlarmsViewModel добавить таймер для проверки будильников
+    private System.Timers.Timer? _alarmCheckTimer;
+
     private TimersAndAlarmsViewModel()
     {
         Localized = LocalizationManager.GetLocalizedStrings();
@@ -166,14 +167,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(NewTimerSeconds));
             OnPropertyChanged(nameof(NewAlarmHours));
             OnPropertyChanged(nameof(NewAlarmMinutes));
-            OnPropertyChanged(nameof(NewAlarmSeconds));
         };
         NewTimerHours = "";
         NewTimerMinutes = "";
         NewTimerSeconds = "";
         NewAlarmHours = "";
         NewAlarmMinutes = "";
-        NewAlarmSeconds = "";
         ShowTimerInputCommand = new RelayCommand(_ => IsTimerInputVisible = true);
         ShowAlarmInputCommand = new RelayCommand(_ => IsAlarmInputVisible = true);
         AddTimerCommand = new RelayCommand(_ => AddTimer(), _ => IsNewTimerValid);
@@ -186,6 +185,40 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
                 EditTimer(timer);
         });
         ApplyEditTimerCommand = new RelayCommand(_ => ApplyEditTimer(), _ => IsEditingTimer && IsNewTimerValid);
+        _alarmCheckTimer = new System.Timers.Timer(1000);
+        _alarmCheckTimer.Elapsed += AlarmCheckTimer_Elapsed;
+        _alarmCheckTimer.AutoReset = true;
+        _alarmCheckTimer.Start();
+    }
+
+    private void AlarmCheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+        var now = DateTime.Now;
+        foreach (var alarm in Alarms)
+        {
+            if (alarm.IsRunning && alarm.IsActive &&
+                alarm.AlarmTime.Hours == now.Hour && alarm.AlarmTime.Minutes == now.Minute && now.Second == 0)
+            {
+                // Воспроизвести alarm.mp3 через отдельный плеер
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var app = System.Windows.Application.Current as App;
+                    if (app?.Services is not { } services)
+                        return;
+                    var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
+                    if (soundService == null)
+                        return;
+                    var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    if (string.IsNullOrEmpty(baseDir))
+                        return;
+                    string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "alarm.mp3");
+                    var soundHandle = soundService.PlaySoundInstance(soundPath, true);
+                    var notification = new TimerNotificationWindow(soundHandle, alarm.AlarmTime.ToString(@"hh\:mm"), "alarm");
+                    notification.Show();
+                    alarm.Stop(); // Ставим на паузу после срабатывания
+                });
+            }
+        }
     }
 
     /// <summary>
@@ -215,12 +248,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void AddAlarm()
     {
+        CorrectAlarmTime();
         if (IsNewAlarmValid)
         {
             TryParseOrZero(NewAlarmHours, out int h);
             TryParseOrZero(NewAlarmMinutes, out int m);
-            TryParseOrZero(NewAlarmSeconds, out int s);
-            var ts = new TimeSpan(h, m, s);
+            var ts = new TimeSpan(h, m, 0);
             var alarm = new AlarmEntryViewModel(ts);
             alarm.RequestDelete += a => Alarms.Remove(a);
             alarm.RequestDeactivate += a => a.IsActive = false;
@@ -228,7 +261,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             IsAlarmInputVisible = false;
             NewAlarmHours = "";
             NewAlarmMinutes = "";
-            NewAlarmSeconds = "";
         }
     }
 
@@ -259,7 +291,43 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         IsAlarmInputVisible = false;
         NewAlarmHours = "";
         NewAlarmMinutes = "";
-        NewAlarmSeconds = "";
+    }
+
+    // Автокоррекция времени для будильника
+    public void CorrectAlarmTime()
+    {
+        if (TryParseOrZero(NewAlarmHours, out var h))
+        {
+            if (h > 23) NewAlarmHours = "23";
+            else if (h < 0) NewAlarmHours = "0";
+        }
+        if (TryParseOrZero(NewAlarmMinutes, out var m))
+        {
+            if (m > 59) NewAlarmMinutes = "59";
+            else if (m < 0) NewAlarmMinutes = "0";
+        }
+    }
+
+    /// <summary>
+    /// Автоматически корректирует значения часов, минут и секунд для таймера в допустимые диапазоны.
+    /// </summary>
+    public void CorrectTimerTime()
+    {
+        if (TryParseOrZero(NewTimerHours, out var h))
+        {
+            if (h > 23) NewTimerHours = "23";
+            else if (h < 0) NewTimerHours = "0";
+        }
+        if (TryParseOrZero(NewTimerMinutes, out var m))
+        {
+            if (m > 59) NewTimerMinutes = "59";
+            else if (m < 0) NewTimerMinutes = "0";
+        }
+        if (TryParseOrZero(NewTimerSeconds, out var s))
+        {
+            if (s > 59) NewTimerSeconds = "59";
+            else if (s < 0) NewTimerSeconds = "0";
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -309,9 +377,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     private bool _isWidgetVisible = true;
     public bool IsWidgetVisible { get => _isWidgetVisible; set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); } }
 
-    public bool IsRepeatAvailable => Remaining == TimeSpan.Zero;
-    public ICommand RepeatCommand { get; }
-
     public event Action<TimerEntryViewModel>? RequestDelete;
     public event Action<TimerEntryViewModel>? RequestDeactivate;
 
@@ -328,7 +393,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         DeleteCommand = new RelayCommand(_ => RequestDelete?.Invoke(this));
         DeactivateCommand = new RelayCommand(_ => { if (IsHideAvailable) Deactivate(); });
         ToggleWidgetVisibilityCommand = new RelayCommand(_ => ToggleWidgetVisibility());
-        RepeatCommand = new RelayCommand(_ => Repeat());
     }
 
     /// <summary>
@@ -342,7 +406,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         IsRunning = true;
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
-        OnPropertyChanged(nameof(IsRepeatAvailable));
         if (_timer == null)
         {
             _timer = new System.Timers.Timer(1000);
@@ -371,7 +434,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
             {
                 Remaining = TimeSpan.Zero;
                 Stop();
-                OnPropertyChanged(nameof(IsRepeatAvailable));
+                Remaining = Duration;
                 // --- Воспроизведение звука и показ окна уведомления ---
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -386,7 +449,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
                         return;
                     string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "timer.mp3");
                     var soundHandle = soundService.PlaySoundInstance(soundPath, true);
-                    var notification = new TimerNotificationWindow(soundHandle, Duration.ToString(@"hh\:mm\:ss"));
+                    var notification = new TimerNotificationWindow(soundHandle, Duration.ToString(@"hh\:mm\:ss"), "timer");
                     notification.Show();
                 });
                 // --- конец ---
@@ -395,6 +458,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         else
         {
             Stop();
+            Remaining = Duration;
         }
         // Обновляем DisplayTime
         OnPropertyChanged(nameof(DisplayTime));
@@ -414,13 +478,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public void ToggleWidgetVisibility()
     {
         IsWidgetVisible = !IsWidgetVisible;
-    }
-    public void Repeat()
-    {
-        Remaining = Duration;
-        OnPropertyChanged(nameof(IsRepeatAvailable));
-        OnPropertyChanged(nameof(IsStartAvailable));
-        OnPropertyChanged(nameof(DisplayTime));
     }
     public void Dispose()
     {
