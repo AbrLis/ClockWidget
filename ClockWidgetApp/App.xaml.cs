@@ -65,11 +65,13 @@ public partial class App : System.Windows.Application
         {
             var settingsService = _serviceProvider?.GetRequiredService<ISettingsService>();
             settingsService?.SaveBufferedSettings();
-            _logger?.LogInformation("[App] Settings saved on shutdown/session ending");
+            // Сохраняем таймеры и будильники
+            TimersAndAlarmsViewModel.Instance.SaveTimersAndAlarms();
+            _logger?.LogInformation("[App] Settings and timers/alarms saved on shutdown/session ending");
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "[App] Error saving settings on shutdown/session ending");
+            _logger?.LogError(ex, "[App] Error saving settings/timers/alarms on shutdown/session ending");
         }
     }
 
@@ -155,6 +157,8 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Восстанавливаем коллекции таймеров и будильников до инициализации UI
+        TimersAndAlarmsViewModel.Instance.LoadTimersAndAlarms();
         // Прогрев сервисов и ViewModel для главного окна
         _serviceProvider!.GetRequiredService<ISettingsService>();
         var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();

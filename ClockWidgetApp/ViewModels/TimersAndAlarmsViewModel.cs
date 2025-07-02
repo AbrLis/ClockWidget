@@ -6,6 +6,9 @@ using ClockWidgetApp.Helpers;
 using System.Timers;
 using ClockWidgetApp.Views;
 using ClockWidgetApp.Services;
+using System.Text.Json;
+using ClockWidgetApp.Models;
+using System.IO;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -200,6 +203,9 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     // В TimersAndAlarmsViewModel добавить таймер для проверки будильников
     private System.Timers.Timer? _alarmCheckTimer;
 
+    private const string TimersAlarmsFileName = "timers_alarms.json";
+    private string TimersAlarmsFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClockWidget", TimersAlarmsFileName);
+
     private TimersAndAlarmsViewModel()
     {
         Localized = LocalizationManager.GetLocalizedStrings();
@@ -391,4 +397,44 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public void SaveTimersAndAlarms()
+    {
+        var persist = new TimersAndAlarmsPersistModel
+        {
+            Timers = Timers.Select(t => new TimerPersistModel { Duration = t.Duration }).ToList(),
+            Alarms = Alarms.Select(a => new AlarmPersistModel { AlarmTime = a.AlarmTime, IsActive = a.IsActive }).ToList()
+        };
+        var app = System.Windows.Application.Current as App;
+        var services = app?.Services;
+        var settingsService = services?.GetService(typeof(ISettingsService)) as ISettingsService;
+        settingsService?.SaveTimersAndAlarms(persist);
+    }
+
+    public void LoadTimersAndAlarms()
+    {
+        var app = System.Windows.Application.Current as App;
+        var services = app?.Services;
+        var settingsService = services?.GetService(typeof(ISettingsService)) as ISettingsService;
+        var persist = settingsService?.LoadTimersAndAlarms();
+        if (persist == null) return;
+        Timers.Clear();
+        foreach (var t in persist.Timers)
+        {
+            var timer = new TimerEntryViewModel(t.Duration);
+            timer.RequestDelete += tt => { tt.Dispose(); Timers.Remove(tt); };
+            timer.RequestDeactivate += tt => tt.IsActive = false;
+            Timers.Add(timer);
+        }
+        Alarms.Clear();
+        foreach (var a in persist.Alarms)
+        {
+            var alarm = new AlarmEntryViewModel(a.AlarmTime) { IsActive = a.IsActive };
+            alarm.RequestDelete += aa => Alarms.Remove(aa);
+            alarm.RequestDeactivate += aa => aa.IsActive = false;
+            if (a.IsActive)
+                alarm.Start();
+            Alarms.Add(alarm);
+        }
+    }
 } 

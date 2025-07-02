@@ -212,4 +212,30 @@ public class WidgetSettings
     {
         return value == "en" ? "en" : "ru";
     }
+}
+
+/// <summary>
+/// Модель для сериализации таймера.
+/// </summary>
+public class TimerPersistModel
+{
+    public TimeSpan Duration { get; set; }
+}
+
+/// <summary>
+/// Модель для сериализации будильника.
+/// </summary>
+public class AlarmPersistModel
+{
+    public TimeSpan AlarmTime { get; set; }
+    public bool IsActive { get; set; }
+}
+
+/// <summary>
+/// Модель для сериализации всех таймеров и будильников.
+/// </summary>
+public class TimersAndAlarmsPersistModel
+{
+    public List<TimerPersistModel> Timers { get; set; } = new();
+    public List<AlarmPersistModel> Alarms { get; set; } = new();
 } 

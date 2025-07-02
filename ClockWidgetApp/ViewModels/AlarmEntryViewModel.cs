@@ -62,7 +62,7 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
     /// <summary>
     /// Останавливает будильник.
     /// </summary>
-    public void Stop() { IsRunning = false; OnPropertyChanged(nameof(IsStartAvailable)); OnPropertyChanged(nameof(IsStopAvailable)); }
+    public void Stop() { IsRunning = false; IsActive = false; OnPropertyChanged(nameof(IsStartAvailable)); OnPropertyChanged(nameof(IsStopAvailable)); OnPropertyChanged(nameof(IsActive)); }
     /// <summary>
     /// Деактивирует будильник (например, скрывает его виджет).
     /// </summary>

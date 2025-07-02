@@ -13,6 +13,7 @@ namespace ClockWidgetApp.Services;
 public class SettingsService : ISettingsService
 {
     private readonly string _settingsPath;
+    private readonly string _timersAlarmsPath;
     private WidgetSettings _currentSettings;
     private readonly ILogger<SettingsService> _logger;
 
@@ -43,6 +44,7 @@ public class SettingsService : ISettingsService
             appDataPath,
             Constants.FileSettings.SETTINGS_FILENAME);
             
+        _timersAlarmsPath = Path.Combine(appDataPath, "timers_alarms.json");
         _logger.LogDebug("[SettingsService] Settings file path: {Path}", _settingsPath);
         _currentSettings = LoadSettings();
     }
@@ -134,6 +136,48 @@ public class SettingsService : ISettingsService
         {
             _logger.LogError(ex, "[SettingsService] Ошибка при сохранении настроек");
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Сохраняет коллекции таймеров и будильников в отдельный файл.
+    /// </summary>
+    public void SaveTimersAndAlarms(TimersAndAlarmsPersistModel model)
+    {
+        try
+        {
+            var directory = Path.GetDirectoryName(_timersAlarmsPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+            var json = JsonSerializer.Serialize(model, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(_timersAlarmsPath, json);
+            _logger.LogDebug("[SettingsService] Timers and alarms saved");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[SettingsService] Ошибка при сохранении timers/alarms");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Загружает коллекции таймеров и будильников из файла.
+    /// </summary>
+    public TimersAndAlarmsPersistModel? LoadTimersAndAlarms()
+    {
+        try
+        {
+            if (!File.Exists(_timersAlarmsPath))
+                return null;
+            var json = File.ReadAllText(_timersAlarmsPath);
+            var model = JsonSerializer.Deserialize<TimersAndAlarmsPersistModel>(json);
+            _logger.LogDebug("[SettingsService] Timers and alarms loaded");
+            return model;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[SettingsService] Ошибка при загрузке timers/alarms");
+            return null;
         }
     }
 } 

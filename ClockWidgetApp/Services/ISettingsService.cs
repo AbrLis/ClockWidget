@@ -26,4 +26,14 @@ public interface ISettingsService
     /// Загружает настройки из файла.
     /// </summary>
     WidgetSettings LoadSettings();
+
+    /// <summary>
+    /// Сохраняет коллекции таймеров и будильников в отдельный файл.
+    /// </summary>
+    void SaveTimersAndAlarms(TimersAndAlarmsPersistModel model);
+
+    /// <summary>
+    /// Загружает коллекции таймеров и будильников из файла.
+    /// </summary>
+    TimersAndAlarmsPersistModel? LoadTimersAndAlarms();
 } 
