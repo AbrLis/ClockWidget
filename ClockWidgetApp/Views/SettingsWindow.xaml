@@ -18,9 +18,9 @@
         Background="White">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <viewModels:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
-        <viewModels:StringNotEmptyToBoolConverter x:Key="StringNotEmptyToBoolConverter"/>
-        <viewModels:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
+        <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+        <helpers:StringNotEmptyToBoolConverter x:Key="StringNotEmptyToBoolConverter"/>
+        <helpers:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
     </Window.Resources>
     <TabControl x:Name="MainTabControl">
         <!-- Вкладка настроек -->

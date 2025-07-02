@@ -147,7 +147,7 @@ public partial class SettingsWindow : Window
     private void TimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         // Найти DataContext таймера
-        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is ClockWidgetApp.ViewModels.TimerEntryViewModel timer)
+        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
         {
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
             if (vm.EditTimerCommand.CanExecute(timer))
@@ -177,7 +177,7 @@ public partial class SettingsWindow : Window
     private void AlarmItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         // Найти DataContext будильника
-        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
+        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is AlarmEntryViewModel alarm)
         {
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
             if (vm.EditAlarmCommand.CanExecute(alarm))
