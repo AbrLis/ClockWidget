@@ -124,6 +124,8 @@ public class AlarmsViewModel : INotifyPropertyChanged
             TryParseOrZero(NewAlarmMinutes, out int m);
             var ts = new TimeSpan(h, m, 0);
             _editingAlarm.AlarmTime = ts;
+            if (_editingAlarm.IsEnabled)
+                _editingAlarm.UpdateNextTrigger();
             _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.AlarmTime));
             _editingAlarm = null;
             IsAlarmInputVisible = false;

@@ -37,6 +37,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         TimersVM = new TimersViewModel();
         AlarmsVM = new AlarmsViewModel();
         _alarmMonitorService = new AlarmMonitorService(AlarmsVM.Alarms);
+        _alarmMonitorService.AlarmTriggered += OnAlarmTriggered;
         var filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClockWidget", "timers_alarms.json");
         _persistenceService = new TimersAndAlarmsPersistenceService(filePath);
         LocalizationManager.LanguageChanged += (s, e) =>
@@ -44,6 +45,32 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             Localized = LocalizationManager.GetLocalizedStrings();
             OnPropertyChanged(nameof(Localized));
         };
+    }
+
+    private void OnAlarmTriggered(AlarmEntryViewModel alarm)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            var app = System.Windows.Application.Current as App;
+            if (app?.Services is not { } services)
+                return;
+            var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
+            if (soundService == null)
+                return;
+            var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            if (string.IsNullOrEmpty(baseDir))
+                return;
+            string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "alarm.mp3");
+            var soundHandle = soundService.PlaySoundInstance(soundPath, true);
+            string dateTimeText = alarm.NextTriggerDateTime.HasValue
+                ? alarm.NextTriggerDateTime.Value.ToString("dd.MM.yyyy") + " - " + alarm.NextTriggerDateTime.Value.ToString("HH:mm")
+                : alarm.AlarmTime.ToString(@"hh\:mm");
+            var notification = new Views.TimerNotificationWindow(soundHandle, dateTimeText, "alarm");
+            notification.Show();
+            alarm.IsEnabled = false;
+            alarm.ClearNextTriggerDateTime();
+            alarm.OnPropertyChanged(nameof(alarm.IsEnabled));
+        });
     }
 
     /// <summary>

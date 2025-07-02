@@ -12,14 +12,31 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
     /// Время срабатывания будильника.
     /// </summary>
     public TimeSpan AlarmTime { get; set; }
+    private bool _isEnabled;
     /// <summary>
     /// Включён ли будильник.
     /// </summary>
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            if (_isEnabled != value)
+            {
+                _isEnabled = value;
+                if (!_isEnabled)
+                    NextTriggerDateTime = null;
+                OnPropertyChanged(nameof(IsEnabled));
+                OnPropertyChanged(nameof(IsStartAvailable));
+                OnPropertyChanged(nameof(IsStopAvailable));
+                OnPropertyChanged(nameof(NextTriggerDateTime));
+            }
+        }
+    }
     /// <summary>
     /// Дата и время следующего срабатывания будильника (если включён).
     /// </summary>
-    public DateTime? NextTriggerDateTime { get; set; }
+    public DateTime? NextTriggerDateTime { get; private set; }
 
     /// <summary>
     /// Команда для включения будильника.
@@ -43,13 +60,15 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
     public AlarmEntryViewModel(TimeSpan alarmTime, bool isEnabled = false, DateTime? nextTriggerDateTime = null)
     {
         AlarmTime = alarmTime;
-        IsEnabled = isEnabled;
+        _isEnabled = isEnabled;
         NextTriggerDateTime = nextTriggerDateTime;
         ToggleEnabledCommand = new RelayCommand(_ => ToggleEnabled());
         StartCommand = new RelayCommand(_ => Start(), _ => !IsEnabled);
         StopCommand = new RelayCommand(_ => Stop(), _ => IsEnabled);
         if (IsEnabled && NextTriggerDateTime == null)
             UpdateNextTrigger();
+        if (!IsEnabled)
+            NextTriggerDateTime = null;
     }
 
     public void ToggleEnabled()
@@ -57,16 +76,20 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
         IsEnabled = !IsEnabled;
         if (IsEnabled)
             UpdateNextTrigger();
-        else
-            NextTriggerDateTime = null;
         OnPropertyChanged(nameof(IsEnabled));
-        OnPropertyChanged(nameof(NextTriggerDateTime));
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
+        OnPropertyChanged(nameof(NextTriggerDateTime));
     }
 
     public void UpdateNextTrigger()
     {
+        if (!IsEnabled)
+        {
+            NextTriggerDateTime = null;
+            OnPropertyChanged(nameof(NextTriggerDateTime));
+            return;
+        }
         var now = DateTime.Now;
         var todayTrigger = new DateTime(now.Year, now.Month, now.Day, AlarmTime.Hours, AlarmTime.Minutes, 0);
         NextTriggerDateTime = todayTrigger > now ? todayTrigger : todayTrigger.AddDays(1);
@@ -90,11 +113,16 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
         if (IsEnabled)
         {
             IsEnabled = false;
-            NextTriggerDateTime = null;
             OnPropertyChanged(nameof(IsEnabled));
             OnPropertyChanged(nameof(IsStartAvailable));
             OnPropertyChanged(nameof(IsStopAvailable));
         }
+    }
+
+    public void ClearNextTriggerDateTime()
+    {
+        NextTriggerDateTime = null;
+        OnPropertyChanged(nameof(NextTriggerDateTime));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

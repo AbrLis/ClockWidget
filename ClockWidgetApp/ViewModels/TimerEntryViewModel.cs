@@ -34,6 +34,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public ICommand StopCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand DeactivateCommand { get; }
+    public ICommand ResetCommand { get; }
 
     private bool _isRunning;
     public bool IsRunning { get => _isRunning; set { _isRunning = value; OnPropertyChanged(); } }
@@ -47,8 +48,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
 
     public event Action<TimerEntryViewModel>? RequestDelete;
     public event Action<TimerEntryViewModel>? RequestDeactivate;
-
-    public ICommand ToggleWidgetVisibilityCommand { get; }
 
     private System.Timers.Timer? _timer;
 
@@ -64,7 +63,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         StopCommand = new RelayCommand(_ => { if (IsStopAvailable) Stop(); });
         DeleteCommand = new RelayCommand(_ => RequestDelete?.Invoke(this));
         DeactivateCommand = new RelayCommand(_ => { if (IsHideAvailable) Deactivate(); });
-        ToggleWidgetVisibilityCommand = new RelayCommand(_ => ToggleWidgetVisibility());
+        ResetCommand = new RelayCommand(_ => Reset());
     }
 
     /// <summary>
@@ -143,9 +142,15 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         OnPropertyChanged(nameof(IsHideAvailable));
         RequestDeactivate?.Invoke(this);
     }
-    public void ToggleWidgetVisibility()
+    /// <summary>
+    /// Сбрасывает таймер к начальному значению и останавливает его.
+    /// </summary>
+    public void Reset()
     {
-        IsWidgetVisible = !IsWidgetVisible;
+        Stop();
+        Remaining = Duration;
+        OnPropertyChanged(nameof(Remaining));
+        OnPropertyChanged(nameof(DisplayTime));
     }
     public void Dispose()
     {
