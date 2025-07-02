@@ -227,8 +227,18 @@ public class TimerPersistModel
 /// </summary>
 public class AlarmPersistModel
 {
+    /// <summary>
+    /// Время срабатывания будильника.
+    /// </summary>
     public TimeSpan AlarmTime { get; set; }
-    public bool IsActive { get; set; }
+    /// <summary>
+    /// Включён ли будильник (true = включён, false = выключен).
+    /// </summary>
+    public bool IsEnabled { get; set; }
+    /// <summary>
+    /// Дата и время следующего срабатывания будильника (если включён).
+    /// </summary>
+    public DateTime? NextTriggerDateTime { get; set; }
 }
 
 /// <summary>

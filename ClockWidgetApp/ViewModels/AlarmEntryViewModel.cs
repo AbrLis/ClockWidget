@@ -1,9 +1,10 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 /// <summary>
-/// ViewModel для отдельного будильника.
+/// ViewModel для отдельного будильника (только два состояния: включен/выключен).
 /// </summary>
 public class AlarmEntryViewModel : INotifyPropertyChanged
 {
@@ -12,72 +13,91 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
     /// </summary>
     public TimeSpan AlarmTime { get; set; }
     /// <summary>
-    /// Активен ли будильник.
+    /// Включён ли будильник.
     /// </summary>
-    public bool IsActive { get; set; } = true;
+    public bool IsEnabled { get; set; }
     /// <summary>
-    /// Строка для отображения времени будильника.
+    /// Дата и время следующего срабатывания будильника (если включён).
     /// </summary>
-    public string DisplayTime => AlarmTime.ToString(@"hh\:mm\:ss");
+    public DateTime? NextTriggerDateTime { get; set; }
 
-    // Команды для управления будильником
+    /// <summary>
+    /// Команда для включения будильника.
+    /// </summary>
     public ICommand StartCommand { get; }
-    public ICommand StopCommand { get; }
-    public ICommand DeleteCommand { get; }
-    public ICommand DeactivateCommand { get; }
-
-    private bool _isRunning;
-    public bool IsRunning { get => _isRunning; set { _isRunning = value; OnPropertyChanged(); } }
-
-    public bool IsStartAvailable => !IsRunning && IsActive;
-    public bool IsStopAvailable => IsRunning && IsActive;
-    public bool IsHideAvailable => !IsWidgetVisible;
-
-    private bool _isWidgetVisible = true;
-    public bool IsWidgetVisible { get => _isWidgetVisible; set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); } }
-
-    public event Action<AlarmEntryViewModel>? RequestDelete;
-    public event Action<AlarmEntryViewModel>? RequestDeactivate;
-
-    public ICommand ToggleWidgetVisibilityCommand { get; }
-
     /// <summary>
-    /// Конструктор AlarmEntryViewModel.
+    /// Команда для выключения будильника.
     /// </summary>
-    /// <param name="alarmTime">Время срабатывания будильника.</param>
-    public AlarmEntryViewModel(TimeSpan alarmTime)
+    public ICommand StopCommand { get; }
+    /// <summary>
+    /// Доступна ли кнопка запуска.
+    /// </summary>
+    public bool IsStartAvailable => !IsEnabled;
+    /// <summary>
+    /// Доступна ли кнопка остановки.
+    /// </summary>
+    public bool IsStopAvailable => IsEnabled;
+
+    public ICommand ToggleEnabledCommand { get; }
+
+    public AlarmEntryViewModel(TimeSpan alarmTime, bool isEnabled = false, DateTime? nextTriggerDateTime = null)
     {
         AlarmTime = alarmTime;
-        StartCommand = new RelayCommand(_ => { if (IsStartAvailable) Start(); });
-        StopCommand = new RelayCommand(_ => { if (IsStopAvailable) Stop(); });
-        DeleteCommand = new RelayCommand(_ => RequestDelete?.Invoke(this));
-        DeactivateCommand = new RelayCommand(_ => { if (IsHideAvailable) Deactivate(); });
-        ToggleWidgetVisibilityCommand = new RelayCommand(_ => ToggleWidgetVisibility());
+        IsEnabled = isEnabled;
+        NextTriggerDateTime = nextTriggerDateTime;
+        ToggleEnabledCommand = new RelayCommand(_ => ToggleEnabled());
+        StartCommand = new RelayCommand(_ => Start(), _ => !IsEnabled);
+        StopCommand = new RelayCommand(_ => Stop(), _ => IsEnabled);
+        if (IsEnabled && NextTriggerDateTime == null)
+            UpdateNextTrigger();
     }
 
-    /// <summary>
-    /// Запускает будильник.
-    /// </summary>
-    public void Start() { IsRunning = true; OnPropertyChanged(nameof(IsStartAvailable)); OnPropertyChanged(nameof(IsStopAvailable)); }
-    /// <summary>
-    /// Останавливает будильник.
-    /// </summary>
-    public void Stop() { IsRunning = false; IsActive = false; OnPropertyChanged(nameof(IsStartAvailable)); OnPropertyChanged(nameof(IsStopAvailable)); OnPropertyChanged(nameof(IsActive)); }
-    /// <summary>
-    /// Деактивирует будильник (например, скрывает его виджет).
-    /// </summary>
-    public void Deactivate() { IsActive = false; OnPropertyChanged(nameof(IsActive)); OnPropertyChanged(nameof(IsStartAvailable)); OnPropertyChanged(nameof(IsStopAvailable)); OnPropertyChanged(nameof(IsHideAvailable)); RequestDeactivate?.Invoke(this); }
-    /// <summary>
-    /// Переключает видимость виджета будильника.
-    /// </summary>
-    public void ToggleWidgetVisibility()
+    public void ToggleEnabled()
     {
-        IsWidgetVisible = !IsWidgetVisible;
+        IsEnabled = !IsEnabled;
+        if (IsEnabled)
+            UpdateNextTrigger();
+        else
+            NextTriggerDateTime = null;
+        OnPropertyChanged(nameof(IsEnabled));
+        OnPropertyChanged(nameof(NextTriggerDateTime));
+        OnPropertyChanged(nameof(IsStartAvailable));
+        OnPropertyChanged(nameof(IsStopAvailable));
     }
+
+    public void UpdateNextTrigger()
+    {
+        var now = DateTime.Now;
+        var todayTrigger = new DateTime(now.Year, now.Month, now.Day, AlarmTime.Hours, AlarmTime.Minutes, 0);
+        NextTriggerDateTime = todayTrigger > now ? todayTrigger : todayTrigger.AddDays(1);
+        OnPropertyChanged(nameof(NextTriggerDateTime));
+    }
+
+    public void Start()
+    {
+        if (!IsEnabled)
+        {
+            IsEnabled = true;
+            UpdateNextTrigger();
+            OnPropertyChanged(nameof(IsEnabled));
+            OnPropertyChanged(nameof(IsStartAvailable));
+            OnPropertyChanged(nameof(IsStopAvailable));
+        }
+    }
+
+    public void Stop()
+    {
+        if (IsEnabled)
+        {
+            IsEnabled = false;
+            NextTriggerDateTime = null;
+            OnPropertyChanged(nameof(IsEnabled));
+            OnPropertyChanged(nameof(IsStartAvailable));
+            OnPropertyChanged(nameof(IsStopAvailable));
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
-    /// <summary>
-    /// Уведомляет об изменении свойства для биндинга.
-    /// </summary>
     public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 } 

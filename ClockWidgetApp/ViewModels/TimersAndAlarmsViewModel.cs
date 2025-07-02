@@ -37,7 +37,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         TimersVM = new TimersViewModel();
         AlarmsVM = new AlarmsViewModel();
         _alarmMonitorService = new AlarmMonitorService(AlarmsVM.Alarms);
-        _alarmMonitorService.AlarmTriggered += OnAlarmTriggered;
         var filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClockWidget", "timers_alarms.json");
         _persistenceService = new TimersAndAlarmsPersistenceService(filePath);
         LocalizationManager.LanguageChanged += (s, e) =>
@@ -48,15 +47,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Обработка срабатывания будильника (уведомление UI, воспроизведение звука и т.д.).
-    /// </summary>
-    private void OnAlarmTriggered(AlarmEntryViewModel alarm)
-    {
-        // Здесь можно реализовать уведомление UI, воспроизведение звука и т.д.
-        // Например, вызвать сервис звука и показать окно уведомления.
-    }
-
-    /// <summary>
     /// Сохраняет таймеры и будильники.
     /// </summary>
     public void SaveTimersAndAlarms()
@@ -64,7 +54,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         var persist = new Models.TimersAndAlarmsPersistModel
         {
             Timers = TimersVM.Timers.Select(t => new Models.TimerPersistModel { Duration = t.Duration }).ToList(),
-            Alarms = AlarmsVM.Alarms.Select(a => new Models.AlarmPersistModel { AlarmTime = a.AlarmTime, IsActive = a.IsActive }).ToList()
+            Alarms = AlarmsVM.Alarms.Select(a => new Models.AlarmPersistModel { AlarmTime = a.AlarmTime, IsEnabled = a.IsEnabled, NextTriggerDateTime = a.NextTriggerDateTime }).ToList()
         };
         _persistenceService.Save(persist);
     }
@@ -87,11 +77,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         AlarmsVM.Alarms.Clear();
         foreach (var a in persist.Alarms)
         {
-            var alarm = new AlarmEntryViewModel(a.AlarmTime) { IsActive = a.IsActive };
-            alarm.RequestDelete += aa => AlarmsVM.Alarms.Remove(aa);
-            alarm.RequestDeactivate += aa => aa.IsActive = false;
-            if (a.IsActive)
-                alarm.Start();
+            var alarm = new AlarmEntryViewModel(a.AlarmTime, a.IsEnabled, a.NextTriggerDateTime);
             AlarmsVM.Alarms.Add(alarm);
         }
     }

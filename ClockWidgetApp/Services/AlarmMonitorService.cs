@@ -34,14 +34,12 @@ public class AlarmMonitorService : IDisposable
         var now = DateTime.Now;
         foreach (var alarm in _alarms)
         {
-            if (alarm.IsRunning && alarm.IsActive)
+            if (alarm.IsEnabled && alarm.NextTriggerDateTime.HasValue)
             {
-                var alarmTime = new TimeSpan(alarm.AlarmTime.Hours, alarm.AlarmTime.Minutes, 0);
-                var nowTime = new TimeSpan(now.Hour, now.Minute, 0);
-                if (nowTime >= alarmTime)
+                if (now >= alarm.NextTriggerDateTime.Value)
                 {
                     AlarmTriggered?.Invoke(alarm);
-                    alarm.Stop();
+                    alarm.UpdateNextTrigger();
                 }
             }
         }

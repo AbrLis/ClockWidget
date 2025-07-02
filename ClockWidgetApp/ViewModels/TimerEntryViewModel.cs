@@ -38,7 +38,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     private bool _isRunning;
     public bool IsRunning { get => _isRunning; set { _isRunning = value; OnPropertyChanged(); } }
 
-    public bool IsStartAvailable => !IsRunning && IsActive;
+    public bool IsStartAvailable => !IsRunning;
     public bool IsStopAvailable => IsRunning && IsActive;
     public bool IsHideAvailable => !IsWidgetVisible;
 
@@ -75,6 +75,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         if (IsRunning) return;
         if (Remaining <= TimeSpan.Zero)
             return;
+        IsActive = true;
         IsRunning = true;
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));

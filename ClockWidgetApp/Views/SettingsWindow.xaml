@@ -267,11 +267,6 @@
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="#FFFFFDE7"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                                        <Setter Property="Background" Value="#E6FFE6"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
                                             </Style>
                                         </Border.Style>
                                         <Border.Triggers>
@@ -375,7 +370,7 @@
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="#FFE3F2FD"/>
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                    <DataTrigger Binding="{Binding IsEnabled}" Value="True">
                                                         <Setter Property="Background" Value="#E6FFE6"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>

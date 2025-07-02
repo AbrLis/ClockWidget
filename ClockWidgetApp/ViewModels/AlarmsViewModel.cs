@@ -93,8 +93,6 @@ public class AlarmsViewModel : INotifyPropertyChanged
             TryParseOrZero(NewAlarmMinutes, out int m);
             var ts = new TimeSpan(h, m, 0);
             var alarm = new AlarmEntryViewModel(ts);
-            alarm.RequestDelete += a => Alarms.Remove(a);
-            alarm.RequestDeactivate += a => a.IsActive = false;
             Alarms.Insert(0, alarm);
             IsAlarmInputVisible = false;
             NewAlarmHours = "";
@@ -127,7 +125,6 @@ public class AlarmsViewModel : INotifyPropertyChanged
             var ts = new TimeSpan(h, m, 0);
             _editingAlarm.AlarmTime = ts;
             _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.AlarmTime));
-            _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.DisplayTime));
             _editingAlarm = null;
             IsAlarmInputVisible = false;
             NewAlarmHours = "";
