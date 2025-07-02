@@ -210,7 +210,7 @@
                     <StackPanel>
                         <TextBlock Text="{Binding Localized.Timers_Time}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                         <!-- Поле ввода таймера с анимацией и раздельными полями -->
-                        <Border Margin="0,8,0,0" Background="#FFFDE9" CornerRadius="6" Padding="6" Visibility="{Binding IsTimerInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border Margin="0,8,0,0" Background="#FFFDE9" CornerRadius="6" Padding="6" Visibility="{Binding TimersVM.IsTimerInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Border.Triggers>
                                 <EventTrigger RoutedEvent="Border.Loaded">
                                     <BeginStoryboard>
@@ -221,19 +221,19 @@
                                 </EventTrigger>
                             </Border.Triggers>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBox Width="32" Text="{Binding NewTimerHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
+                                <TextBox Width="32" Text="{Binding TimersVM.NewTimerHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
                                 <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <TextBox Width="32" Text="{Binding NewTimerMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
+                                <TextBox Width="32" Text="{Binding TimersVM.NewTimerMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
                                 <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <TextBox Width="32" Text="{Binding NewTimerSeconds, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
+                                <TextBox Width="32" Text="{Binding TimersVM.NewTimerSeconds, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
                                 <TextBlock Text="{Binding Localized.Timer_Seconds}" Margin="2,0,8,0" VerticalAlignment="Center"/>
                                 <!-- Кнопка OK для добавления -->
-                                <Button Content="OK" Command="{Binding AddTimerCommand}" IsEnabled="{Binding IsNewTimerValid}">
+                                <Button Content="OK" Command="{Binding TimersVM.AddTimerCommand}" IsEnabled="{Binding TimersVM.IsNewTimerValid}">
                                     <Button.Style>
                                         <Style TargetType="Button">
                                             <Setter Property="Visibility" Value="Visible"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEditingTimer}" Value="True">
+                                                <DataTrigger Binding="{Binding TimersVM.IsEditingTimer}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -241,26 +241,26 @@
                                     </Button.Style>
                                 </Button>
                                 <!-- Кнопка OK для редактирования -->
-                                <Button Content="OK" Command="{Binding ApplyEditTimerCommand}" IsEnabled="{Binding IsNewTimerValid}">
+                                <Button Content="OK" Command="{Binding TimersVM.ApplyEditTimerCommand}" IsEnabled="{Binding TimersVM.IsNewTimerValid}">
                                     <Button.Style>
                                         <Style TargetType="Button">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEditingTimer}" Value="True">
+                                                <DataTrigger Binding="{Binding TimersVM.IsEditingTimer}" Value="True">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
                                 </Button>
-                                <Button Content="✖️" Command="{Binding CancelTimerInputCommand}" Margin="4,0,0,0"/>
+                                <Button Content="✖️" Command="{Binding TimersVM.CancelTimerInputCommand}" Margin="4,0,0,0"/>
                             </StackPanel>
                         </Border>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                            <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Timers_Add}" Command="{Binding ShowTimerInputCommand}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding TimersVM.IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                            <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Timers_Add}" Command="{Binding TimersVM.ShowTimerInputCommand}"/>
                         </StackPanel>
                         <!-- Список таймеров -->
-                        <ItemsControl x:Name="TimersList" Margin="0,10,0,0" ItemsSource="{Binding Timers}">
+                        <ItemsControl x:Name="TimersList" Margin="0,10,0,0" ItemsSource="{Binding TimersVM.Timers}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFF9E79F" Margin="0,0,0,8">
@@ -321,7 +321,7 @@
                     <StackPanel>
                         <TextBlock Text="{Binding Localized.Alarms_Time}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                         <!-- Поле ввода будильника с анимацией и раздельными полями -->
-                        <Border Margin="0,8,0,0" Background="#F0F8FF" CornerRadius="6" Padding="6" Visibility="{Binding IsAlarmInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border Margin="0,8,0,0" Background="#F0F8FF" CornerRadius="6" Padding="6" Visibility="{Binding AlarmsVM.IsAlarmInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Border.Triggers>
                                 <EventTrigger RoutedEvent="Border.Loaded">
                                     <BeginStoryboard>
@@ -332,42 +332,42 @@
                                 </EventTrigger>
                             </Border.Triggers>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBox Width="32" Text="{Binding NewAlarmHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
+                                <TextBox Width="32" Text="{Binding AlarmsVM.NewAlarmHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
                                 <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <TextBox Width="32" Text="{Binding NewAlarmMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
+                                <TextBox Width="32" Text="{Binding AlarmsVM.NewAlarmMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
                                 <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <Button Content="OK" Command="{Binding AddAlarmCommand}" IsEnabled="{Binding IsNewAlarmValid}">
+                                <Button Content="OK" Command="{Binding AlarmsVM.AddAlarmCommand}" IsEnabled="{Binding AlarmsVM.IsNewAlarmValid}">
                                     <Button.Style>
                                         <Style TargetType="Button">
                                             <Setter Property="Visibility" Value="Visible"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEditingAlarm}" Value="True">
+                                                <DataTrigger Binding="{Binding AlarmsVM.IsEditingAlarm}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
                                 </Button>
-                                <Button Content="OK" Command="{Binding ApplyEditAlarmCommand}" IsEnabled="{Binding IsNewAlarmValid}">
+                                <Button Content="OK" Command="{Binding AlarmsVM.ApplyEditAlarmCommand}" IsEnabled="{Binding AlarmsVM.IsNewAlarmValid}">
                                     <Button.Style>
                                         <Style TargetType="Button">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEditingAlarm}" Value="True">
+                                                <DataTrigger Binding="{Binding AlarmsVM.IsEditingAlarm}" Value="True">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
                                 </Button>
-                                <Button Content="✖️" Command="{Binding CancelAlarmInputCommand}" Margin="4,0,0,0"/>
+                                <Button Content="✖️" Command="{Binding AlarmsVM.CancelAlarmInputCommand}" Margin="4,0,0,0"/>
                             </StackPanel>
                         </Border>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                            <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Alarms_Add}" Command="{Binding ShowAlarmInputCommand}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding AlarmsVM.IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                            <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Alarms_Add}" Command="{Binding AlarmsVM.ShowAlarmInputCommand}"/>
                         </StackPanel>
                         <!-- Список будильников -->
-                        <ItemsControl x:Name="AlarmsList" Margin="0,10,0,0" ItemsSource="{Binding Alarms}">
+                        <ItemsControl x:Name="AlarmsList" Margin="0,10,0,0" ItemsSource="{Binding AlarmsVM.Alarms}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFB3E5FC" Margin="0,0,0,8">

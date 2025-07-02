@@ -150,8 +150,8 @@ public partial class SettingsWindow : Window
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
         {
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
-            if (vm.EditTimerCommand.CanExecute(timer))
-                vm.EditTimerCommand.Execute(timer);
+            if (vm.TimersVM.EditTimerCommand.CanExecute(timer))
+                vm.TimersVM.EditTimerCommand.Execute(timer);
         }
     }
 
@@ -160,7 +160,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void TimerTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        TimersAndAlarmsViewModel.Instance.CorrectTimerTime();
+        TimersAndAlarmsViewModel.Instance.TimersVM.CorrectTimerTime();
     }
 
     /// <summary>
@@ -168,7 +168,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void AlarmTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        TimersAndAlarmsViewModel.Instance.CorrectAlarmTime();
+        TimersAndAlarmsViewModel.Instance.AlarmsVM.CorrectAlarmTime();
     }
 
     /// <summary>
@@ -180,8 +180,8 @@ public partial class SettingsWindow : Window
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is AlarmEntryViewModel alarm)
         {
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
-            if (vm.EditAlarmCommand.CanExecute(alarm))
-                vm.EditAlarmCommand.Execute(alarm);
+            if (vm.AlarmsVM.EditAlarmCommand.CanExecute(alarm))
+                vm.AlarmsVM.EditAlarmCommand.Execute(alarm);
         }
     }
 
