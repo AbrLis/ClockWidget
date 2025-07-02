@@ -102,35 +102,30 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         if (Remaining.TotalSeconds > 0)
         {
             Remaining = Remaining - TimeSpan.FromSeconds(1);
-            if (Remaining.TotalSeconds <= 0)
-            {
-                Remaining = TimeSpan.Zero;
-                Stop();
-                Remaining = Duration;
-                // --- Воспроизведение звука и показ окна уведомления ---
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    var app = System.Windows.Application.Current as App;
-                    if (app?.Services is not { } services)
-                        return;
-                    var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
-                    if (soundService == null)
-                        return;
-                    var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    if (string.IsNullOrEmpty(baseDir))
-                        return;
-                    string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "timer.mp3");
-                    var soundHandle = soundService.PlaySoundInstance(soundPath, true);
-                    var notification = new TimerNotificationWindow(soundHandle, Duration.ToString(@"hh\:mm\:ss"), "timer");
-                    notification.Show();
-                });
-                // --- конец ---
-            }
         }
-        else
+        if (Remaining.TotalSeconds <= 0)
         {
+            Remaining = TimeSpan.Zero;
             Stop();
             Remaining = Duration;
+            // --- Воспроизведение звука и показ окна уведомления ---
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                var app = System.Windows.Application.Current as App;
+                if (app?.Services is not { } services)
+                    return;
+                var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
+                if (soundService == null)
+                    return;
+                var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                if (string.IsNullOrEmpty(baseDir))
+                    return;
+                string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "timer.mp3");
+                var soundHandle = soundService.PlaySoundInstance(soundPath, true);
+                var notification = new TimerNotificationWindow(soundHandle, Duration.ToString(@"hh\:mm\:ss"), "timer");
+                notification.Show();
+            });
+            // --- конец ---
         }
         // Обновляем DisplayTime
         OnPropertyChanged(nameof(DisplayTime));

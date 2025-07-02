@@ -54,14 +54,17 @@ public partial class MainWindowViewModel
         // Логика кукушки
         try
         {
-            if (CuckooEveryHour && time.Minute == 0 && time.Second == 0 && _lastCuckooHour != time.Hour)
+            if (CuckooEveryHour && time.Minute == 0 && time.Second <= 2 && _lastCuckooHour != time.Hour)
             {
                 _logger.LogDebug($"[MainWindowViewModel] Cuckoo: Playing sound for hour {time.Hour}");
                 _soundService.PlayCuckooSound(time.Hour);
                 _lastCuckooHour = time.Hour;
                 return;
             }
-            _lastCuckooHour = -1;
+            if (time.Minute != 0)
+            {
+                _lastCuckooHour = -1;
+            }
         }
         catch (Exception ex)
         {
@@ -71,7 +74,7 @@ public partial class MainWindowViewModel
         // Логика сигнала каждые полчаса
         try
         {
-            if (HalfHourChimeEnabled && time.Minute == 30 && time.Second == 0 && _lastHalfHourChimeMinute != time.Minute)
+            if (HalfHourChimeEnabled && time.Minute == 30 && time.Second <= 2 && _lastHalfHourChimeMinute != time.Minute)
             {
                 _logger.LogDebug($"[MainWindowViewModel] HalfHourChime: Playing half-hour chime at {time:HH:mm:ss}");
                 _soundService.PlayHalfHourChime();

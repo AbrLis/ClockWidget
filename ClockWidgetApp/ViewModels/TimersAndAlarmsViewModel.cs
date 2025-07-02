@@ -247,27 +247,31 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         var now = DateTime.Now;
         foreach (var alarm in Alarms)
         {
-            if (alarm.IsRunning && alarm.IsActive &&
-                alarm.AlarmTime.Hours == now.Hour && alarm.AlarmTime.Minutes == now.Minute && now.Second == 0)
+            if (alarm.IsRunning && alarm.IsActive)
             {
-                // Воспроизвести alarm.mp3 через отдельный плеер
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                var alarmTime = new TimeSpan(alarm.AlarmTime.Hours, alarm.AlarmTime.Minutes, 0);
+                var nowTime = new TimeSpan(now.Hour, now.Minute, 0);
+                if (nowTime >= alarmTime)
                 {
-                    var app = System.Windows.Application.Current as App;
-                    if (app?.Services is not { } services)
-                        return;
-                    var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
-                    if (soundService == null)
-                        return;
-                    var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    if (string.IsNullOrEmpty(baseDir))
-                        return;
-                    string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "alarm.mp3");
-                    var soundHandle = soundService.PlaySoundInstance(soundPath, true);
-                    var notification = new TimerNotificationWindow(soundHandle, alarm.AlarmTime.ToString(@"hh\:mm"), "alarm");
-                    notification.Show();
-                    alarm.Stop(); // Ставим на паузу после срабатывания
-                });
+                    // Воспроизвести alarm.mp3 через отдельный плеер
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        var app = System.Windows.Application.Current as App;
+                        if (app?.Services is not { } services)
+                            return;
+                        var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
+                        if (soundService == null)
+                            return;
+                        var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                        if (string.IsNullOrEmpty(baseDir))
+                            return;
+                        string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "alarm.mp3");
+                        var soundHandle = soundService.PlaySoundInstance(soundPath, true);
+                        var notification = new TimerNotificationWindow(soundHandle, alarm.AlarmTime.ToString(@"hh\:mm"), "alarm");
+                        notification.Show();
+                        alarm.Stop(); // Ставим на паузу после срабатывания
+                    });
+                }
             }
         }
     }
