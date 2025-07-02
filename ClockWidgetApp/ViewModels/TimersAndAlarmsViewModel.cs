@@ -104,7 +104,15 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         AlarmsVM.Alarms.Clear();
         foreach (var a in persist.Alarms)
         {
-            var alarm = new AlarmEntryViewModel(a.AlarmTime, a.IsEnabled, a.NextTriggerDateTime);
+            // Если время следующего срабатывания будильника истекло — выключаем будильник при загрузке
+            bool isEnabled = a.IsEnabled;
+            DateTime? nextTrigger = a.NextTriggerDateTime;
+            if (isEnabled && nextTrigger.HasValue && nextTrigger.Value <= DateTime.Now)
+            {
+                isEnabled = false;
+                nextTrigger = null;
+            }
+            var alarm = new AlarmEntryViewModel(a.AlarmTime, isEnabled, nextTrigger);
             alarm.RequestDelete += aa => AlarmsVM.Alarms.Remove(aa);
             AlarmsVM.Alarms.Add(alarm);
         }
