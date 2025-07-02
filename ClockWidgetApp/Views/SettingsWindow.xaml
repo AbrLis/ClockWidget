@@ -263,7 +263,17 @@
                         <ItemsControl x:Name="TimersList" Margin="0,10,0,0" ItemsSource="{Binding Timers}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFF9E79F" Margin="0,0,0,8" Background="#FFFFFDE7">
+                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFF9E79F" Margin="0,0,0,8">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#FFFFFDE7"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                        <Setter Property="Background" Value="#E6FFE6"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
                                         <Border.Triggers>
                                             <EventTrigger RoutedEvent="Border.Loaded">
                                                 <BeginStoryboard>
