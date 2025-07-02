@@ -105,6 +105,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         foreach (var a in persist.Alarms)
         {
             var alarm = new AlarmEntryViewModel(a.AlarmTime, a.IsEnabled, a.NextTriggerDateTime);
+            alarm.RequestDelete += aa => AlarmsVM.Alarms.Remove(aa);
             AlarmsVM.Alarms.Add(alarm);
         }
     }
