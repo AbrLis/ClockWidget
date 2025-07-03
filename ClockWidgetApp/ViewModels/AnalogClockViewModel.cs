@@ -97,7 +97,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         _timeService.TimeUpdated += OnTimeUpdated;
         OnTimeUpdated(this, DateTime.Now);
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-        ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged += OnLanguageChanged;
         OpenSettingsCommand = new RelayCommand(_ => _windowService?.OpenSettingsWindow());
     }
 
@@ -180,12 +179,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         });
     }
 
-    /// <summary>Обработчик смены языка. Вызывает обновление всех связанных свойств.</summary>
-    private void OnLanguageChanged(object? sender, EventArgs e)
-    {
-        // Здесь можно вызвать OnPropertyChanged для всех локализуемых свойств, если они есть
-    }
-
     #endregion
 
     #region IDisposable
@@ -196,7 +189,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         {
             _timeService.TimeUpdated -= OnTimeUpdated;
             _mainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
-            ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged -= OnLanguageChanged;
             _disposed = true;
         }
     }
