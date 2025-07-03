@@ -24,27 +24,9 @@ public partial class App : System.Windows.Application
     private ToolStripMenuItem? _exitItem;
 
     /// <summary>
-    /// Конструктор приложения. Инициализирует логирование и обработчики ошибок.
+    /// Временный логгер для single instance событий (до инициализации DI/основного логгера).
     /// </summary>
-    public App()
-    {
-        var logLevel = ParseLogLevelFromArgs(Environment.GetCommandLineArgs());
-        ConfigureLogging(logLevel);
-        ConfigureServices();
-        _logger = _serviceProvider?.GetRequiredService<ILogger<App>>();
-        // Глобальный обработчик необработанных исключений
-        AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-        {
-            _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
-        };
-        this.DispatcherUnhandledException += (sender, args) =>
-        {
-            _logger?.LogError(args.Exception, "[App] Unhandled exception (Dispatcher)");
-            args.Handled = true;
-        };
-        // Подписка на завершение сессии (выход из системы, завершение работы и т.д.)
-        this.SessionEnding += App_SessionEnding;
-    }
+    private static Serilog.ILogger? _earlyLogger;
 
     /// <summary>
     /// Обработчик события завершения сессии пользователя (выход из системы, завершение работы и т.д.).
@@ -157,6 +139,50 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Временный логгер для single instance событий
+        _earlyLogger = new Serilog.LoggerConfiguration()
+            .WriteTo.File(System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ClockWidget", "logs", "clock-widget-singleinstance.log"),
+                rollingInterval: Serilog.RollingInterval.Day,
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+
+        // Проверка на единственный экземпляр
+        if (!SingleInstance.Start())
+        {
+            _earlyLogger.Information("[App] Application instance already running (early logger)");
+            System.Diagnostics.Process current = System.Diagnostics.Process.GetCurrentProcess();
+            foreach (var process in System.Diagnostics.Process.GetProcessesByName(current.ProcessName))
+            {
+                if (process.Id != current.Id && process.MainWindowHandle != IntPtr.Zero)
+                {
+                    NativeMethods.SetForegroundWindow(process.MainWindowHandle);
+                    _earlyLogger.Information($"[App] Focus transferred to main window (pid={process.Id}) (early logger)");
+                    break;
+                }
+            }
+            _earlyLogger.Information("[App] Exiting duplicate instance (early logger)");
+            Serilog.Log.CloseAndFlush();
+            Shutdown();
+            return;
+        }
+        // --- Вся инициализация только для первого экземпляра ---
+        var logLevel = ParseLogLevelFromArgs(Environment.GetCommandLineArgs());
+        ConfigureLogging(logLevel);
+        ConfigureServices();
+        _logger = _serviceProvider?.GetRequiredService<ILogger<App>>();
+        // Глобальный обработчик необработанных исключений
+        AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+        {
+            _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
+        };
+        this.DispatcherUnhandledException += (sender, args) =>
+        {
+            _logger?.LogError(args.Exception, "[App] Unhandled exception (Dispatcher)");
+            args.Handled = true;
+        };
+        this.SessionEnding += App_SessionEnding;
         // Восстанавливаем коллекции таймеров и будильников до инициализации UI
         TimersAndAlarmsViewModel.Instance.LoadTimersAndAlarms();
         // Прогрев сервисов и ViewModel для главного окна
@@ -174,9 +200,7 @@ public partial class App : System.Windows.Application
         var windowService = _serviceProvider.GetRequiredService<IWindowService>();
         if (mainVm.ShowDigitalClock)
             windowService.OpenMainWindow();
-        // Показываем иконку в трее
         InitializeTrayIcon(mainVm);
-        // Показываем аналоговые часы, если они включены в настройках через сервис
         if (mainVm.ShowAnalogClock)
         {
             if (_serviceProvider == null)
@@ -336,6 +360,7 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы завершения.</param>
     protected override void OnExit(ExitEventArgs e)
     {
+        SingleInstance.Stop();
         try
         {
             _logger?.LogInformation("[App] Application shutting down (DI)");
