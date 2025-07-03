@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <!-- Настройки путей для выходных файлов -->
-    <BaseOutputPath>$(MSBuildThisFileDirectory)bin</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj</BaseIntermediateOutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)artifacts\$(MSBuildProjectName)\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
+    <!-- Важно, чтобы разные проекты не пересекались -->
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
-</Project> 
+</Project>
