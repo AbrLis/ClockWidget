@@ -111,4 +111,8 @@ public class LocalizedStrings
     /// Локализованная строка для пункта меню трея 'Настройка таймера/будильника'.
     /// </summary>
     public string Tray_TimerAlarmSettings => LocalizationManager.GetString("Tray_TimerAlarmSettings", _lang);
+    /// <summary>
+    /// Локализованная строка для пункта меню трея 'Стоп'.
+    /// </summary>
+    public string Tray_Stop => LocalizationManager.GetString("Tray_Stop", _lang);
 } 

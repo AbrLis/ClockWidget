@@ -25,11 +25,20 @@ public partial class App : System.Windows.Application
     private ToolStripMenuItem? _settingsItem;
     private ToolStripMenuItem? _timerAlarmSettingsItem;
     private ToolStripMenuItem? _exitItem;
+    /// <summary>
+    /// Менеджер иконок трея для отображения состояния таймеров и будильников (через DI).
+    /// </summary>
+    private TrayIconManager? _trayIconManager;
 
     /// <summary>
     /// Временный логгер для single instance событий (до инициализации DI/основного логгера).
     /// </summary>
     private static Serilog.ILogger? _earlyLogger;
+
+    /// <summary>
+    /// Глобальный менеджер иконок трея для таймеров и будильников.
+    /// </summary>
+    public TrayIconManager TrayIconManager => _trayIconManager!;
 
     /// <summary>
     /// Обработчик события завершения сессии пользователя (выход из системы, завершение работы и т.д.).
@@ -123,6 +132,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<ITimeService, TimeService>();
         services.AddSingleton<ISoundService, SoundService>();
         services.AddSingleton<IWindowService, WindowService>();
+        services.AddSingleton<TrayIconManager>();
         // Регистрация ViewModel
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
@@ -143,6 +153,7 @@ public partial class App : System.Windows.Application
             builder.AddSerilog(Log.Logger, dispose: true);
         });
         _serviceProvider = services.BuildServiceProvider();
+        _trayIconManager = _serviceProvider.GetRequiredService<TrayIconManager>();
     }
 
     /// <summary>
