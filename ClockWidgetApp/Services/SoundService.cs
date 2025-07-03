@@ -37,6 +37,40 @@ public class SoundService : ISoundService
     }
 
     /// <summary>
+    /// Создаёт и запускает MediaPlayer для воспроизведения звука.
+    /// </summary>
+    /// <param name="soundPath">Путь к аудиофайлу.</param>
+    /// <param name="loop">Воспроизводить в цикле.</param>
+    /// <param name="onEnded">Действие при завершении воспроизведения (может быть null).</param>
+    /// <returns>Созданный MediaPlayer.</returns>
+    private MediaPlayer CreateAndPlayMediaPlayer(string soundPath, bool loop, Action<MediaPlayer>? onEnded = null)
+    {
+        var player = new MediaPlayer();
+        player.Open(new Uri(soundPath));
+        player.Volume = 1.0;
+        player.MediaEnded += (s, e) =>
+        {
+            if (loop)
+            {
+                player.Position = TimeSpan.Zero;
+                player.Play();
+            }
+            else
+            {
+                player.Close();
+                onEnded?.Invoke(player);
+            }
+        };
+        player.MediaFailed += (s, e) =>
+        {
+            _logger.LogError($"[SoundService] MediaPlayer failed: {e.ErrorException}");
+        };
+        player.Play();
+        _logger.LogDebug($"[SoundService] Playing sound: {soundPath}, loop={loop}");
+        return player;
+    }
+
+    /// <summary>
     /// Воспроизводит аудиофайл по указанному пути. Если loop=true, воспроизводит в цикле.
     /// В случае ошибки логирует путь, loop и ThreadId.
     /// </summary>
@@ -54,30 +88,12 @@ public class SoundService : ISoundService
                 _logger.LogWarning($"[SoundService] Sound file not found: {soundPath}");
                 return;
             }
-            _player = new MediaPlayer();
-            _isLooping = loop;
-            _player.Open(new Uri(soundPath));
-            _player.Volume = 1.0;
-            _player.MediaEnded += (s, e) =>
+            // Все действия с MediaPlayer выполняем в UI-потоке
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (_isLooping)
-                {
-                    _player.Position = TimeSpan.Zero;
-                    _player.Play();
-                }
-                else
-                {
-                    _player.Close();
-                    _player = null;
-                    _logger.LogDebug($"[SoundService] MediaPlayer closed after playback: {soundPath}");
-                }
-            };
-            _player.MediaFailed += (s, e) =>
-            {
-                _logger.LogError($"[SoundService] MediaPlayer failed: {e.ErrorException}");
-            };
-            _player.Play();
-            _logger.LogDebug($"[SoundService] Playing sound: {soundPath}, loop={loop}");
+                _player = CreateAndPlayMediaPlayer(soundPath, loop, p => { _player = null; _logger.LogDebug($"[SoundService] MediaPlayer closed after playback: {soundPath}"); });
+                _isLooping = loop;
+            });
         }
         catch (Exception ex)
         {
@@ -90,14 +106,18 @@ public class SoundService : ISoundService
     /// </summary>
     public void StopSound()
     {
-        if (_player != null)
+        // Все действия с MediaPlayer выполняем в UI-потоке
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            _player.Stop();
-            _player.Close();
-            _player = null;
-            _isLooping = false;
-            _logger.LogDebug("[SoundService] Sound stopped.");
-        }
+            if (_player != null)
+            {
+                _player.Stop();
+                _player.Close();
+                _player = null;
+                _isLooping = false;
+                _logger.LogDebug("[SoundService] Sound stopped.");
+            }
+        });
     }
 
     /// <summary>
@@ -143,28 +163,13 @@ public class SoundService : ISoundService
                 _logger.LogWarning($"[SoundService] Sound file not found: {soundPath}");
                 return new SoundHandle(new MediaPlayer()); // пустой handle
             }
-            var player = new MediaPlayer();
-            player.Open(new Uri(soundPath));
-            player.Volume = 1.0;
-            player.MediaEnded += (s, e) =>
+            MediaPlayer? player = null;
+            // Все действия с MediaPlayer выполняем в UI-потоке
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (loop)
-                {
-                    player.Position = TimeSpan.Zero;
-                    player.Play();
-                }
-                else
-                {
-                    player.Close();
-                }
-            };
-            player.MediaFailed += (s, e) =>
-            {
-                _logger.LogError($"[SoundService] MediaPlayer failed: {e.ErrorException}");
-            };
-            player.Play();
-            _logger.LogDebug($"[SoundService] Playing sound instance: {soundPath}, loop={loop}");
-            return new SoundHandle(player);
+                player = CreateAndPlayMediaPlayer(soundPath, loop);
+            });
+            return new SoundHandle(player!);
         }
         catch (Exception ex)
         {
