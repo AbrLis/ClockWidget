@@ -13,7 +13,10 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class App : System.Windows.Application
 {
-    private ServiceProvider? _serviceProvider;
+    /// <summary>
+    /// DI-контейнер приложения. Гарантированно инициализируется в OnStartup.
+    /// </summary>
+    private ServiceProvider _serviceProvider = default!;
     private ILogger<App>? _logger;
     private NotifyIcon? _notifyIcon = null;
     private ContextMenuStrip? _trayMenu = null;
@@ -45,7 +48,7 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            var settingsService = _serviceProvider?.GetRequiredService<ISettingsService>();
+            var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
             settingsService?.SaveBufferedSettings();
             // Сохраняем таймеры и будильники
             TimersAndAlarmsViewModel.Instance.SaveTimersAndAlarms();
@@ -124,12 +127,12 @@ public partial class App : System.Windows.Application
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
         // Внедряем IWindowService в AnalogClockViewModel через фабрику
-        services.AddTransient<AnalogClockViewModel>(sp =>
+        services.AddTransient<AnalogClockViewModel>( sp =>
             new AnalogClockViewModel(
                 sp.GetRequiredService<ITimeService>(),
                 sp.GetRequiredService<ISettingsService>(),
                 sp.GetRequiredService<MainWindowViewModel>(),
-                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AnalogClockViewModel>>(),
+                sp.GetRequiredService<ILogger<AnalogClockViewModel>>(),
                 sp.GetRequiredService<IWindowService>()
             )
         );
@@ -149,11 +152,11 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         // Временный логгер для single instance событий
-        _earlyLogger = new Serilog.LoggerConfiguration()
-            .WriteTo.File(System.IO.Path.Combine(
+        _earlyLogger = new LoggerConfiguration()
+            .WriteTo.File(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "ClockWidget", "logs", "clock-widget-singleinstance.log"),
-                rollingInterval: Serilog.RollingInterval.Day,
+                rollingInterval: RollingInterval.Day,
                 outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
 
@@ -180,7 +183,7 @@ public partial class App : System.Windows.Application
         var logLevel = ParseLogLevelFromArgs(Environment.GetCommandLineArgs());
         ConfigureLogging(logLevel);
         ConfigureServices();
-        _logger = _serviceProvider?.GetRequiredService<ILogger<App>>();
+        _logger = _serviceProvider.GetRequiredService<ILogger<App>>();
         // Глобальный обработчик необработанных исключений
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
@@ -195,27 +198,29 @@ public partial class App : System.Windows.Application
         // Восстанавливаем коллекции таймеров и будильников до инициализации UI
         TimersAndAlarmsViewModel.Instance.LoadTimersAndAlarms();
         // Прогрев сервисов и ViewModel для главного окна
-        _serviceProvider!.GetRequiredService<ISettingsService>();
-        var mainVm = _serviceProvider!.GetRequiredService<MainWindowViewModel>();
-        var mainLogger = _serviceProvider!.GetRequiredService<ILogger<MainWindow>>();
-        var settingsVm = _serviceProvider!.GetRequiredService<SettingsWindowViewModel>();
-        var logger = _serviceProvider!.GetRequiredService<ILogger<SettingsWindow>>();
-        base.OnStartup(e);
-        _logger?.LogInformation("[App] Application starting");
-        var timeService = _serviceProvider!.GetRequiredService<ITimeService>();
-        timeService.Start();
-        if (_serviceProvider == null)
-            throw new InvalidOperationException("DI ServiceProvider is not initialized.");
+        _serviceProvider.GetRequiredService<ISettingsService>();
+        var mainVm = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+        var mainLogger = _serviceProvider.GetRequiredService<ILogger<MainWindow>>();
+        var settingsVm = _serviceProvider.GetRequiredService<SettingsWindowViewModel>();
+        var logger = _serviceProvider.GetRequiredService<ILogger<SettingsWindow>>();
+        // --- Прогрев окна настроек ---
+        var prewarmedSettingsWindow = new SettingsWindow(settingsVm, logger);
+        prewarmedSettingsWindow.Hide();
         var windowService = _serviceProvider.GetRequiredService<IWindowService>();
+        if (windowService is WindowService wsImpl)
+            wsImpl.SetSettingsWindow(prewarmedSettingsWindow);
         if (mainVm.ShowDigitalClock)
             windowService.OpenMainWindow();
         InitializeTrayIcon(mainVm);
         if (mainVm.ShowAnalogClock)
         {
-            if (_serviceProvider == null)
-                throw new InvalidOperationException("DI ServiceProvider is not initialized.");
             windowService.OpenAnalogClockWindow();
         }
+        // --- конец прогрева ---
+        base.OnStartup(e);
+        _logger?.LogInformation("[App] Application starting");
+        var timeService = _serviceProvider.GetRequiredService<ITimeService>();
+        timeService.Start();
     }
 
     /// <summary>
@@ -225,7 +230,7 @@ public partial class App : System.Windows.Application
     private void InitializeTrayIcon(MainWindowViewModel mainViewModel)
     {
         _trayMenu = new ContextMenuStrip();
-        string lang = ClockWidgetApp.Helpers.LocalizationManager.CurrentLanguage;
+        string lang = Helpers.LocalizationManager.CurrentLanguage;
         _showDigitalItem = new ToolStripMenuItem();
         _showAnalogItem = new ToolStripMenuItem();
         _settingsItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Settings", lang));
@@ -265,14 +270,14 @@ public partial class App : System.Windows.Application
                     ws.OpenSettingsWindow(); // fallback
             }
         };
-        _exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
+        _exitItem.Click += (s, e) => Current.Shutdown();
         _trayMenu.Items.Add(_showDigitalItem);
         _trayMenu.Items.Add(_showAnalogItem);
         _trayMenu.Items.Add(_settingsItem);
         _trayMenu.Items.Add(_timerAlarmSettingsItem);
         _trayMenu.Items.Add(separator);
         _trayMenu.Items.Add(_exitItem);
-        string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
+        string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
         if (!File.Exists(iconPath))
         {
             _logger?.LogWarning("[App] Tray icon file not found: {Path}", iconPath);
@@ -283,7 +288,7 @@ public partial class App : System.Windows.Application
         _notifyIcon.Visible = true;
         _notifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
         _notifyIcon.ContextMenuStrip = _trayMenu;
-        _notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseUp);
+        _notifyIcon.MouseUp += new MouseEventHandler(NotifyIcon_MouseUp);
     }
 
     /// <summary>
@@ -292,7 +297,7 @@ public partial class App : System.Windows.Application
     /// <param name="mainViewModel">Главная ViewModel.</param>
     private void UpdateTrayMenuItems(MainWindowViewModel mainViewModel)
     {
-        string lang = ClockWidgetApp.Helpers.LocalizationManager.CurrentLanguage;
+        string lang = Helpers.LocalizationManager.CurrentLanguage;
         if (_showDigitalItem != null && mainViewModel != null)
         {
             _showDigitalItem.Text = mainViewModel.ShowDigitalClock
@@ -330,21 +335,21 @@ public partial class App : System.Windows.Application
     /// </summary>
     /// <param name="sender">Источник события.</param>
     /// <param name="e">Аргументы события мыши.</param>
-    private void NotifyIcon_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
+    private void NotifyIcon_MouseUp(object? sender, MouseEventArgs e)
     {
-        var mainViewModel = _serviceProvider?.GetRequiredService<MainWindowViewModel>();
-        if (e.Button == System.Windows.Forms.MouseButtons.Right && mainViewModel != null)
+        var mainViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+        if (e.Button == MouseButtons.Right && mainViewModel != null)
         {
             UpdateTrayMenuItems(mainViewModel);
             _trayMenu?.Show();
             return;
         }
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
         {
             // Выводим все активные окна на передний план через WindowService
-            System.Windows.Application.Current.Dispatcher.Invoke(static () =>
+            Current.Dispatcher.Invoke(static () =>
             {
-                var ws = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
+                var ws = ((App)Current).Services.GetService(typeof(IWindowService)) as IWindowService;
                 ws?.BringAllToFront();
             });
         }
@@ -358,7 +363,7 @@ public partial class App : System.Windows.Application
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            var ws = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
+            var ws = ((App)Current).Services.GetService(typeof(IWindowService)) as IWindowService;
             ws?.OpenSettingsWindow();
         });
     }
@@ -374,7 +379,7 @@ public partial class App : System.Windows.Application
         {
             _logger?.LogInformation("[App] Application shutting down (DI)");
             SaveSettingsOnShutdown();
-            var timeService = _serviceProvider?.GetRequiredService<ITimeService>();
+            var timeService = _serviceProvider.GetRequiredService<ITimeService>();
             if (timeService != null)
             {
                 timeService.Stop();
@@ -412,6 +417,6 @@ public partial class App : System.Windows.Application
     /// <summary>
     /// Возвращает DI-контейнер сервисов приложения.
     /// </summary>
-    public IServiceProvider Services => _serviceProvider!;
+    public IServiceProvider Services => _serviceProvider;
 }
 

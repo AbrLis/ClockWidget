@@ -80,9 +80,9 @@ namespace ClockWidgetApp.Services
         /// <inheritdoc/>
         public void OpenSettingsWindow()
         {
+            // Если окно ещё не создано (или не внедрено) — создаём его
             if (_settingsWindow == null)
             {
-                // Получаем зависимости через DI
                 var services = ((App)System.Windows.Application.Current).Services;
                 var settingsVm = services.GetRequiredService<ClockWidgetApp.ViewModels.SettingsWindowViewModel>();
                 var logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SettingsWindow>>();
@@ -90,13 +90,9 @@ namespace ClockWidgetApp.Services
                 // При попытке закрытия окна — скрываем его, не уничтожая
                 _settingsWindow.Closing += (s, e) => { e.Cancel = true; _settingsWindow.Hide(); };
                 _settingsWindow.Closed += (s, e) => _settingsWindow = null;
-                _settingsWindow.Show();
             }
-            else
-            {
-                _settingsWindow.Show(); // Показываем окно, если оно было скрыто
-                _settingsWindow.Activate();
-            }
+            _settingsWindow.Show();
+            _settingsWindow.Activate();
             // Устанавливаем флаг в MainWindow
             if (_settingsWindow != null && System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
                 mainWindow.IsSettingsWindowOpen = true;
@@ -155,6 +151,14 @@ namespace ClockWidgetApp.Services
                 else
                     _settingsWindow.SelectGeneralTab();
             }
+        }
+
+        /// <summary>
+        /// Внедряет заранее созданный экземпляр окна настроек.
+        /// </summary>
+        public void SetSettingsWindow(SettingsWindow window)
+        {
+            _settingsWindow = window;
         }
     }
 } 
