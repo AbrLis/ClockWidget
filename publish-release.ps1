@@ -7,7 +7,7 @@ Remove-Item -Path "bin","obj" -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "Сборка автономного приложения..."
 dotnet publish ClockWidgetApp `
     -c Release `
-    -o ./bin/Release `
+    -o ./artifacts/ClockWidgetApp/bin/Release/bin/Release `
     -p:PublishSingleFile=true `
     -p:SelfContained=true `
     -p:DebugType=None `
@@ -17,7 +17,7 @@ dotnet publish ClockWidgetApp `
     --nologo
 
 # Проверяем результат
-$publishPath = "bin/Release"
+$publishPath = "artifacts/ClockWidgetApp/bin/Release/bin/Release"
 if (Test-Path "$publishPath/ClockWidgetApp.exe") {
     $exeSize = (Get-Item "$publishPath/ClockWidgetApp.exe").Length / 1MB
     Write-Host "Публикация успешно завершена!"

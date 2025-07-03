@@ -5,6 +5,8 @@ using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
 using ClockWidgetApp.Models;
 using Microsoft.Extensions.Logging;
+using System.Windows;
+using System.Windows.Input;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -23,6 +25,10 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     private TransformGroup _secondHandTransform;
     private List<ClockTick> _clockTicks = new List<ClockTick>();
     private bool _disposed;
+    private bool _isDragging;
+    private System.Windows.Point _dragStartPoint;
+    private readonly IWindowService? _windowService;
+    public ICommand OpenSettingsCommand { get; }
 
     /// <summary>
     /// Событие, возникающее при изменении значения свойства.
@@ -94,7 +100,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="AnalogClockViewModel"/>.
     /// </summary>
-    public AnalogClockViewModel(ITimeService timeService, ISettingsService settingsService, MainWindowViewModel mainViewModel, ILogger<AnalogClockViewModel> logger)
+    public AnalogClockViewModel(ITimeService timeService, ISettingsService settingsService, MainWindowViewModel mainViewModel, ILogger<AnalogClockViewModel> logger, IWindowService? windowService = null)
     {
         try
         {
@@ -103,6 +109,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             _timeService = timeService;
             _settingsService = settingsService;
             _mainViewModel = mainViewModel;
+            _windowService = windowService;
             _hourHandTransform = new TransformGroup();
             _minuteHandTransform = new TransformGroup();
             _secondHandTransform = new TransformGroup();
@@ -110,6 +117,8 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             _timeService.TimeUpdated += OnTimeUpdated;
             OnTimeUpdated(this, DateTime.Now);
             _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
+            ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged += OnLanguageChanged;
+            OpenSettingsCommand = new RelayCommand(_ => _windowService?.OpenSettingsWindow());
             _logger.LogDebug("[AnalogClockViewModel] Subscribed to MainViewModel property changes");
             _logger.LogDebug("[AnalogClockViewModel] Analog clock view model initialized");
         }
@@ -265,6 +274,52 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>
+    /// Начать перемещение окна. Запоминает стартовую точку.
+    /// </summary>
+    /// <param name="startPoint">Точка начала перемещения (относительно окна).</param>
+    public void StartDrag(System.Windows.Point startPoint)
+    {
+        _isDragging = true;
+        _dragStartPoint = startPoint;
+        _logger.LogDebug("[AnalogClockViewModel] StartDrag at {Point}", startPoint);
+    }
+
+    /// <summary>
+    /// Выполнить перемещение окна. Возвращает смещение (delta) относительно стартовой точки, если перемещение активно.
+    /// </summary>
+    /// <param name="currentPoint">Текущая позиция мыши (относительно окна).</param>
+    /// <returns>Смещение (deltaX, deltaY) или null, если не происходит drag.</returns>
+    public (double deltaX, double deltaY)? DragMove(System.Windows.Point currentPoint)
+    {
+        if (!_isDragging) return null;
+        var delta = currentPoint - _dragStartPoint;
+        _logger.LogDebug("[AnalogClockViewModel] DragMove delta=({DeltaX},{DeltaY})", delta.X, delta.Y);
+        return (delta.X, delta.Y);
+    }
+
+    /// <summary>
+    /// Завершить перемещение окна.
+    /// </summary>
+    public void StopDrag()
+    {
+        if (_isDragging)
+        {
+            _isDragging = false;
+            _logger.LogDebug("[AnalogClockViewModel] StopDrag");
+        }
+    }
+
+    /// <summary>
+    /// Обработчик смены языка. Вызывает обновление всех связанных свойств.
+    /// </summary>
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        _logger.LogDebug("[AnalogClockViewModel] Language changed, updating properties");
+        // Здесь можно вызвать OnPropertyChanged для всех локализуемых свойств, если они есть
+        // Например: OnPropertyChanged(nameof(SomeLocalizedProperty));
+    }
+
+    /// <summary>
     /// Освобождает ресурсы, используемые экземпляром класса <see cref="AnalogClockViewModel"/>.
     /// </summary>
     public void Dispose()
@@ -273,6 +328,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         {
             _timeService.TimeUpdated -= OnTimeUpdated;
             _mainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
+            ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged -= OnLanguageChanged;
             _disposed = true;
         }
     }

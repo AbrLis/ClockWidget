@@ -15,9 +15,6 @@ public partial class AnalogClockWindow : Window
     // Логгер для событий окна
     private readonly ILogger<AnalogClockWindow> _logger;
     private readonly MainWindowViewModel _mainViewModel;
-    // Переменные для логики перемещения окна мышью
-    private System.Windows.Point _dragStartPoint;
-    private bool _isDragging;
 
     /// <summary>
     /// Создаёт окно с аналоговыми часами и инициализирует все компоненты и обработчики событий.
@@ -77,102 +74,55 @@ public partial class AnalogClockWindow : Window
     /// </summary>
     private void AnalogClockWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            _logger.LogDebug("[AnalogClockWindow] Analog clock window loaded");
-        }
-        catch (Exception ex)
-        {
-            if (_logger != null)
-                _logger.LogError(ex, "[AnalogClockWindow] Error in window loaded event");
-        }
+        _logger.LogDebug("[AnalogClockWindow] Analog clock window loaded");
     }
 
     /// <summary>
-    /// Начало перемещения окна мышью (запоминаем стартовую точку).
+    /// Начало перемещения окна мышью (запускает drag в ViewModel).
     /// </summary>
     private void AnalogClockWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        try
-        {
-            _dragStartPoint = e.GetPosition(this);
-            _isDragging = true;
-            CaptureMouse();
-            _logger.LogDebug("[AnalogClockWindow] Mouse left button down, started dragging");
-            e.Handled = true;
-        }
-        catch (Exception ex)
-        {
-            if (_logger != null)
-                _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button down event");
-        }
+        _viewModel.StartDrag(e.GetPosition(this));
+        CaptureMouse();
+        _logger.LogDebug("[AnalogClockWindow] Mouse left button down, started dragging");
+        e.Handled = true;
     }
 
     /// <summary>
-    /// Завершение перемещения окна мышью.
+    /// Завершение перемещения окна мышью (завершает drag в ViewModel).
     /// </summary>
     private void AnalogClockWindow_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        try
-        {
-            if (_isDragging)
-            {
-                _isDragging = false;
-                ReleaseMouseCapture();
-                _logger.LogDebug("[AnalogClockWindow] Mouse left button up, stopped dragging");
-                e.Handled = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_logger != null)
-                _logger.LogError(ex, "[AnalogClockWindow] Error in mouse left button up event");
-        }
+        _viewModel.StopDrag();
+        ReleaseMouseCapture();
+        _logger.LogDebug("[AnalogClockWindow] Mouse left button up, stopped dragging");
+        e.Handled = true;
     }
 
     /// <summary>
-    /// Перемещение окна мышью (реализация drag & drop).
+    /// Перемещение окна мышью (вызывает DragMove в ViewModel и применяет delta к Left/Top).
     /// </summary>
     private void AnalogClockWindow_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        try
+        var delta = _viewModel.DragMove(e.GetPosition(this));
+        if (delta.HasValue)
         {
-            if (_isDragging)
-            {
-                var currentPosition = e.GetPosition(this);
-                var delta = currentPosition - _dragStartPoint;
-                
-                Left += delta.X;
-                Top += delta.Y;
-                
-                _logger.LogDebug("[AnalogClockWindow] Window moved: Left={Left}, Top={Top}", Left, Top);
-                e.Handled = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_logger != null)
-                _logger.LogError(ex, "[AnalogClockWindow] Error in mouse move event");
+            Left += delta.Value.deltaX;
+            Top += delta.Value.deltaY;
+            _logger.LogDebug("[AnalogClockWindow] Window moved: Left={Left}, Top={Top}", Left, Top);
+            e.Handled = true;
         }
     }
 
     /// <summary>
-    /// Открытие окна настроек по правому клику мыши.
+    /// Открытие окна настроек по правому клику мыши (через команду ViewModel).
     /// </summary>
     private void AnalogClockWindow_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        try
-        {
-            _logger.LogDebug("[AnalogClockWindow] Opening settings window");
-            var windowService = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
-            windowService?.OpenSettingsWindow();
-            e.Handled = true;
-        }
-        catch (Exception ex)
-        {
-            if (_logger != null)
-                _logger.LogError(ex, "[AnalogClockWindow] Error opening settings window");
-        }
+        if (_viewModel.OpenSettingsCommand.CanExecute(null))
+            _viewModel.OpenSettingsCommand.Execute(null);
+        _logger.LogDebug("[AnalogClockWindow] Opening settings window");
+        e.Handled = true;
     }
 
     /// <summary>
@@ -180,34 +130,17 @@ public partial class AnalogClockWindow : Window
     /// </summary>
     private void AnalogClockWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
-        try
-        {
-            _logger.LogDebug("Analog clock window closing");
-            
-            // Сохраняем позицию окна при закрытии
-            _viewModel.SaveWindowPosition(Left, Top);
-            
-            // Отписываемся от событий
-            PreviewMouseLeftButtonDown -= AnalogClockWindow_PreviewMouseLeftButtonDown;
-            PreviewMouseLeftButtonUp -= AnalogClockWindow_PreviewMouseLeftButtonUp;
-            PreviewMouseMove -= AnalogClockWindow_PreviewMouseMove;
-            MouseRightButtonDown -= AnalogClockWindow_MouseRightButtonDown;
-            Closing -= AnalogClockWindow_Closing;
-            Loaded -= AnalogClockWindow_Loaded;
-            
-            // Очищаем DataContext и освобождаем ресурсы ViewModel
-            if (_viewModel is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-            DataContext = null;
-            
-            _logger.LogDebug("Analog clock window closed");
-        }
-        catch (Exception ex)
-        {
-            if (_logger != null)
-                _logger.LogError(ex, "Error during window closing");
-        }
+        _logger.LogDebug("Analog clock window closing");
+        _viewModel.SaveWindowPosition(Left, Top);
+        PreviewMouseLeftButtonDown -= AnalogClockWindow_PreviewMouseLeftButtonDown;
+        PreviewMouseLeftButtonUp -= AnalogClockWindow_PreviewMouseLeftButtonUp;
+        PreviewMouseMove -= AnalogClockWindow_PreviewMouseMove;
+        MouseRightButtonDown -= AnalogClockWindow_MouseRightButtonDown;
+        Closing -= AnalogClockWindow_Closing;
+        Loaded -= AnalogClockWindow_Loaded;
+        if (_viewModel is IDisposable disposable)
+            disposable.Dispose();
+        DataContext = null;
+        _logger.LogDebug("Analog clock window closed");
     }
 } 

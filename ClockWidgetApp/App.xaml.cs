@@ -123,7 +123,16 @@ public partial class App : System.Windows.Application
         // Регистрация ViewModel
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
-        services.AddTransient<AnalogClockViewModel>();
+        // Внедряем IWindowService в AnalogClockViewModel через фабрику
+        services.AddTransient<AnalogClockViewModel>(sp =>
+            new AnalogClockViewModel(
+                sp.GetRequiredService<ITimeService>(),
+                sp.GetRequiredService<ISettingsService>(),
+                sp.GetRequiredService<MainWindowViewModel>(),
+                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AnalogClockViewModel>>(),
+                sp.GetRequiredService<IWindowService>()
+            )
+        );
         // Логгеры
         services.AddLogging(builder =>
         {
