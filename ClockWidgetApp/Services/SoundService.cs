@@ -38,6 +38,7 @@ public class SoundService : ISoundService
 
     /// <summary>
     /// Воспроизводит аудиофайл по указанному пути. Если loop=true, воспроизводит в цикле.
+    /// В случае ошибки логирует путь, loop и ThreadId.
     /// </summary>
     /// <param name="soundPath">Путь к аудиофайлу.</param>
     /// <param name="loop">Воспроизводить в цикле.</param>
@@ -80,7 +81,7 @@ public class SoundService : ISoundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SoundService] Error playing sound");
+            _logger.LogError(ex, "[SoundService] Error playing sound. Path: {Path}, Loop: {Loop}, ThreadId: {ThreadId}", soundPath, loop, System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
     }
 
@@ -126,6 +127,7 @@ public class SoundService : ISoundService
 
     /// <summary>
     /// Воспроизводит аудиофайл и возвращает handle для управления этим воспроизведением.
+    /// В случае ошибки логирует путь, loop и ThreadId.
     /// </summary>
     /// <param name="soundPath">Путь к аудиофайлу.</param>
     /// <param name="loop">Воспроизводить в цикле.</param>
@@ -166,7 +168,7 @@ public class SoundService : ISoundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SoundService] Error playing sound instance");
+            _logger.LogError(ex, "[SoundService] Error playing sound instance. Path: {Path}, Loop: {Loop}, ThreadId: {ThreadId}", soundPath, loop, System.Threading.Thread.CurrentThread.ManagedThreadId);
             return new SoundHandle(new MediaPlayer());
         }
     }

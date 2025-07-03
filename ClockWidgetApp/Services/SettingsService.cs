@@ -78,9 +78,9 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// Загружает настройки из файла.
+    /// Загружает настройки из файла. Если файл отсутствует или пустой, возвращает настройки по умолчанию.
     /// </summary>
-    /// <returns>Загруженные настройки.</returns>
+    /// <returns>Загруженные или стандартные настройки.</returns>
     public WidgetSettings LoadSettings()
     {
         try
@@ -91,6 +91,13 @@ public class SettingsService : ISettingsService
             }
 
             var json = File.ReadAllText(_settingsPath);
+            // Проверка на пустой или "пустой" файл
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                _logger.LogWarning("[SettingsService] Файл настроек пустой. Используются настройки по умолчанию.");
+                return WidgetSettings.ValidateSettings(new WidgetSettings());
+            }
+
             var settings = JsonSerializer.Deserialize<WidgetSettings>(json) ?? new WidgetSettings();
             return WidgetSettings.ValidateSettings(settings);
         }
@@ -102,7 +109,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// Сохраняет настройки в файл.
+    /// Сохраняет настройки в файл через временный файл для предотвращения потери данных.
     /// </summary>
     /// <param name="settings">Настройки для сохранения.</param>
     public void SaveSettings(WidgetSettings settings)
@@ -129,8 +136,14 @@ public class SettingsService : ISettingsService
             };
 
             var json = JsonSerializer.Serialize(settings, options);
-            File.WriteAllText(_settingsPath, json);
-            _logger.LogDebug("[SettingsService] Настройки успешно сохранены");
+            var tempFile = _settingsPath + ".tmp";
+
+            // Сохраняем сначала во временный файл
+            File.WriteAllText(tempFile, json);
+            File.Copy(tempFile, _settingsPath, true);
+            File.Delete(tempFile);
+
+            _logger.LogDebug("[SettingsService] Настройки успешно сохранены через временный файл");
         }
         catch (Exception ex)
         {
