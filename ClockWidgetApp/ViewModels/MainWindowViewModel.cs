@@ -11,11 +11,22 @@ namespace ClockWidgetApp.ViewModels;
 /// </summary>
 public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel, IDisposable
 {
+    #region Private Fields
+    /// <summary>Сервис времени.</summary>
     private readonly ITimeService _timeService;
+    /// <summary>Сервис настроек.</summary>
     private readonly ISettingsService _settingsService;
+    /// <summary>Сервис звука.</summary>
     private readonly ISoundService _soundService;
+    /// <summary>Логгер для событий ViewModel.</summary>
     private readonly ILogger<MainWindowViewModel> _logger;
+    /// <summary>Флаг освобождения ресурсов.</summary>
     private bool _disposed;
+    /// <summary>Флаг открытия окна настроек.</summary>
+    private bool _isSettingsWindowOpen;
+    private bool _isDragging;
+    private System.Windows.Point _dragStartPoint;
+    #endregion
 
     /// <summary>
     /// Событие, возникающее при изменении значения свойства.
@@ -23,20 +34,68 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
+    /// Показывает, открыто ли окно настроек.
+    /// </summary>
+    public bool IsSettingsWindowOpen
+    {
+        get => _isSettingsWindowOpen;
+        set { _isSettingsWindowOpen = value; OnPropertyChanged(); }
+    }
+
+    /// <summary>
+    /// Команда для открытия окна настроек.
+    /// </summary>
+    public RelayCommand OpenSettingsCommand => new RelayCommand(_ => OpenSettingsWindow());
+
+    /// <summary>
+    /// Команда для скрытия главного окна.
+    /// </summary>
+    public RelayCommand HideWindowCommand => new RelayCommand(_ => HideWindow());
+
+    /// <summary>
+    /// Метод для начала перетаскивания окна. Сохраняет исходную точку нажатия мыши.
+    /// </summary>
+    public void StartDrag(System.Windows.Point startPoint)
+    {
+        _dragStartPoint = startPoint;
+        _isDragging = true;
+    }
+
+    /// <summary>
+    /// Метод для завершения перетаскивания окна. Сбрасывает флаг перетаскивания.
+    /// </summary>
+    public void EndDrag()
+    {
+        _isDragging = false;
+    }
+
+    /// <summary>
+    /// Возвращает смещение мыши относительно исходной точки нажатия (dragStartPoint), не обновляя dragStartPoint.
+    /// </summary>
+    public (double deltaX, double deltaY)? MoveDrag(System.Windows.Point currentPosition)
+    {
+        if (_isDragging)
+        {
+            var diff = currentPosition - _dragStartPoint;
+            return (diff.X, diff.Y);
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="MainWindowViewModel"/>.
-    /// Загружает сохраненные настройки и запускает сервис обновления времени.
+    /// Загружает сохранённые настройки и запускает сервис обновления времени.
     /// </summary>
     public MainWindowViewModel(ITimeService timeService, ISettingsService settingsService, ISoundService soundService, ILogger<MainWindowViewModel> logger)
     {
+        _logger = logger;
+        _timeService = timeService;
+        _settingsService = settingsService;
+        _soundService = soundService;
         try
         {
-            _logger = logger;
             _logger.LogDebug("[MainWindowViewModel] Initializing main window view model");
-            _timeService = timeService;
-            _settingsService = settingsService;
-            _soundService = soundService;
             var settings = _settingsService.CurrentSettings;
-            _logger.LogDebug("[MainWindowViewModel] Loading settings for main window: {Settings}", settings);
             InitializeFromSettings(settings);
             SubscribeToLanguageChanges();
             _timeService.TimeUpdated += OnTimeUpdated;
@@ -50,11 +109,12 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
         }
         catch (Exception ex)
         {
-            if (_logger != null)
-                _logger.LogError(ex, "[MainWindowViewModel] Error initializing main window view model");
+            _logger.LogError(ex, "[MainWindowViewModel] Error initializing main window view model");
             throw;
         }
     }
+
+    #region Public Methods
 
     /// <summary>
     /// Вызывает событие <see cref="PropertyChanged"/>.
@@ -77,7 +137,6 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
                 _logger.LogDebug("[MainWindowViewModel] Disposing main window view model");
                 if (_timeService != null)
                     _timeService.TimeUpdated -= OnTimeUpdated;
-                // Не вызываем _timeService.Dispose(), если это singleton из App
                 _disposed = true;
                 _logger.LogDebug("[MainWindowViewModel] Main window view model disposed");
             }
@@ -87,4 +146,30 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             }
         }
     }
+
+    #endregion
+
+    #region Private Methods
+
+    /// <summary>
+    /// Открывает окно настроек через сервис.
+    /// </summary>
+    private void OpenSettingsWindow()
+    {
+        _logger.LogDebug("[MainWindowViewModel] OpenSettingsWindow called");
+        _windowService?.OpenSettingsWindow();
+        IsSettingsWindowOpen = true;
+    }
+
+    /// <summary>
+    /// Скрывает главное окно через сервис и сохраняет позицию.
+    /// </summary>
+    private void HideWindow()
+    {
+        _logger.LogDebug("[MainWindowViewModel] HideWindow called");
+        SaveWindowPosition(MainWindow?.Left ?? 0, MainWindow?.Top ?? 0);
+        _windowService?.HideMainWindow();
+    }
+
+    #endregion
 } 

@@ -9,10 +9,16 @@ namespace ClockWidgetApp.Services
     /// </summary>
     public class WindowService : IWindowService
     {
+        #region Private Fields
+        /// <summary>Экземпляр главного окна.</summary>
         private MainWindow? _mainWindow = null;
+        /// <summary>Экземпляр окна аналоговых часов.</summary>
         private AnalogClockWindow? _analogClockWindow = null;
+        /// <summary>Экземпляр окна настроек.</summary>
         private SettingsWindow? _settingsWindow = null;
+        #endregion
 
+        #region Открытие и скрытие окон
         /// <inheritdoc/>
         public void OpenMainWindow()
         {
@@ -95,7 +101,13 @@ namespace ClockWidgetApp.Services
             _settingsWindow.Activate();
             // Устанавливаем флаг в MainWindow
             if (_settingsWindow != null && System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
-                mainWindow.IsSettingsWindowOpen = true;
+            {
+                /// <summary>
+                /// Устанавливает флаг открытия окна настроек во ViewModel главного окна.
+                /// </summary>
+                if (mainWindow.ViewModel != null)
+                    mainWindow.ViewModel.IsSettingsWindowOpen = true;
+            }
         }
 
         /// <summary>
@@ -105,25 +117,21 @@ namespace ClockWidgetApp.Services
         {
             _settingsWindow?.Hide();
         }
+        #endregion
 
-        /// <summary>
-        /// Возвращает текущий экземпляр главного окна (MainWindow), если он открыт.
-        /// </summary>
+        #region Получение экземпляров окон
+        /// <summary>Возвращает текущий экземпляр главного окна (MainWindow), если он открыт.</summary>
         public MainWindow? GetMainWindow() => _mainWindow;
 
-        /// <summary>
-        /// Возвращает текущий экземпляр окна аналоговых часов (AnalogClockWindow), если он открыт.
-        /// </summary>
+        /// <summary>Возвращает текущий экземпляр окна аналоговых часов (AnalogClockWindow), если он открыт.</summary>
         public AnalogClockWindow? GetAnalogClockWindow() => _analogClockWindow;
 
-        /// <summary>
-        /// Возвращает текущий экземпляр окна настроек (SettingsWindow), если он открыт.
-        /// </summary>
+        /// <summary>Возвращает текущий экземпляр окна настроек (SettingsWindow), если он открыт.</summary>
         public SettingsWindow? GetSettingsWindow() => _settingsWindow;
+        #endregion
 
-        /// <summary>
-        /// Активирует все окна приложения (выводит на передний план).
-        /// </summary>
+        #region Прочее
+        /// <summary>Активирует все окна приложения (выводит на передний план).</summary>
         public void BringAllToFront()
         {
             void BringToFront(System.Windows.Window? window)
@@ -141,6 +149,7 @@ namespace ClockWidgetApp.Services
             BringToFront(_settingsWindow);
         }
 
+        /// <summary>Открывает окно настроек с выбором вкладки.</summary>
         public void OpenSettingsWindow(bool selectTimersTab)
         {
             OpenSettingsWindow();
@@ -153,12 +162,11 @@ namespace ClockWidgetApp.Services
             }
         }
 
-        /// <summary>
-        /// Внедряет заранее созданный экземпляр окна настроек.
-        /// </summary>
+        /// <summary>Внедряет заранее созданный экземпляр окна настроек.</summary>
         public void SetSettingsWindow(SettingsWindow window)
         {
             _settingsWindow = window;
         }
+        #endregion
     }
 } 

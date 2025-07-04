@@ -6,54 +6,33 @@ namespace ClockWidgetApp.Services
     /// </summary>
     public interface IWindowService
     {
-        /// <summary>
-        /// Открывает главное окно приложения (цифровые часы), если оно ещё не открыто, либо активирует его.
-        /// </summary>
+        #region Открытие и скрытие окон
+        /// <summary>Открывает главное окно приложения (цифровые часы), если оно ещё не открыто, либо активирует его.</summary>
         void OpenMainWindow();
-
-        /// <summary>
-        /// Скрывает главное окно приложения (MainWindow), не уничтожая его. Повторный показ возможен через OpenMainWindow().
-        /// </summary>
+        /// <summary>Скрывает главное окно приложения (MainWindow), не уничтожая его. Повторный показ возможен через OpenMainWindow().</summary>
         void HideMainWindow();
-
-        /// <summary>
-        /// Открывает окно аналоговых часов, если оно ещё не открыто, либо активирует его.
-        /// </summary>
+        /// <summary>Открывает окно аналоговых часов, если оно ещё не открыто, либо активирует его.</summary>
         void OpenAnalogClockWindow();
-
-        /// <summary>
-        /// Скрывает окно аналоговых часов (AnalogClockWindow), не уничтожая его. Повторный показ возможен через OpenAnalogClockWindow().
-        /// </summary>
+        /// <summary>Скрывает окно аналоговых часов (AnalogClockWindow), не уничтожая его. Повторный показ возможен через OpenAnalogClockWindow().</summary>
         void HideAnalogClockWindow();
-
-        /// <summary>
-        /// Открывает окно настроек, если оно ещё не открыто, либо активирует его.
-        /// </summary>
+        /// <summary>Открывает окно настроек, если оно ещё не открыто, либо активирует его.</summary>
         void OpenSettingsWindow();
-
-        /// <summary>
-        /// Скрывает окно настроек (SettingsWindow), не уничтожая его. Повторный показ возможен через OpenSettingsWindow().
-        /// </summary>
+        /// <summary>Скрывает окно настроек (SettingsWindow), не уничтожая его. Повторный показ возможен через OpenSettingsWindow().</summary>
         void HideSettingsWindow();
+        #endregion
 
-        /// <summary>
-        /// Возвращает текущий экземпляр главного окна (MainWindow), если он существует, иначе null.
-        /// </summary>
+        #region Получение экземпляров окон
+        /// <summary>Возвращает текущий экземпляр главного окна (MainWindow), если он существует, иначе null.</summary>
         MainWindow? GetMainWindow();
-
-        /// <summary>
-        /// Возвращает текущий экземпляр окна аналоговых часов (AnalogClockWindow), если он существует, иначе null.
-        /// </summary>
+        /// <summary>Возвращает текущий экземпляр окна аналоговых часов (AnalogClockWindow), если он существует, иначе null.</summary>
         AnalogClockWindow? GetAnalogClockWindow();
-
-        /// <summary>
-        /// Возвращает текущий экземпляр окна настроек (SettingsWindow), если он существует, иначе null.
-        /// </summary>
+        /// <summary>Возвращает текущий экземпляр окна настроек (SettingsWindow), если он существует, иначе null.</summary>
         SettingsWindow? GetSettingsWindow();
+        #endregion
 
-        /// <summary>
-        /// Активирует все окна приложения (выводит на передний план все открытые окна).
-        /// </summary>
+        #region Прочее
+        /// <summary>Активирует все окна приложения (выводит на передний план все открытые окна).</summary>
         void BringAllToFront();
+        #endregion
     }
 } 

@@ -10,8 +10,12 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class SettingsWindow : Window
 {
+    #region Private Fields
+    /// <summary>ViewModel окна настроек.</summary>
     private readonly SettingsWindowViewModel _viewModel = null!;
+    /// <summary>Логгер для событий окна.</summary>
     private readonly ILogger<SettingsWindow> _logger;
+    #endregion
 
     /// <summary>
     /// Создаёт новое окно настроек.
@@ -31,34 +35,38 @@ public partial class SettingsWindow : Window
             // Устанавливаем DataContext для вкладки 'Alarms & Timers' на Singleton-экземпляр
             if (TimersAlarmsGrid != null)
                 TimersAlarmsGrid.DataContext = TimersAndAlarmsViewModel.Instance;
-            _logger.LogDebug($"[SettingsWindow] DataContext type: {DataContext?.GetType().FullName}");
             LocalizationManager.LanguageChanged += (s, e) =>
             {
                 DataContext = null;
                 DataContext = _viewModel;
             };
-            // Добавляем обработчик закрытия окна
             Closing += SettingsWindow_Closing;
             _logger.LogDebug("[SettingsWindow] Settings window initialized");
         }
         catch (Exception ex)
         {
-            if (_logger != null)
-                _logger.LogError(ex, "[SettingsWindow] Error initializing settings window");
+            _logger.LogError(ex, "[SettingsWindow] Error initializing settings window");
             throw;
         }
     }
 
+    /// <summary>
+    /// ViewModel для биндинга в XAML и других окон.
+    /// </summary>
+    public SettingsWindowViewModel ViewModel => _viewModel;
+
+    #region Event Handlers & Private Methods
+
+    /// <summary>
+    /// Обработка закрытия окна: скрытие и сброс флага открытия.
+    /// </summary>
     private void SettingsWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         try
         {
             _logger.LogDebug("[SettingsWindow] Settings window closing");
             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.IsSettingsWindowOpen = false;
-            }
-            // Вместо уничтожения окна скрываем его, чтобы оно оставалось в памяти
+                mainWindow.ViewModel.IsSettingsWindowOpen = false;
             e.Cancel = true;
             this.Hide();
             _logger.LogDebug("[SettingsWindow] Settings window hidden (not closed)");
@@ -69,31 +77,29 @@ public partial class SettingsWindow : Window
         }
     }
 
+    /// <summary>
+    /// Кнопка закрытия приложения.
+    /// </summary>
     private void CloseWidgetButton_Click(object sender, RoutedEventArgs e)
     {
         try
         {
             _logger.LogDebug("[SettingsWindow] Close widget button clicked");
-            
-            // Закрываем все окна приложения
             foreach (Window window in System.Windows.Application.Current.Windows)
-            {
-                _logger.LogDebug("[SettingsWindow] Closing window: {WindowType}", window.GetType().Name);
                 window.Close();
-            }
-            
-            // Завершаем работу приложения
             _logger.LogDebug("[SettingsWindow] Shutting down application");
             System.Windows.Application.Current.Shutdown();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "[SettingsWindow] Error during application shutdown");
-            // Даже в случае ошибки пытаемся завершить работу
             System.Windows.Application.Current.Shutdown();
         }
     }
 
+    /// <summary>
+    /// Кнопка открытия логов.
+    /// </summary>
     private void ShowLogsButton_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -130,7 +136,9 @@ public partial class SettingsWindow : Window
         }
     }
 
-    // Обработчик для разрешения только числового ввода в TextBox
+    /// <summary>
+    /// Разрешает только числовой ввод в TextBox.
+    /// </summary>
     private void NumberOnly_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
         foreach (char c in e.Text)
@@ -143,10 +151,11 @@ public partial class SettingsWindow : Window
         }
     }
 
-    // Обработчик клика по таймеру для редактирования
-    private void TimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    /// <summary>
+    /// Клик по таймеру для редактирования.
+    /// </summary>
+    private void TimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        // Найти DataContext таймера
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
         {
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
@@ -156,7 +165,7 @@ public partial class SettingsWindow : Window
     }
 
     /// <summary>
-    /// Автоматически корректирует значения времени таймера при потере фокуса.
+    /// Корректирует значения времени таймера при потере фокуса.
     /// </summary>
     private void TimerTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
@@ -164,7 +173,7 @@ public partial class SettingsWindow : Window
     }
 
     /// <summary>
-    /// Автоматически корректирует значения времени будильника при потере фокуса.
+    /// Корректирует значения времени будильника при потере фокуса.
     /// </summary>
     private void AlarmTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
@@ -172,11 +181,10 @@ public partial class SettingsWindow : Window
     }
 
     /// <summary>
-    /// Обрабатывает клик по строке будильника для редактирования.
+    /// Клик по строке будильника для редактирования.
     /// </summary>
     private void AlarmItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        // Найти DataContext будильника
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is AlarmEntryViewModel alarm)
         {
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
@@ -190,7 +198,6 @@ public partial class SettingsWindow : Window
     /// </summary>
     public void SelectTimersTab()
     {
-        // Вкладка с таймерами и будильниками — вторая (индекс 1)
         if (MainTabControl != null && MainTabControl.Items.Count > 1)
             MainTabControl.SelectedIndex = 1;
     }
@@ -200,8 +207,9 @@ public partial class SettingsWindow : Window
     /// </summary>
     public void SelectGeneralTab()
     {
-        // Первая вкладка — индекс 0
         if (MainTabControl != null && MainTabControl.Items.Count > 0)
             MainTabControl.SelectedIndex = 0;
     }
+
+    #endregion
 } 

@@ -9,7 +9,7 @@
         Title="{Binding Localized.MainWindow_Title}" 
         Height="450" 
         Width="800"
-        Icon="/Resources/Icons/app_ico_32.ico"
+        Icon="/Resources/Icons/app.ico"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -19,7 +19,7 @@
         ShowActivated="True"
         WindowStartupLocation="Manual">
     <Window.Resources>
-        <BitmapImage x:Key="WindowIcon" UriSource="/Resources/Icons/app_ico_32.ico"/>
+        <BitmapImage x:Key="WindowIcon" UriSource="/Resources/Icons/app.ico"/>
     </Window.Resources>
     <Grid>
         <Border x:Name="BackgroundBorder" 

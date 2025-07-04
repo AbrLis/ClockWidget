@@ -10,11 +10,24 @@ namespace ClockWidgetApp;
 /// </summary>
 public partial class MainWindow : Window
 {
+    #region Private Fields
+    /// <summary>ViewModel главного окна.</summary>
     private readonly MainWindowViewModel _viewModel;
+    /// <summary>Логгер для событий окна.</summary>
     private readonly ILogger<MainWindow> _logger;
-    private System.Windows.Point _dragStartPoint;
+    /// <summary>Стартовая позиция мыши при drag&drop (в координатах экрана).</summary>
+    private System.Windows.Point _dragStartMouseScreen;
+    /// <summary>Стартовая позиция окна по X.</summary>
+    private double _dragStartWindowLeft;
+    /// <summary>Стартовая позиция окна по Y.</summary>
+    private double _dragStartWindowTop;
+    /// <summary>Флаг активного перетаскивания окна.</summary>
     private bool _isDragging;
-    public bool IsSettingsWindowOpen { get; set; }
+    #endregion
+
+    /// <summary>
+    /// ViewModel для биндинга в XAML и других окон.
+    /// </summary>
     public MainWindowViewModel ViewModel => _viewModel;
 
     /// <summary>
@@ -31,7 +44,6 @@ public partial class MainWindow : Window
             DataContext = _viewModel;
             ClockWidgetApp.Helpers.LocalizationManager.LanguageChanged += (s, e) =>
             {
-                // Принудительно обновляем DataContext, чтобы обновить все привязки
                 DataContext = null;
                 DataContext = _viewModel;
             };
@@ -55,58 +67,68 @@ public partial class MainWindow : Window
         }
     }
 
+    #region Event Handlers & Private Methods
+
+    /// <summary>
+    /// Начало перетаскивания окна мышью.
+    /// </summary>
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        _dragStartPoint = e.GetPosition(this);
         _isDragging = true;
+        _dragStartMouseScreen = PointToScreen(e.GetPosition(this));
+        _dragStartWindowLeft = Left;
+        _dragStartWindowTop = Top;
         CaptureMouse();
         e.Handled = true;
     }
 
+    /// <summary>
+    /// Завершение перетаскивания окна мышью.
+    /// </summary>
     private void MainWindow_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        if (_isDragging)
-        {
-            _isDragging = false;
-            ReleaseMouseCapture();
-            e.Handled = true;
-        }
+        _isDragging = false;
+        ReleaseMouseCapture();
+        e.Handled = true;
     }
 
+    /// <summary>
+    /// Перемещение окна мышью.
+    /// </summary>
     private void MainWindow_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (_isDragging && IsMouseCaptured)
         {
-            System.Windows.Point currentPosition = e.GetPosition(this);
-            Vector diff = currentPosition - _dragStartPoint;
-            Left += diff.X;
-            Top += diff.Y;
+            System.Windows.Point currentMouseScreen = PointToScreen(e.GetPosition(this));
+            var delta = currentMouseScreen - _dragStartMouseScreen;
+            Left = _dragStartWindowLeft + delta.X;
+            Top = _dragStartWindowTop + delta.Y;
             e.Handled = true;
         }
     }
 
+    /// <summary>
+    /// Открытие окна настроек по правой кнопке мыши.
+    /// </summary>
     private void MainWindow_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        // Открываем окно настроек по правой кнопке мыши через сервис
-        if (!IsSettingsWindowOpen)
+        if (!_viewModel.IsSettingsWindowOpen)
         {
-            var windowService = ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
-            windowService?.OpenSettingsWindow();
+            _viewModel.OpenSettingsCommand.Execute(null);
         }
-        e.Handled = true; // Предотвращаем появление контекстного меню
+        e.Handled = true;
     }
 
+    /// <summary>
+    /// Обработка закрытия окна: скрытие и сохранение позиции.
+    /// </summary>
     private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         try
         {
             _logger.LogDebug("[MainWindow] Main window closing");
-            // Вместо закрытия — скрываем окно, чтобы оно могло быть показано повторно
             e.Cancel = true;
-            this.Hide();
-            // Сохраняем текущую позицию окна
-            _viewModel.SaveWindowPosition(Left, Top);
-            // Очищаем DataContext и освобождаем ресурсы ViewModel
+            _viewModel.HideWindowCommand.Execute(null);
             if (_viewModel is IDisposable disposable)
             {
                 disposable.Dispose();
@@ -119,4 +141,6 @@ public partial class MainWindow : Window
             _logger.LogError(ex, "[MainWindow] Error during window closing");
         }
     }
+
+    #endregion
 }
