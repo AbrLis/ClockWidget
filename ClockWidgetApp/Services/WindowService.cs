@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.Services
 {
@@ -155,10 +156,9 @@ namespace ClockWidgetApp.Services
             OpenSettingsWindow();
             if (_settingsWindow != null)
             {
-                if (selectTimersTab)
-                    _settingsWindow.SelectTimersTab();
-                else
-                    _settingsWindow.SelectGeneralTab();
+                var vm = _settingsWindow.ViewModel;
+                if (vm != null)
+                    vm.SelectedTabIndex = selectTimersTab ? Constants.SETTINGS_TAB_INDEX_TIMERS : Constants.SETTINGS_TAB_INDEX_GENERAL;
             }
         }
 

@@ -34,6 +34,15 @@ public static class Constants
     public static bool DEFAULT_CUCKOO_EVERY_HOUR => CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
 
     /// <summary>
+    /// Индекс вкладки 'Общие настройки' в окне настроек.
+    /// </summary>
+    public const int SETTINGS_TAB_INDEX_GENERAL = 0;
+    /// <summary>
+    /// Индекс вкладки 'Будильники и таймеры' в окне настроек.
+    /// </summary>
+    public const int SETTINGS_TAB_INDEX_TIMERS = 1;
+
+    /// <summary>
     /// Настройки окна виджета.
     /// </summary>
     public static class WindowSettings

@@ -32,9 +32,6 @@ public partial class SettingsWindow : Window
             _logger.LogDebug("[SettingsWindow] Initializing settings window");
             InitializeComponent();
             DataContext = _viewModel;
-            // Устанавливаем DataContext для вкладки 'Alarms & Timers' на Singleton-экземпляр
-            if (TimersAlarmsGrid != null)
-                TimersAlarmsGrid.DataContext = TimersAndAlarmsViewModel.Instance;
             LocalizationManager.LanguageChanged += (s, e) =>
             {
                 DataContext = null;
@@ -82,19 +79,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void CloseWidgetButton_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            _logger.LogDebug("[SettingsWindow] Close widget button clicked");
-            foreach (Window window in System.Windows.Application.Current.Windows)
-                window.Close();
-            _logger.LogDebug("[SettingsWindow] Shutting down application");
-            System.Windows.Application.Current.Shutdown();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[SettingsWindow] Error during application shutdown");
-            System.Windows.Application.Current.Shutdown();
-        }
+        _viewModel.CloseAppCommand.Execute(null);
     }
 
     /// <summary>
@@ -102,38 +87,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void ShowLogsButton_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            string logsDir = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "ClockWidget",
-                "logs");
-            if (!System.IO.Directory.Exists(logsDir))
-            {
-                System.Windows.MessageBox.Show(_viewModel.Localized.SettingsWindow_LogsNotFound, _viewModel.Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-            var logFiles = System.IO.Directory.GetFiles(logsDir, "clock-widget-*.log");
-            if (logFiles.Length == 0)
-            {
-                System.Windows.MessageBox.Show(_viewModel.Localized.SettingsWindow_LogsNotFound, _viewModel.Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-            var lastLog = logFiles
-                .Select(f => new System.IO.FileInfo(f))
-                .OrderByDescending(f => f.LastWriteTime)
-                .First().FullName;
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = lastLog,
-                UseShellExecute = true
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[SettingsWindow] Ошибка при открытии файла логов");
-            System.Windows.MessageBox.Show($"Ошибка при открытии файла логов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        _viewModel.ShowLogsCommand.Execute(null);
     }
 
     /// <summary>
@@ -152,24 +106,11 @@ public partial class SettingsWindow : Window
     }
 
     /// <summary>
-    /// Клик по таймеру для редактирования.
-    /// </summary>
-    private void TimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
-        {
-            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
-            if (vm.TimersVM.EditTimerCommand.CanExecute(timer))
-                vm.TimersVM.EditTimerCommand.Execute(timer);
-        }
-    }
-
-    /// <summary>
     /// Корректирует значения времени таймера при потере фокуса.
     /// </summary>
     private void TimerTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        TimersAndAlarmsViewModel.Instance.TimersVM.CorrectTimerTime();
+        ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.TimersVM.CorrectTimerTime();
     }
 
     /// <summary>
@@ -177,38 +118,33 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void AlarmTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        TimersAndAlarmsViewModel.Instance.AlarmsVM.CorrectAlarmTime();
+        ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.AlarmsVM.CorrectAlarmTime();
+    }
+
+    /// <summary>
+    /// Клик по таймеру для редактирования.
+    /// </summary>
+    private void TimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
+        {
+            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.TimersVM;
+            if (vm.EditTimerCommand.CanExecute(timer))
+                vm.EditTimerCommand.Execute(timer);
+        }
     }
 
     /// <summary>
     /// Клик по строке будильника для редактирования.
     /// </summary>
-    private void AlarmItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void AlarmItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is AlarmEntryViewModel alarm)
         {
-            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
-            if (vm.AlarmsVM.EditAlarmCommand.CanExecute(alarm))
-                vm.AlarmsVM.EditAlarmCommand.Execute(alarm);
+            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.AlarmsVM;
+            if (vm.EditAlarmCommand.CanExecute(alarm))
+                vm.EditAlarmCommand.Execute(alarm);
         }
-    }
-
-    /// <summary>
-    /// Программно выбирает вкладку 'Будильники и таймеры'.
-    /// </summary>
-    public void SelectTimersTab()
-    {
-        if (MainTabControl != null && MainTabControl.Items.Count > 1)
-            MainTabControl.SelectedIndex = 1;
-    }
-
-    /// <summary>
-    /// Программно выбирает вкладку 'Общие настройки'.
-    /// </summary>
-    public void SelectGeneralTab()
-    {
-        if (MainTabControl != null && MainTabControl.Items.Count > 0)
-            MainTabControl.SelectedIndex = 0;
     }
 
     #endregion

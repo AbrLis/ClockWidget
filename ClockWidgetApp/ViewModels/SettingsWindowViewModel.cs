@@ -2,6 +2,11 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.Helpers;
+using System.Windows;
+using System.Windows.Input;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -224,6 +229,44 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
 
     /// <summary>
+    /// Индекс выбранной вкладки.
+    /// </summary>
+    private int _selectedTabIndex;
+    public int SelectedTabIndex
+    {
+        get => _selectedTabIndex;
+        set { _selectedTabIndex = value; OnPropertyChanged(); }
+    }
+
+    /// <summary>
+    /// Команда для выбора вкладки по индексу.
+    /// </summary>
+    public RelayCommand SelectTabCommand => new RelayCommand(idx =>
+    {
+        if (idx is int i)
+            SelectedTabIndex = i;
+    });
+
+    /// <summary>
+    /// Команда для открытия последнего лог-файла.
+    /// </summary>
+    public RelayCommand ShowLogsCommand => new RelayCommand(_ => ShowLogs());
+
+    /// <summary>
+    /// Команда для завершения работы приложения.
+    /// </summary>
+    public RelayCommand CloseAppCommand => new RelayCommand(_ => CloseApp());
+
+    /// <summary>
+    /// ViewModel для таймеров (для биндинга в XAML).
+    /// </summary>
+    public TimersViewModel TimersVM => TimersAndAlarmsViewModel.Instance.TimersVM;
+    /// <summary>
+    /// ViewModel для будильников (для биндинга в XAML).
+    /// </summary>
+    public AlarmsViewModel AlarmsVM => TimersAndAlarmsViewModel.Instance.AlarmsVM;
+
+    /// <summary>
     /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
     /// </summary>
     /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
@@ -260,5 +303,61 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Открывает последний лог-файл приложения.
+    /// </summary>
+    private void ShowLogs()
+    {
+        try
+        {
+            string logsDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ClockWidget",
+                "logs");
+            if (!Directory.Exists(logsDir))
+            {
+                System.Windows.MessageBox.Show(Localized.SettingsWindow_LogsNotFound, Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var logFiles = Directory.GetFiles(logsDir, "clock-widget-*.log");
+            if (logFiles.Length == 0)
+            {
+                System.Windows.MessageBox.Show(Localized.SettingsWindow_LogsNotFound, Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var lastLog = logFiles
+                .Select(f => new FileInfo(f))
+                .OrderByDescending(f => f.LastWriteTime)
+                .First().FullName;
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = lastLog,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[SettingsWindowViewModel] Ошибка при открытии файла логов");
+            System.Windows.MessageBox.Show($"Ошибка при открытии файла логов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>
+    /// Завершает работу приложения.
+    /// </summary>
+    private void CloseApp()
+    {
+        try
+        {
+            _logger.LogDebug("[SettingsWindowViewModel] Shutting down application");
+            System.Windows.Application.Current.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[SettingsWindowViewModel] Error during application shutdown");
+            System.Windows.Application.Current.Shutdown();
+        }
     }
 } 

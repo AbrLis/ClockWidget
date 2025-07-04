@@ -22,7 +22,7 @@
         <helpers:StringNotEmptyToBoolConverter x:Key="StringNotEmptyToBoolConverter"/>
         <helpers:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
     </Window.Resources>
-    <TabControl x:Name="MainTabControl">
+    <TabControl x:Name="MainTabControl" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
         <!-- Вкладка настроек -->
         <TabItem Header="{Binding Localized.SettingsWindow_CommonSettings}">
             <StackPanel Margin="10">
