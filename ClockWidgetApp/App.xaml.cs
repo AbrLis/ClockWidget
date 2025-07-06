@@ -111,6 +111,10 @@ public partial class App : System.Windows.Application
         _lifecycleService = _serviceProvider.GetRequiredService<ApplicationLifecycleService>();
         _lifecycleService.RegisterLifecycleHandlers(this);
 
+        // Запуск сервиса времени для обновления виджетов
+        var timeService = _serviceProvider.GetRequiredService<ITimeService>();
+        timeService.Start();
+
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
             _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
