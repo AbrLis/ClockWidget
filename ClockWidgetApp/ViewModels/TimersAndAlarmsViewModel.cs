@@ -277,7 +277,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             string dateTimeText = alarm.NextTriggerDateTime.HasValue
                 ? alarm.NextTriggerDateTime.Value.ToString("dd.MM.yyyy") + " - " + alarm.NextTriggerDateTime.Value.ToString("HH:mm")
                 : alarm.AlarmTime.ToString(@"hh\:mm");
-            var notification = new Views.TimerNotificationWindow(soundHandle, dateTimeText, "alarm");
+            var notification = Views.TimerNotificationWindow.CreateWithCloseCallback(soundHandle, dateTimeText, "alarm");
             notification.Show();
             alarm.IsEnabled = false;
             alarm.ClearNextTriggerDateTime();
