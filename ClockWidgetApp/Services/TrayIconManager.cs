@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;

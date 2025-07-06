@@ -9,11 +9,15 @@ namespace ClockWidgetApp.Services;
 /// </summary>
 public class SoundHandle : ISoundHandle
 {
+    /// <summary>MediaPlayer для воспроизведения звука.</summary>
     private MediaPlayer? _player;
     public SoundHandle(MediaPlayer player)
     {
         _player = player;
     }
+    /// <summary>
+    /// Останавливает воспроизведение и освобождает ресурсы.
+    /// </summary>
     public void Stop()
     {
         if (_player != null)
@@ -25,24 +29,28 @@ public class SoundHandle : ISoundHandle
     }
 }
 
+/// <summary>
+/// Сервис для воспроизведения звуковых файлов.
+/// </summary>
 public class SoundService : ISoundService
 {
+    #region Private fields
     private readonly ILogger<SoundService> _logger;
     private MediaPlayer? _player;
     private bool _isLooping = false;
+    #endregion
 
+    #region Constructors
     public SoundService(ILogger<SoundService> logger)
     {
         _logger = logger;
     }
+    #endregion
 
+    #region Private methods
     /// <summary>
     /// Создаёт и запускает MediaPlayer для воспроизведения звука.
     /// </summary>
-    /// <param name="soundPath">Путь к аудиофайлу.</param>
-    /// <param name="loop">Воспроизводить в цикле.</param>
-    /// <param name="onEnded">Действие при завершении воспроизведения (может быть null).</param>
-    /// <returns>Созданный MediaPlayer.</returns>
     private MediaPlayer CreateAndPlayMediaPlayer(string soundPath, bool loop, Action<MediaPlayer>? onEnded = null)
     {
         var player = new MediaPlayer();
@@ -69,13 +77,10 @@ public class SoundService : ISoundService
         _logger.LogDebug($"[SoundService] Playing sound: {soundPath}, loop={loop}");
         return player;
     }
+    #endregion
 
-    /// <summary>
-    /// Воспроизводит аудиофайл по указанному пути. Если loop=true, воспроизводит в цикле.
-    /// В случае ошибки логирует путь, loop и ThreadId.
-    /// </summary>
-    /// <param name="soundPath">Путь к аудиофайлу.</param>
-    /// <param name="loop">Воспроизводить в цикле.</param>
+    #region Public methods
+    /// <inheritdoc/>
     public void PlaySound(string soundPath, bool loop = false)
     {
         try
@@ -88,7 +93,6 @@ public class SoundService : ISoundService
                 _logger.LogWarning($"[SoundService] Sound file not found: {soundPath}");
                 return;
             }
-            // Все действия с MediaPlayer выполняем в UI-потоке
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 _player = CreateAndPlayMediaPlayer(soundPath, loop, p => { _player = null; _logger.LogDebug($"[SoundService] MediaPlayer closed after playback: {soundPath}"); });
@@ -101,12 +105,9 @@ public class SoundService : ISoundService
         }
     }
 
-    /// <summary>
-    /// Останавливает воспроизведение звука.
-    /// </summary>
+    /// <inheritdoc/>
     public void StopSound()
     {
-        // Все действия с MediaPlayer выполняем в UI-потоке
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             if (_player != null)
@@ -120,10 +121,7 @@ public class SoundService : ISoundService
         });
     }
 
-    /// <summary>
-    /// Воспроизводит аудиофайл кукушки для указанного часа.
-    /// </summary>
-    /// <param name="hour">Час (1-12).</param>
+    /// <inheritdoc/>
     public void PlayCuckooSound(int hour)
     {
         _logger.LogDebug($"[SoundService] PlayCuckooSound called, hour={hour}");
@@ -134,9 +132,7 @@ public class SoundService : ISoundService
         PlaySound(soundPath);
     }
 
-    /// <summary>
-    /// Воспроизводит аудиофайл сигнала для половины часа (например, 12:30, 1:30 и т.д.).
-    /// </summary>
+    /// <inheritdoc/>
     public void PlayHalfHourChime()
     {
         _logger.LogDebug("[SoundService] PlayHalfHourChime called");
@@ -145,13 +141,7 @@ public class SoundService : ISoundService
         PlaySound(soundPath);
     }
 
-    /// <summary>
-    /// Воспроизводит аудиофайл и возвращает handle для управления этим воспроизведением.
-    /// В случае ошибки логирует путь, loop и ThreadId.
-    /// </summary>
-    /// <param name="soundPath">Путь к аудиофайлу.</param>
-    /// <param name="loop">Воспроизводить в цикле.</param>
-    /// <returns>Handle для управления воспроизведением.</returns>
+    /// <inheritdoc/>
     public ISoundHandle PlaySoundInstance(string soundPath, bool loop = false)
     {
         try
@@ -161,10 +151,9 @@ public class SoundService : ISoundService
             if (!fileExists)
             {
                 _logger.LogWarning($"[SoundService] Sound file not found: {soundPath}");
-                return new SoundHandle(new MediaPlayer()); // пустой handle
+                return new SoundHandle(new MediaPlayer());
             }
             MediaPlayer? player = null;
-            // Все действия с MediaPlayer выполняем в UI-потоке
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 player = CreateAndPlayMediaPlayer(soundPath, loop);
@@ -177,4 +166,5 @@ public class SoundService : ISoundService
             return new SoundHandle(new MediaPlayer());
         }
     }
+    #endregion
 } 

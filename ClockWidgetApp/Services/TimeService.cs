@@ -8,20 +8,30 @@ namespace ClockWidgetApp.Services;
 /// </summary>
 public class TimeService : IDisposable, ITimeService
 {
+    #region Private fields
+    /// <summary>Таймер для обновления времени.</summary>
     private readonly System.Timers.Timer _timer;
+    /// <summary>Логгер для событий сервиса.</summary>
     private readonly ILogger<TimeService> _logger;
+    /// <summary>Текущее время.</summary>
     private DateTime _currentTime;
+    /// <summary>Флаг, указывающий, что сервис был освобождён.</summary>
     private bool _isDisposed;
+    /// <summary>Последнее обновлённое значение секунды.</summary>
     private DateTime _lastSecondUpdate;
+    #endregion
 
+    #region Events
     /// <summary>
     /// Событие, возникающее при обновлении времени.
     /// </summary>
     public event EventHandler<DateTime>? TimeUpdated;
+    #endregion
 
+    #region Constructors
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="TimeService"/>.
-    /// Создает таймер с интервалом в 100мс для более точного обновления.
+    /// Создаёт таймер с интервалом 100мс для точного обновления.
     /// </summary>
     public TimeService(ILogger<TimeService> logger)
     {
@@ -42,7 +52,9 @@ public class TimeService : IDisposable, ITimeService
             throw;
         }
     }
+    #endregion
 
+    #region Public methods
     /// <summary>
     /// Запускает сервис обновления времени.
     /// </summary>
@@ -93,6 +105,30 @@ public class TimeService : IDisposable, ITimeService
     }
 
     /// <summary>
+    /// Освобождает ресурсы, используемые сервисом времени.
+    /// </summary>
+    public void Dispose()
+    {
+        try
+        {
+            if (!_isDisposed)
+            {
+                _logger.LogDebug("[TimeService] Disposing");
+                Stop();
+                _timer.Dispose();
+                _isDisposed = true;
+                _logger.LogDebug("[TimeService] Disposed");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[TimeService] Dispose error");
+        }
+    }
+    #endregion
+
+    #region Private methods
+    /// <summary>
     /// Обработчик события таймера.
     /// Обновляет текущее время и вызывает событие <see cref="TimeUpdated"/> только при изменении секунды.
     /// </summary>
@@ -127,26 +163,5 @@ public class TimeService : IDisposable, ITimeService
             _logger.LogError(ex, "[TimeService] Timer elapsed error");
         }
     }
-
-    /// <summary>
-    /// Освобождает ресурсы, используемые сервисом времени.
-    /// </summary>
-    public void Dispose()
-    {
-        try
-        {
-            if (!_isDisposed)
-            {
-                _logger.LogDebug("[TimeService] Disposing");
-                Stop();
-                _timer.Dispose();
-                _isDisposed = true;
-                _logger.LogDebug("[TimeService] Disposed");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[TimeService] Dispose error");
-        }
-    }
+    #endregion
 } 
