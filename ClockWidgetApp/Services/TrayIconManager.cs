@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using ClockWidgetApp.ViewModels;
 
 namespace ClockWidgetApp.Services
 {
     /// <summary>
-    /// Сервис для управления иконками трея для активных таймеров и будильников.
+    /// Сервис для управления иконками трея для активных таймеров, будильников и главного приложения.
     /// </summary>
     public class TrayIconManager : IDisposable
     {
@@ -14,6 +17,18 @@ namespace ClockWidgetApp.Services
         /// Словарь активных иконок трея по идентификатору таймера/будильника.
         /// </summary>
         private readonly Dictionary<string, TrayIconInfo> _trayIcons = new();
+
+        // Главный NotifyIcon приложения и его меню
+        private NotifyIcon? _mainNotifyIcon;
+        private ContextMenuStrip? _mainTrayMenu;
+        private ToolStripMenuItem? _showDigitalItem;
+        private ToolStripMenuItem? _showAnalogItem;
+        private ToolStripMenuItem? _settingsItem;
+        private ToolStripMenuItem? _timerAlarmSettingsItem;
+        private ToolStripMenuItem? _exitItem;
+        private ILogger? _logger;
+        private MainWindowViewModel? _mainViewModel;
+        private IServiceProvider? _serviceProvider;
         #endregion
 
         #region Nested types
@@ -42,6 +57,150 @@ namespace ClockWidgetApp.Services
         /// Событие при выборе "Стоп" в контекстном меню иконки трея.
         /// </summary>
         public event Action<string>? StopRequested;
+        #endregion
+
+        #region Main tray icon logic
+        /// <summary>
+        /// Инициализирует главный NotifyIcon приложения и его меню.
+        /// </summary>
+        public void InitializeMainTrayIcon(MainWindowViewModel mainViewModel, IServiceProvider serviceProvider, ILogger logger)
+        {
+            _mainViewModel = mainViewModel;
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+            _mainTrayMenu = new ContextMenuStrip();
+            string lang = Helpers.LocalizationManager.CurrentLanguage;
+            _showDigitalItem = new ToolStripMenuItem();
+            _showAnalogItem = new ToolStripMenuItem();
+            _settingsItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Settings", lang));
+            _timerAlarmSettingsItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_TimerAlarmSettings", lang));
+            _exitItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Exit", lang));
+            var separator = new ToolStripSeparator();
+            var separator2 = new ToolStripSeparator();
+            _showDigitalItem.Click += (s, e) =>
+            {
+                if (_mainViewModel != null)
+                    _mainViewModel.ShowDigitalClock = !_mainViewModel.ShowDigitalClock;
+            };
+            _showAnalogItem.Click += (s, e) =>
+            {
+                if (_mainViewModel != null)
+                    _mainViewModel.ShowAnalogClock = !_mainViewModel.ShowAnalogClock;
+            };
+            _settingsItem.Click += (s, e) =>
+            {
+                if (_serviceProvider != null)
+                {
+                    var ws = _serviceProvider.GetService(typeof(IWindowService)) as IWindowService;
+                    if (ws is WindowService windowService)
+                        windowService.OpenSettingsWindow(false);
+                    else
+                        ws?.OpenSettingsWindow();
+                }
+            };
+            _timerAlarmSettingsItem.Click += (s, e) =>
+            {
+                if (_serviceProvider != null)
+                {
+                    var ws = _serviceProvider.GetService(typeof(IWindowService)) as IWindowService;
+                    if (ws is WindowService windowService)
+                        windowService.OpenSettingsWindow(true);
+                    else
+                        ws?.OpenSettingsWindow();
+                }
+            };
+            _exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
+            _mainTrayMenu.Items.Add(_showDigitalItem);
+            _mainTrayMenu.Items.Add(_showAnalogItem);
+            _mainTrayMenu.Items.Add(separator2);
+            _mainTrayMenu.Items.Add(_settingsItem);
+            _mainTrayMenu.Items.Add(_timerAlarmSettingsItem);
+            _mainTrayMenu.Items.Add(separator);
+            _mainTrayMenu.Items.Add(_exitItem);
+            string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "app.ico");
+            if (!File.Exists(iconPath))
+            {
+                _logger?.LogWarning("[TrayIconManager] Tray icon file not found: {Path}", iconPath);
+                return;
+            }
+            _mainNotifyIcon = new NotifyIcon();
+            _mainNotifyIcon.Icon = new System.Drawing.Icon(iconPath);
+            _mainNotifyIcon.Visible = true;
+            _mainNotifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
+            _mainNotifyIcon.ContextMenuStrip = _mainTrayMenu;
+            _mainNotifyIcon.MouseUp += NotifyIcon_MouseUp;
+            Helpers.LocalizationManager.LanguageChanged += (s, e) => UpdateMainTrayMenuItems();
+        }
+
+        /// <summary>
+        /// Обновляет текст пунктов меню главного трея в зависимости от состояния приложения.
+        /// </summary>
+        public void UpdateMainTrayMenuItems()
+        {
+            if (_mainViewModel == null) return;
+            string lang = Helpers.LocalizationManager.CurrentLanguage;
+            if (_showDigitalItem != null)
+            {
+                _showDigitalItem.Text = _mainViewModel.ShowDigitalClock
+                    ? Helpers.LocalizationManager.GetString("Tray_HideDigital", lang)
+                    : Helpers.LocalizationManager.GetString("Tray_ShowDigital", lang);
+            }
+            if (_showAnalogItem != null)
+            {
+                _showAnalogItem.Text = _mainViewModel.ShowAnalogClock
+                    ? Helpers.LocalizationManager.GetString("Tray_HideAnalog", lang)
+                    : Helpers.LocalizationManager.GetString("Tray_ShowAnalog", lang);
+            }
+            if (_settingsItem != null)
+                _settingsItem.Text = Helpers.LocalizationManager.GetString("Tray_Settings", lang);
+            if (_timerAlarmSettingsItem != null)
+                _timerAlarmSettingsItem.Text = Helpers.LocalizationManager.GetString("Tray_TimerAlarmSettings", lang);
+            if (_exitItem != null)
+                _exitItem.Text = Helpers.LocalizationManager.GetString("Tray_Exit", lang);
+            if (_mainNotifyIcon != null)
+                _mainNotifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
+        }
+
+        /// <summary>
+        /// Освобождает ресурсы главного NotifyIcon.
+        /// </summary>
+        public void DisposeMainTrayIcon()
+        {
+            if (_mainNotifyIcon != null)
+            {
+                _mainNotifyIcon.Visible = false;
+                _mainNotifyIcon.Dispose();
+                _mainNotifyIcon = null;
+            }
+            _mainTrayMenu = null;
+            _showDigitalItem = null;
+            _showAnalogItem = null;
+            _settingsItem = null;
+            _timerAlarmSettingsItem = null;
+            _exitItem = null;
+        }
+
+        /// <summary>
+        /// Обработчик клика по главной иконке в трее.
+        /// </summary>
+        private void NotifyIcon_MouseUp(object? sender, MouseEventArgs e)
+        {
+            if (_mainViewModel == null) return;
+            if (e.Button == MouseButtons.Right)
+            {
+                UpdateMainTrayMenuItems();
+                _mainTrayMenu?.Show();
+                return;
+            }
+            if (e.Button == MouseButtons.Left)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(static () =>
+                {
+                    var ws = (System.Windows.Application.Current as App)?.Services.GetService(typeof(IWindowService)) as IWindowService;
+                    ws?.BringAllToFront();
+                });
+            }
+        }
         #endregion
 
         #region Public methods
