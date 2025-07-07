@@ -74,6 +74,7 @@
   <data name="Alarms_Status" xml:space="preserve"><value>Статус</value></data>
   <data name="Alarms_Enable" xml:space="preserve"><value>Вкл/Выкл будильник</value></data>
   <data name="Alarms_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Alarms_DuplicateNotification" xml:space="preserve"><value>Будильник на это время уже существует.</value></data>
   <data name="WidgetSettings_Title" xml:space="preserve"><value>Настройки отображения</value></data>
   <data name="WidgetSettings_Size" xml:space="preserve"><value>Размер виджета</value></data>
   <data name="WidgetSettings_SizeTooltip" xml:space="preserve"><value>Измените размер плавающего окна</value></data>

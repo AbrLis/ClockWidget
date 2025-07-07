@@ -87,4 +87,24 @@ public class AlarmsViewModelTests
         Assert.Equal("23", vm.NewAlarmHours);
         Assert.Equal("0", vm.NewAlarmMinutes);
     }
+
+    /// <summary>
+    /// Проверяет, что нельзя добавить дублирующийся будильник и появляется уведомление.
+    /// </summary>
+    [Fact]
+    public void AddAlarmCommand_ShouldNotAddDuplicateAlarm_AndShowNotification()
+    {
+        var vm = new AlarmsViewModel();
+        vm.NewAlarmHours = "7";
+        vm.NewAlarmMinutes = "30";
+        vm.AddAlarmCommand.Execute(null);
+        // Пытаемся добавить тот же будильник
+        vm.NewAlarmHours = "7";
+        vm.NewAlarmMinutes = "30";
+        vm.AddAlarmCommand.Execute(null);
+        // Должен остаться только один будильник
+        Assert.Single(vm.Alarms);
+        // Должно появиться уведомление о дублировании
+        Assert.False(string.IsNullOrWhiteSpace(vm.DuplicateAlarmNotification));
+    }
 } 

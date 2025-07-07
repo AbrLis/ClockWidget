@@ -115,4 +115,5 @@ public class LocalizedStrings
     /// Локализованная строка для пункта меню трея 'Стоп'.
     /// </summary>
     public string Tray_Stop => LocalizationManager.GetString("Tray_Stop", _lang);
+    public string Alarms_DuplicateNotification => LocalizationManager.GetString("Alarms_DuplicateNotification", _lang);
 } 

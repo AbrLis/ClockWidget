@@ -2,6 +2,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Linq;
+using System.Threading.Tasks;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -38,6 +41,16 @@ public class AlarmsViewModel : INotifyPropertyChanged
         TryParseOrZero(NewAlarmMinutes, out var m) &&
         (h > 0 || m > 0) &&
         h >= 0 && m >= 0 && m < 60;
+
+    /// <summary>
+    /// Сообщение о дублирующемся будильнике.
+    /// </summary>
+    private string _duplicateAlarmNotification = string.Empty;
+    public string DuplicateAlarmNotification
+    {
+        get => _duplicateAlarmNotification;
+        set { _duplicateAlarmNotification = value; OnPropertyChanged(); }
+    }
 
     /// <summary>
     /// Команда для отображения поля ввода будильника.
@@ -82,7 +95,7 @@ public class AlarmsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Добавляет новый будильник после валидации времени.
+    /// Добавляет новый будильник после валидации времени. Если будильник с таким временем уже есть, не добавляет и уведомляет пользователя.
     /// </summary>
     private void AddAlarm()
     {
@@ -92,12 +105,19 @@ public class AlarmsViewModel : INotifyPropertyChanged
             TryParseOrZero(NewAlarmHours, out int h);
             TryParseOrZero(NewAlarmMinutes, out int m);
             var ts = new TimeSpan(h, m, 0);
+            // Проверка на дублирующийся будильник
+            if (Alarms.Any(a => a.AlarmTime == ts))
+            {
+                ShowDuplicateAlarmNotification();
+                return;
+            }
             var alarm = new AlarmEntryViewModel(ts);
             alarm.RequestDelete += a => Alarms.Remove(a);
             Alarms.Insert(0, alarm);
             IsAlarmInputVisible = false;
             NewAlarmHours = "";
             NewAlarmMinutes = "";
+            DuplicateAlarmNotification = string.Empty;
         }
     }
 
@@ -164,6 +184,13 @@ public class AlarmsViewModel : INotifyPropertyChanged
         IsAlarmInputVisible = false;
         NewAlarmHours = "";
         NewAlarmMinutes = "";
+    }
+
+    private async void ShowDuplicateAlarmNotification(string? message = null)
+    {
+        DuplicateAlarmNotification = message ?? LocalizationManager.GetLocalizedStrings().Alarms_DuplicateNotification;
+        await Task.Delay(Helpers.Constants.DuplicateAlarmNotificationDurationMs);
+        DuplicateAlarmNotification = string.Empty;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

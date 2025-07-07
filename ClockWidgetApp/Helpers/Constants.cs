@@ -43,6 +43,11 @@ public static class Constants
     public const int SETTINGS_TAB_INDEX_TIMERS = 1;
 
     /// <summary>
+    /// Время отображения уведомления о дублирующемся будильнике (мс).
+    /// </summary>
+    public const int DuplicateAlarmNotificationDurationMs = 3000;
+
+    /// <summary>
     /// Настройки окна виджета.
     /// </summary>
     public static class WindowSettings

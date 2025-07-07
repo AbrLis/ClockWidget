@@ -331,36 +331,41 @@
                                     </BeginStoryboard>
                                 </EventTrigger>
                             </Border.Triggers>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBox Width="32" Text="{Binding AlarmsVM.NewAlarmHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
-                                <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <TextBox Width="32" Text="{Binding AlarmsVM.NewAlarmMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
-                                <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                <Button Content="OK" Command="{Binding AlarmsVM.AddAlarmCommand}" IsEnabled="{Binding AlarmsVM.IsNewAlarmValid}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding AlarmsVM.IsEditingAlarm}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                                <Button Content="OK" Command="{Binding AlarmsVM.ApplyEditAlarmCommand}" IsEnabled="{Binding AlarmsVM.IsNewAlarmValid}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding AlarmsVM.IsEditingAlarm}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                                <Button Content="✖️" Command="{Binding AlarmsVM.CancelAlarmInputCommand}" Margin="4,0,0,0"/>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBox Width="32" Text="{Binding AlarmsVM.NewAlarmHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
+                                    <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBox Width="32" Text="{Binding AlarmsVM.NewAlarmMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
+                                    <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                    <Button Content="OK" Command="{Binding AlarmsVM.AddAlarmCommand}" IsEnabled="{Binding AlarmsVM.IsNewAlarmValid}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding AlarmsVM.IsEditingAlarm}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="OK" Command="{Binding AlarmsVM.ApplyEditAlarmCommand}" IsEnabled="{Binding AlarmsVM.IsNewAlarmValid}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding AlarmsVM.IsEditingAlarm}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="✖️" Command="{Binding AlarmsVM.CancelAlarmInputCommand}" Margin="4,0,0,0"/>
+                                </StackPanel>
+                                <!-- Уведомление о дублирующемся будильнике -->
+                                <TextBlock Text="{Binding AlarmsVM.DuplicateAlarmNotification}" Foreground="OrangeRed" FontSize="12" Margin="0,4,0,0"
+                                           Visibility="{Binding AlarmsVM.DuplicateAlarmNotification, Converter={StaticResource StringNotEmptyToBoolConverter}, ConverterParameter=True}"/>
                             </StackPanel>
                         </Border>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding AlarmsVM.IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
