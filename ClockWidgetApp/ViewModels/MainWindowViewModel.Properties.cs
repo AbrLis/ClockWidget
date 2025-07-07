@@ -17,9 +17,6 @@ public partial class MainWindowViewModel
     private bool _analogClockTopmost = true;
     private bool _digitalClockTopmost = true;
 
-    private MainWindow? MainWindow => ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) is IWindowService ws ? ws.GetMainWindow() : null;
-    private AnalogClockWindow? AnalogClockWindow => ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) is IWindowService ws ? ws.GetAnalogClockWindow() : null;
-
     /// <summary>
     /// Текст времени для отображения.
     /// </summary>
@@ -227,18 +224,15 @@ public partial class MainWindowViewModel
 
     private void UpdateAnalogClockTopmost()
     {
-        if (AnalogClockWindow != null)
+        var analogWindow = _windowService.GetAnalogClockWindow();
+        if (analogWindow != null)
         {
-            AnalogClockWindow.Topmost = _analogClockTopmost;
+            analogWindow.Topmost = _analogClockTopmost;
         }
     }
     private void UpdateDigitalClockTopmost()
     {
-        var window = MainWindow;
-        if (window != null)
-        {
-            window.Topmost = _digitalClockTopmost;
-        }
+        _windowService.SetMainWindowTopmost(_digitalClockTopmost);
     }
 
     private void SubscribeToLanguageChanges()

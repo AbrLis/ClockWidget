@@ -22,7 +22,15 @@ namespace ClockWidgetApp.Helpers
             services.AddSingleton<ISoundService, SoundService>();
             services.AddSingleton<IWindowService, WindowService>();
             services.AddSingleton<TrayIconManager>();
-            services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<MainWindowViewModel>(sp =>
+                new MainWindowViewModel(
+                    sp.GetRequiredService<ITimeService>(),
+                    sp.GetRequiredService<ISettingsService>(),
+                    sp.GetRequiredService<ISoundService>(),
+                    sp.GetRequiredService<IWindowService>(),
+                    sp.GetRequiredService<ILogger<MainWindowViewModel>>()
+                )
+            );
             services.AddTransient<SettingsWindowViewModel>();
             services.AddSingleton<ApplicationLifecycleService>(sp =>
                 new ApplicationLifecycleService(

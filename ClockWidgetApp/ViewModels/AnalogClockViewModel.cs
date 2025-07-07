@@ -159,24 +159,27 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Обработчик события обновления времени. Обновляет углы поворота стрелок.</summary>
     private void OnTimeUpdated(object? sender, DateTime time)
     {
-        double hourAngle = (time.Hour % 12 + time.Minute / 60.0) * 30;
-        double minuteAngle = time.Minute * 6;
-        double secondAngle = time.Second * 6;
-        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        if (System.Windows.Application.Current != null)
         {
-            if (_hourHandTransform.Children.Count > 0 && _hourHandTransform.Children[0] is RotateTransform hourRotate)
-                hourRotate.Angle = hourAngle;
-            else
-                HourHandTransform = new TransformGroup { Children = { new RotateTransform(hourAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
-            if (_minuteHandTransform.Children.Count > 0 && _minuteHandTransform.Children[0] is RotateTransform minuteRotate)
-                minuteRotate.Angle = minuteAngle;
-            else
-                MinuteHandTransform = new TransformGroup { Children = { new RotateTransform(minuteAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
-            if (_secondHandTransform.Children.Count > 0 && _secondHandTransform.Children[0] is RotateTransform secondRotate)
-                secondRotate.Angle = secondAngle;
-            else
-                SecondHandTransform = new TransformGroup { Children = { new RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
-        });
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                double hourAngle = (time.Hour % 12 + time.Minute / 60.0) * 30;
+                double minuteAngle = time.Minute * 6;
+                double secondAngle = time.Second * 6;
+                if (_hourHandTransform.Children.Count > 0 && _hourHandTransform.Children[0] is RotateTransform hourRotate)
+                    hourRotate.Angle = hourAngle;
+                else
+                    HourHandTransform = new TransformGroup { Children = { new RotateTransform(hourAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
+                if (_minuteHandTransform.Children.Count > 0 && _minuteHandTransform.Children[0] is RotateTransform minuteRotate)
+                    minuteRotate.Angle = minuteAngle;
+                else
+                    MinuteHandTransform = new TransformGroup { Children = { new RotateTransform(minuteAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
+                if (_secondHandTransform.Children.Count > 0 && _secondHandTransform.Children[0] is RotateTransform secondRotate)
+                    secondRotate.Angle = secondAngle;
+                else
+                    SecondHandTransform = new TransformGroup { Children = { new RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
+            });
+        }
     }
 
     #endregion

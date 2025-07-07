@@ -34,5 +34,17 @@ namespace ClockWidgetApp.Services
         /// <summary>Активирует все окна приложения (выводит на передний план все открытые окна).</summary>
         void BringAllToFront();
         #endregion
+
+        #region Свойства главного окна
+        /// <summary>Возвращает или устанавливает признак "поверх всех окон" для главного окна.</summary>
+        bool GetMainWindowTopmost();
+        void SetMainWindowTopmost(bool value);
+        /// <summary>Возвращает или устанавливает горизонтальную позицию главного окна.</summary>
+        double GetMainWindowLeft();
+        void SetMainWindowLeft(double value);
+        /// <summary>Возвращает или устанавливает вертикальную позицию главного окна.</summary>
+        double GetMainWindowTop();
+        void SetMainWindowTop(double value);
+        #endregion
     }
 } 

@@ -18,6 +18,8 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     private readonly ISettingsService _settingsService;
     /// <summary>Сервис звука.</summary>
     private readonly ISoundService _soundService;
+    /// <summary>Сервис управления окнами.</summary>
+    private readonly IWindowService _windowService;
     /// <summary>Логгер для событий ViewModel.</summary>
     private readonly ILogger<MainWindowViewModel> _logger;
     /// <summary>Флаг освобождения ресурсов.</summary>
@@ -86,12 +88,18 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     /// Инициализирует новый экземпляр класса <see cref="MainWindowViewModel"/>.
     /// Загружает сохранённые настройки и запускает сервис обновления времени.
     /// </summary>
-    public MainWindowViewModel(ITimeService timeService, ISettingsService settingsService, ISoundService soundService, ILogger<MainWindowViewModel> logger)
+    public MainWindowViewModel(ITimeService timeService, ISettingsService settingsService, ISoundService soundService, IWindowService windowService, ILogger<MainWindowViewModel> logger)
     {
+        System.Diagnostics.Debug.Assert(logger != null, "_logger is null");
+        System.Diagnostics.Debug.Assert(timeService != null, "_timeService is null");
+        System.Diagnostics.Debug.Assert(settingsService != null, "_settingsService is null");
+        System.Diagnostics.Debug.Assert(soundService != null, "_soundService is null");
+        System.Diagnostics.Debug.Assert(windowService != null, "_windowService is null");
         _logger = logger;
         _timeService = timeService;
         _settingsService = settingsService;
         _soundService = soundService;
+        _windowService = windowService;
         try
         {
             _logger.LogDebug("[MainWindowViewModel] Initializing main window view model");
@@ -100,11 +108,14 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             SubscribeToLanguageChanges();
             _timeService.TimeUpdated += OnTimeUpdated;
             OnTimeUpdated(this, DateTime.Now);
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            if (System.Windows.Application.Current != null)
             {
-                UpdateWindowsVisibility();
-                _logger.LogDebug("[MainWindowViewModel] Windows visibility updated after initialization");
-            }));
+                System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    UpdateWindowsVisibility();
+                    _logger.LogDebug("[MainWindowViewModel] Windows visibility updated after initialization");
+                }));
+            }
             _logger.LogDebug("[MainWindowViewModel] Main window view model initialized");
         }
         catch (Exception ex)
@@ -167,8 +178,8 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     private void HideWindow()
     {
         _logger.LogDebug("[MainWindowViewModel] HideWindow called");
-        SaveWindowPosition(MainWindow?.Left ?? 0, MainWindow?.Top ?? 0);
-        _windowService?.HideMainWindow();
+        SaveWindowPosition(_windowService.GetMainWindowLeft(), _windowService.GetMainWindowTop());
+        _windowService.HideMainWindow();
     }
 
     #endregion

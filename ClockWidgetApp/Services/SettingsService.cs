@@ -26,21 +26,36 @@ public class SettingsService : ISettingsService
     #region Constructors
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="SettingsService"/> и загружает настройки из файла или создает по умолчанию.
+    /// Позволяет явно задать путь к файлам настроек и таймеров/будильников (для тестирования).
     /// </summary>
-    public SettingsService(ILogger<SettingsService> logger)
+    public SettingsService(ILogger<SettingsService> logger, string? settingsPath = null, string? timersAlarmsPath = null)
     {
         _logger = logger;
-        var appDataPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "ClockWidget");
-        if (!Directory.Exists(appDataPath))
+        if (string.IsNullOrEmpty(settingsPath) || string.IsNullOrEmpty(timersAlarmsPath))
         {
-            Directory.CreateDirectory(appDataPath);
-            _logger.LogDebug("[SettingsService] Created settings directory: {Path}", appDataPath);
+            var appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ClockWidget");
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+                _logger.LogDebug("[SettingsService] Created settings directory: {Path}", appDataPath);
+            }
+            _settingsPath = settingsPath ?? Path.Combine(appDataPath, Constants.FileSettings.SETTINGS_FILENAME);
+            _timersAlarmsPath = timersAlarmsPath ?? Path.Combine(appDataPath, "timers_alarms.json");
         }
-        _settingsPath = Path.Combine(appDataPath, Constants.FileSettings.SETTINGS_FILENAME);
-        _timersAlarmsPath = Path.Combine(appDataPath, "timers_alarms.json");
-        _logger.LogDebug("[SettingsService] Settings file path: {Path}", _settingsPath);
+        else
+        {
+            _settingsPath = settingsPath;
+            _timersAlarmsPath = timersAlarmsPath;
+            var settingsDir = Path.GetDirectoryName(_settingsPath);
+            if (!string.IsNullOrEmpty(settingsDir) && !Directory.Exists(settingsDir))
+                Directory.CreateDirectory(settingsDir);
+            var timersDir = Path.GetDirectoryName(_timersAlarmsPath);
+            if (!string.IsNullOrEmpty(timersDir) && !Directory.Exists(timersDir))
+                Directory.CreateDirectory(timersDir);
+            _logger.LogDebug("[SettingsService] (Custom/Test) Settings file path: {Path}", _settingsPath);
+        }
         _currentSettings = LoadSettings();
     }
     #endregion

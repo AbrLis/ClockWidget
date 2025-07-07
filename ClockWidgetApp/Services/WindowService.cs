@@ -168,5 +168,20 @@ namespace ClockWidgetApp.Services
             _settingsWindow = window;
         }
         #endregion
+
+        #region Свойства главного окна
+        /// <summary>Возвращает признак "поверх всех окон" для главного окна.</summary>
+        public bool GetMainWindowTopmost() => _mainWindow?.Topmost ?? false;
+        /// <summary>Устанавливает признак "поверх всех окон" для главного окна.</summary>
+        public void SetMainWindowTopmost(bool value) { if (_mainWindow != null) _mainWindow.Topmost = value; }
+        /// <summary>Возвращает горизонтальную позицию главного окна.</summary>
+        public double GetMainWindowLeft() => _mainWindow?.Left ?? 0;
+        /// <summary>Устанавливает горизонтальную позицию главного окна.</summary>
+        public void SetMainWindowLeft(double value) { if (_mainWindow != null) _mainWindow.Left = value; }
+        /// <summary>Возвращает вертикальную позицию главного окна.</summary>
+        public double GetMainWindowTop() => _mainWindow?.Top ?? 0;
+        /// <summary>Устанавливает вертикальную позицию главного окна.</summary>
+        public void SetMainWindowTop(double value) { if (_mainWindow != null) _mainWindow.Top = value; }
+        #endregion
     }
 } 

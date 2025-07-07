@@ -6,8 +6,6 @@ namespace ClockWidgetApp.ViewModels;
 
 public partial class MainWindowViewModel
 {
-    private IWindowService? _windowService => ((App)System.Windows.Application.Current).Services.GetService(typeof(IWindowService)) as IWindowService;
-
     /// <summary>
     /// Обновляет видимость окон (цифровых и аналоговых часов) в зависимости от настроек.
     /// </summary>
@@ -16,7 +14,7 @@ public partial class MainWindowViewModel
         try
         {
             _logger.LogDebug("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
-            var mainWindow = MainWindow;
+            var mainWindow = _windowService.GetMainWindow();
             // --- Цифровое окно ---
             if (_showDigitalClock)
             {
@@ -68,10 +66,11 @@ public partial class MainWindowViewModel
 
     private void UpdateAnalogClockSize()
     {
-        if (AnalogClockWindow != null)
+        var analogWindow = _windowService.GetAnalogClockWindow();
+        if (analogWindow != null)
         {
-            AnalogClockWindow.Width = _analogClockSize;
-            AnalogClockWindow.Height = _analogClockSize;
+            analogWindow.Width = _analogClockSize;
+            analogWindow.Height = _analogClockSize;
         }
     }
 
