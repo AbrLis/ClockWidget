@@ -34,6 +34,15 @@ public static class Constants
     public static bool DEFAULT_CUCKOO_EVERY_HOUR => CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
 
     /// <summary>
+    /// Минимально допустимый год для длинного таймера (текущий год).
+    /// </summary>
+    public static int LongTimerMinYear => DateTime.Now.Year;
+    /// <summary>
+    /// Максимально допустимый год для длинного таймера.
+    /// </summary>
+    public const int LongTimerMaxYear = 2090;
+
+    /// <summary>
     /// Индекс вкладки 'Общие настройки' в окне настроек.
     /// </summary>
     public const int SETTINGS_TAB_INDEX_GENERAL = 0;

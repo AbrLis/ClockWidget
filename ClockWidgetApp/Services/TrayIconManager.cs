@@ -221,7 +221,10 @@ namespace ClockWidgetApp.Services
             var contextMenu = new ContextMenuStrip();
             var stopText = Helpers.LocalizationManager.GetString("Tray_Stop");
             var stopItem = new ToolStripMenuItem(stopText);
-            stopItem.Click += (s, e) => StopRequested?.Invoke(id);
+            stopItem.Click += (s, e) => {
+                if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+                    StopRequested?.Invoke(id);
+            };
             contextMenu.Items.Add(stopItem);
 
             var notifyIcon = new NotifyIcon

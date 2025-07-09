@@ -265,6 +265,10 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     /// ViewModel для будильников (для биндинга в XAML).
     /// </summary>
     public AlarmsViewModel AlarmsVM => TimersAndAlarmsViewModel.Instance.AlarmsVM;
+    /// <summary>
+    /// ViewModel для длинных таймеров (для биндинга в XAML).
+    /// </summary>
+    public LongTimersViewModel LongTimersVM => TimersAndAlarmsViewModel.Instance.LongTimersVM;
 
     /// <summary>
     /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
@@ -284,6 +288,21 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Localized));
         };
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
+
+        // Подписка на удаление длинных таймеров с подтверждением
+        foreach (var timer in LongTimersVM.LongTimers)
+        {
+            timer.RequestDelete += OnLongTimerRequestDelete;
+        }
+        LongTimersVM.LongTimers.CollectionChanged += (s, e) =>
+        {
+            if (e.NewItems != null)
+                foreach (var item in e.NewItems)
+                    (item as LongTimerEntryViewModel)!.RequestDelete += OnLongTimerRequestDelete;
+            if (e.OldItems != null)
+                foreach (var item in e.OldItems)
+                    (item as LongTimerEntryViewModel)!.RequestDelete -= OnLongTimerRequestDelete;
+        };
     }
 
     private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -358,6 +377,18 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         {
             _logger.LogError(ex, "[SettingsWindowViewModel] Error during application shutdown");
             System.Windows.Application.Current.Shutdown();
+        }
+    }
+
+    /// <summary>
+    /// Обработчик запроса на удаление длинного таймера с подтверждением.
+    /// </summary>
+    private void OnLongTimerRequestDelete(LongTimerEntryViewModel timer)
+    {
+        if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+        {
+            timer.Dispose();
+            LongTimersVM.LongTimers.Remove(timer);
         }
     }
 } 

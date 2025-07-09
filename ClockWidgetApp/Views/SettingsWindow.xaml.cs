@@ -2,6 +2,7 @@ using System.Windows;
 using ClockWidgetApp.ViewModels;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.Helpers;
+using System.Windows.Input;
 
 namespace ClockWidgetApp;
 
@@ -144,6 +145,35 @@ public partial class SettingsWindow : Window
             var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.AlarmsVM;
             if (vm.EditAlarmCommand.CanExecute(alarm))
                 vm.EditAlarmCommand.Execute(alarm);
+        }
+    }
+
+    /// <summary>
+    /// Открывает окно выбора даты и времени длинного таймера над кнопкой +.
+    /// </summary>
+    private void LongTimerAddButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is ClockWidgetApp.ViewModels.SettingsWindowViewModel vm && vm.LongTimersVM != null)
+        {
+            // Получаем позицию кнопки на экране
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+            {
+                var point = button.PointToScreen(new System.Windows.Point(button.ActualWidth / 2, button.ActualHeight / 2));
+                vm.LongTimersVM.ShowInputWindowAt(point);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Клик по кнопке сброса простого таймера.
+    /// </summary>
+    private void TimerResetButton_Click(object sender, RoutedEventArgs e)
+    {
+        // Находим DataContext (TimerEntryViewModel) для этой кнопки
+        if (sender is System.Windows.Controls.Button btn && btn.DataContext is TimerEntryViewModel timer)
+        {
+            timer.Reset();
         }
     }
 

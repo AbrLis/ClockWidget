@@ -58,7 +58,7 @@
   <data name="Tray_HideAnalog" xml:space="preserve"><value>Скрыть аналоговые часы</value></data>
   <data name="Tray_IconText" xml:space="preserve"><value>Clock Widget App</value></data>
   <data name="Tray_TimerAlarmSettings" xml:space="preserve"><value>Настройка таймера/будильника</value></data>
-  <data name="Tray_Stop" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>Удалить</value></data>
   <data name="TimersAndAlarms_Tab" xml:space="preserve"><value>Будильники и таймеры</value></data>
   <data name="Timers_Title" xml:space="preserve"><value>Таймеры</value></data>
   <data name="Timers_Add" xml:space="preserve"><value>Добавить таймер</value></data>

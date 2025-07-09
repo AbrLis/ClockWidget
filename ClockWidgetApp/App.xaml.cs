@@ -111,6 +111,9 @@ public partial class App : System.Windows.Application
         _lifecycleService = _serviceProvider.GetRequiredService<ApplicationLifecycleService>();
         _lifecycleService.RegisterLifecycleHandlers(this);
 
+        // Загрузка таймеров и будильников
+        ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.LoadTimersAndAlarms();
+
         // Запуск сервиса времени для обновления виджетов
         var timeService = _serviceProvider.GetRequiredService<ITimeService>();
         timeService.Start();
@@ -125,10 +128,6 @@ public partial class App : System.Windows.Application
             args.Handled = true;
         };
 
-        // Восстанавливаем коллекции таймеров и будильников до инициализации UI
-        TimersAndAlarmsViewModel.Instance.LoadTimersAndAlarms();
-
-        // Прогрев сервисов и ViewModel для главного окна
         _serviceProvider.GetRequiredService<ISettingsService>();
         var mainVm = _serviceProvider.GetRequiredService<MainWindowViewModel>();
         var mainLogger = _serviceProvider.GetRequiredService<ILogger<MainWindow>>();
@@ -138,12 +137,18 @@ public partial class App : System.Windows.Application
         prewarmedSettingsWindow.Hide();
         var windowService = _serviceProvider.GetRequiredService<IWindowService>();
         if (windowService is WindowService wsImpl)
+        {
             wsImpl.SetSettingsWindow(prewarmedSettingsWindow);
+        }
         if (mainVm.ShowDigitalClock)
+        {
             windowService.OpenMainWindow();
+        }
         _trayIconManager.InitializeMainTrayIcon(mainVm, _serviceProvider, _logger);
         if (mainVm.ShowAnalogClock)
+        {
             windowService.OpenAnalogClockWindow();
+        }
 
         base.OnStartup(e);
         _logger?.LogInformation("[App] Application starting");

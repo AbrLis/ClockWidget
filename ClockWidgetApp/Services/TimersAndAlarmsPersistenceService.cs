@@ -42,6 +42,13 @@ public class TimersAndAlarmsPersistenceService
         if (!File.Exists(_filePath))
             return null;
         var json = File.ReadAllText(_filePath);
-        return JsonSerializer.Deserialize<TimersAndAlarmsPersistModel>(json);
+        try
+        {
+            return JsonSerializer.Deserialize<TimersAndAlarmsPersistModel>(json);
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            throw new InvalidDataException($"Ошибка чтения файла таймеров и будильников: {_filePath}", ex);
+        }
     }
 } 

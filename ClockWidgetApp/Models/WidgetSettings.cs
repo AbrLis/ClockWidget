@@ -239,13 +239,4 @@ public class AlarmPersistModel
     /// Дата и время следующего срабатывания будильника (если включён).
     /// </summary>
     public DateTime? NextTriggerDateTime { get; set; }
-}
-
-/// <summary>
-/// Модель для сериализации всех таймеров и будильников.
-/// </summary>
-public class TimersAndAlarmsPersistModel
-{
-    public List<TimerPersistModel> Timers { get; set; } = new();
-    public List<AlarmPersistModel> Alarms { get; set; } = new();
 } 

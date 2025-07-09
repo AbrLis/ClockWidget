@@ -58,7 +58,7 @@
   <data name="Tray_HideAnalog" xml:space="preserve"><value>Hide analog clock</value></data>
   <data name="Tray_IconText" xml:space="preserve"><value>Clock Widget App</value></data>
   <data name="Tray_TimerAlarmSettings" xml:space="preserve"><value>Alarms &amp; Timers settings</value></data>
-  <data name="Tray_Stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>Delete</value></data>
   <data name="TimersAndAlarms_Tab" xml:space="preserve"><value>Alarms &amp; Timers</value></data>
   <data name="Timers_Title" xml:space="preserve"><value>Timers</value></data>
   <data name="Timers_Add" xml:space="preserve"><value>Add timer</value></data>
