@@ -251,8 +251,9 @@ namespace ClockWidgetApp.Services
             {
                 notifyIcon.MouseUp += (s, e) =>
                 {
-                    if (e.Button == MouseButtons.Left)
+                    if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
                     {
+                        // Открываем окно настроек таймеров (вкладка длинных таймеров)
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             var ws = (System.Windows.Application.Current as App)?.Services.GetService(typeof(IWindowService)) as IWindowService;

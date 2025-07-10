@@ -113,4 +113,13 @@
   <data name="LongTimers_Tooltip_More" xml:space="preserve">
     <value>ещё запущено</value>
   </data>
+  <data name="LongTimers_Years" xml:space="preserve">
+    <value>л</value>
+  </data>
+  <data name="LongTimers_Months" xml:space="preserve">
+    <value>м</value>
+  </data>
+  <data name="LongTimers_Days" xml:space="preserve">
+    <value>д</value>
+  </data>
 </root>

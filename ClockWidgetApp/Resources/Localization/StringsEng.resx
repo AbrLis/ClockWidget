@@ -118,4 +118,13 @@
   <data name="LongTimers_Tooltip_More" xml:space="preserve">
     <value>more running</value>
   </data>
+  <data name="LongTimers_Years" xml:space="preserve">
+    <value>y</value>
+  </data>
+  <data name="LongTimers_Months" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="LongTimers_Days" xml:space="preserve">
+    <value>d</value>
+  </data>
 </root> 

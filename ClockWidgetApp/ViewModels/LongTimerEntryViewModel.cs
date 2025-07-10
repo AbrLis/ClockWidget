@@ -156,7 +156,7 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
-    /// Форматирует оставшееся время в строку Xл:Yм:Zд:hh:mm:ss.
+    /// Форматирует оставшееся время в строку Xл:Yм:Zд:hh:mm:ss с локализованными суффиксами.
     /// </summary>
     private static string FormatRemaining(TimeSpan remaining)
     {
@@ -164,10 +164,14 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
         int years = remaining.Days / 365;
         int months = (remaining.Days % 365) / 30;
         int days = (remaining.Days % 365) % 30;
+        // Получаем локализованные суффиксы
+        string yearsSuffix = Helpers.LocalizationManager.GetString("LongTimers_Years");
+        string monthsSuffix = Helpers.LocalizationManager.GetString("LongTimers_Months");
+        string daysSuffix = Helpers.LocalizationManager.GetString("LongTimers_Days");
         string result = "";
-        if (years > 0) result += $"{years}л:";
-        if (months > 0) result += $"{months}м:";
-        if (days > 0) result += $"{days}д:";
+        if (years > 0) result += $"{years}{yearsSuffix} :";
+        if (months > 0) result += $"{months}{monthsSuffix} :";
+        if (days > 0) result += $"{days}{daysSuffix} :";
         result += remaining.ToString(@"hh\:mm\:ss");
         return result;
     }
