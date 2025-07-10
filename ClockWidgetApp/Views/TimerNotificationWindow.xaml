@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         Title="{Binding TitleText}"
-        Height="Auto" SizeToContent="WidthAndHeight"
+        Height="Auto" MinWidth="280" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"

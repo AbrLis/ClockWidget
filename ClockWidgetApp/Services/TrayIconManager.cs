@@ -218,14 +218,19 @@ namespace ClockWidgetApp.Services
                 return;
             }
 
-            var contextMenu = new ContextMenuStrip();
-            var stopText = Helpers.LocalizationManager.GetString("Tray_Stop");
-            var stopItem = new ToolStripMenuItem(stopText);
-            stopItem.Click += (s, e) => {
-                if (Helpers.DialogHelper.ConfirmLongTimerDelete())
-                    StopRequested?.Invoke(id);
-            };
-            contextMenu.Items.Add(stopItem);
+            // Для иконки длинных таймеров не создаём меню
+            ContextMenuStrip? contextMenu = null;
+            if (id != "longtimers")
+            {
+                contextMenu = new ContextMenuStrip();
+                var stopText = Helpers.LocalizationManager.GetString("Tray_Stop");
+                var stopItem = new ToolStripMenuItem(stopText);
+                stopItem.Click += (s, e) => {
+                    if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+                        StopRequested?.Invoke(id);
+                };
+                contextMenu.Items.Add(stopItem);
+            }
 
             var notifyIcon = new NotifyIcon
             {
@@ -235,7 +240,26 @@ namespace ClockWidgetApp.Services
                 ContextMenuStrip = contextMenu
             };
 
-            _trayIcons[id] = new TrayIconInfo { Id = id, Icon = notifyIcon, StopMenuItem = stopItem };
+            // Для иконки длинных таймеров подписываемся на MouseUp
+            if (id == "longtimers")
+            {
+                notifyIcon.MouseUp += (s, e) =>
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            var ws = (System.Windows.Application.Current as App)?.Services.GetService(typeof(IWindowService)) as IWindowService;
+                            if (ws is WindowService windowService)
+                                windowService.OpenSettingsWindow(true); // true — вкладка таймеров (индекс 1)
+                            else
+                                ws?.OpenSettingsWindow();
+                        });
+                    }
+                };
+            }
+
+            _trayIcons[id] = new TrayIconInfo { Id = id, Icon = notifyIcon, StopMenuItem = null };
         }
 
         /// <summary>

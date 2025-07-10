@@ -98,4 +98,10 @@
   <data name="LongTimers_Title" xml:space="preserve"><value>Длинные таймеры</value></data>
   <data name="LongTimers_Add" xml:space="preserve"><value>Добавить длинный таймер</value></data>
   <data name="LongTimers_TriggerDateTime" xml:space="preserve"><value>Дата и время срабатывания</value></data>
+  <data name="LongTimers_Tooltip_Remaining" xml:space="preserve">
+    <value>Осталось:</value>
+  </data>
+  <data name="LongTimers_Tooltip_NoName" xml:space="preserve">
+    <value>(Без имени)</value>
+  </data>
 </root>

@@ -215,14 +215,8 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
                 _trayIconManager.UpdateTooltip(GetAlarmId(alarm), text);
             }
         }
-        // LongTimers: обновление тултипов
-        foreach (var longTimer in LongTimersVM.LongTimers)
-        {
-            string id = GetLongTimerId(longTimer);
-            string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
-            // Используем TrayTooltip (имя + время)
-            _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, longTimer.TrayTooltip);
-        }
+        // Для длинных таймеров обновляем только одну иконку
+        UpdateLongTimersTrayIcon();
     }
 
     #region Collection event handlers
@@ -263,17 +257,17 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         if (e.NewItems != null)
             foreach (LongTimerEntryViewModel t in e.NewItems)
             {
-                AddLongTimerTray(t);
                 t.RequestExpire += OnLongTimerExpired;
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен длинный таймер: {t.Name} ({t.TargetDateTime})");
             }
         if (e.OldItems != null)
             foreach (LongTimerEntryViewModel t in e.OldItems)
             {
-                RemoveLongTimerTray(t);
                 t.Dispose();
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён из коллекции: {t.Name} ({t.TargetDateTime})");
             }
+        // После любого изменения коллекции обновляем иконку
+        UpdateLongTimersTrayIcon();
     }
     #endregion
 
@@ -440,6 +434,44 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             alarm.ClearNextTriggerDateTime();
             alarm.OnPropertyChanged(nameof(alarm.IsEnabled));
         });
+    }
+
+    /// <summary>
+    /// Генерирует агрегированный тултип для всех длинных таймеров.
+    /// </summary>
+    private string GetLongTimersTooltip()
+    {
+        var sb = new System.Text.StringBuilder();
+        bool first = true;
+        string remainingLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Remaining");
+        string noNameLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_NoName");
+        foreach (var t in LongTimersVM.LongTimers)
+        {
+            if (!first)
+                sb.AppendLine("----------");
+            first = false;
+            sb.AppendLine(string.IsNullOrWhiteSpace(t.Name) ? noNameLabel : t.Name);
+            sb.AppendLine($"{remainingLabel} {t.DisplayTime}");
+        }
+        return sb.ToString().TrimEnd();
+    }
+
+    /// <summary>
+    /// Обновляет или удаляет единую иконку длинных таймеров в трее.
+    /// </summary>
+    private void UpdateLongTimersTrayIcon()
+    {
+        string id = "longtimers";
+        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
+        string tooltip = GetLongTimersTooltip();
+        if (LongTimersVM.LongTimers.Count == 0)
+        {
+            _trayIconManager.RemoveTrayIcon(id);
+        }
+        else
+        {
+            _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, tooltip);
+        }
     }
     #endregion
 }

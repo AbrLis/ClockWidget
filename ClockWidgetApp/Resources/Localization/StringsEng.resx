@@ -103,4 +103,10 @@
   <data name="LongTimers_Title" xml:space="preserve"><value>Long Timers</value></data>
   <data name="LongTimers_Add" xml:space="preserve"><value>Add long timer</value></data>
   <data name="LongTimers_TriggerDateTime" xml:space="preserve"><value>Trigger date and time</value></data>
+  <data name="LongTimers_Tooltip_Remaining" xml:space="preserve">
+    <value>Remaining:</value>
+  </data>
+  <data name="LongTimers_Tooltip_NoName" xml:space="preserve">
+    <value>(No name)</value>
+  </data>
 </root> 
