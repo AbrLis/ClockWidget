@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text.Json;
 using ClockWidgetApp.Helpers;
@@ -57,6 +56,7 @@ public class SettingsService : ISettingsService
             _logger.LogDebug("[SettingsService] (Custom/Test) Settings file path: {Path}", _settingsPath);
         }
         _currentSettings = LoadSettings();
+        _logger.LogInformation("[SettingsService] Settings loaded");
     }
     #endregion
 
@@ -76,7 +76,7 @@ public class SettingsService : ISettingsService
         try
         {
             updateAction(_currentSettings);
-            App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
+            App.MarkWidgetSettingsDirty();
             _logger.LogDebug("[SettingsService] Settings updated in buffer: {Settings}",
                 JsonSerializer.Serialize(_currentSettings));
         }
@@ -103,11 +103,14 @@ public class SettingsService : ISettingsService
         try
         {
             if (!File.Exists(_settingsPath))
+            {
+                _logger.LogWarning("[SettingsService] Settings file not found. Using defaults.");
                 return WidgetSettings.ValidateSettings(new WidgetSettings());
+            }
             var json = File.ReadAllText(_settingsPath);
             if (string.IsNullOrWhiteSpace(json))
             {
-                _logger.LogWarning("[SettingsService] Файл настроек пустой. Используются настройки по умолчанию.");
+                _logger.LogWarning("[SettingsService] Settings file is empty. Using defaults.");
                 return WidgetSettings.ValidateSettings(new WidgetSettings());
             }
             var settings = JsonSerializer.Deserialize<WidgetSettings>(json) ?? new WidgetSettings();
@@ -115,13 +118,14 @@ public class SettingsService : ISettingsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SettingsService] Ошибка при загрузке настроек");
+            _logger.LogError(ex, "[SettingsService] Error loading settings");
             return WidgetSettings.ValidateSettings(new WidgetSettings());
         }
     }
 
     /// <summary>
     /// Сохраняет настройки в файл через временный файл для предотвращения потери данных.
+    /// Перед сохранением предыдущий файл (если есть) переименовывается в .bak для резервного копирования.
     /// </summary>
     public void SaveSettings(WidgetSettings settings)
     {
@@ -133,17 +137,33 @@ public class SettingsService : ISettingsService
             var directory = Path.GetDirectoryName(_settingsPath);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
+            // Создаём резервную копию предыдущего файла
+            if (File.Exists(_settingsPath))
+            {
+                string backupPath = Path.ChangeExtension(_settingsPath, ".bak");
+                try
+                {
+                    if (File.Exists(backupPath))
+                        File.Delete(backupPath);
+                    File.Move(_settingsPath, backupPath);
+                    _logger.LogInformation("[SettingsService] Settings backup created: {Path}", backupPath);
+                }
+                catch (IOException ex)
+                {
+                    _logger.LogWarning(ex, "[SettingsService] Error creating settings backup");
+                }
+            }
             var options = new JsonSerializerOptions { WriteIndented = true };
             var json = JsonSerializer.Serialize(settings, options);
             var tempFile = _settingsPath + ".tmp";
             File.WriteAllText(tempFile, json);
             File.Copy(tempFile, _settingsPath, true);
             File.Delete(tempFile);
-            _logger.LogDebug("[SettingsService] Настройки успешно сохранены через временный файл");
+            _logger.LogInformation("[SettingsService] Settings saved successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SettingsService] Ошибка при сохранении настроек");
+            _logger.LogError(ex, "[SettingsService] Error saving settings");
             throw;
         }
     }
@@ -160,11 +180,11 @@ public class SettingsService : ISettingsService
                 Directory.CreateDirectory(directory);
             var json = JsonSerializer.Serialize(model, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_timersAlarmsPath, json);
-            _logger.LogDebug("[SettingsService] Timers and alarms saved");
+            _logger.LogInformation("[SettingsService] Timers and alarms saved");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SettingsService] Ошибка при сохранении timers/alarms");
+            _logger.LogError(ex, "[SettingsService] Error saving timers/alarms");
             throw;
         }
     }
@@ -177,15 +197,18 @@ public class SettingsService : ISettingsService
         try
         {
             if (!File.Exists(_timersAlarmsPath))
+            {
+                _logger.LogWarning("[SettingsService] Timers/alarms file not found");
                 return null;
+            }
             var json = File.ReadAllText(_timersAlarmsPath);
             var model = JsonSerializer.Deserialize<TimersAndAlarmsPersistModel>(json);
-            _logger.LogDebug("[SettingsService] Timers and alarms loaded");
+            _logger.LogInformation("[SettingsService] Timers and alarms loaded");
             return model;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SettingsService] Ошибка при загрузке timers/alarms");
+            _logger.LogError(ex, "[SettingsService] Error loading timers/alarms");
             return null;
         }
     }
