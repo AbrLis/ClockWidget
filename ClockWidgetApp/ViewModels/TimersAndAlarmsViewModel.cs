@@ -388,7 +388,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         if (id.StartsWith("timer_"))
         {
             var timer = TimersVM.Timers.FirstOrDefault(t => GetTimerId(t) == id);
-            timer?.Stop();
+            timer?.Reset();
         }
         else if (id.StartsWith("alarm_"))
         {

@@ -223,11 +223,17 @@ namespace ClockWidgetApp.Services
             if (id != "longtimers")
             {
                 contextMenu = new ContextMenuStrip();
-                var stopText = Helpers.LocalizationManager.GetString("Tray_Stop");
+                string stopText = id.StartsWith("longtimer_")
+                    ? Helpers.LocalizationManager.GetString("Tray_Stop")
+                    : Helpers.LocalizationManager.GetString("Tray_StopTimer");
                 var stopItem = new ToolStripMenuItem(stopText);
                 stopItem.Click += (s, e) => {
-                    if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+                    if (id.StartsWith("longtimer_")) {
+                        if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+                            StopRequested?.Invoke(id);
+                    } else {
                         StopRequested?.Invoke(id);
+                    }
                 };
                 contextMenu.Items.Add(stopItem);
             }
