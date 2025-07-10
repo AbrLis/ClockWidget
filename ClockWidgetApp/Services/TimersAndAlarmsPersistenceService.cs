@@ -22,6 +22,7 @@ public class TimersAndAlarmsPersistenceService
 
     /// <summary>
     /// Сохраняет данные таймеров и будильников в файл.
+    /// Перед сохранением предыдущий файл (если есть) переименовывается в .bak для резервного копирования.
     /// </summary>
     /// <param name="persist">Модель для сохранения.</param>
     public void Save(TimersAndAlarmsPersistModel persist)
@@ -29,6 +30,21 @@ public class TimersAndAlarmsPersistenceService
         var dir = Path.GetDirectoryName(_filePath);
         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
+        // Создаём резервную копию предыдущего файла
+        if (File.Exists(_filePath))
+        {
+            string backupPath = Path.ChangeExtension(_filePath, ".bak");
+            try
+            {
+                if (File.Exists(backupPath))
+                    File.Delete(backupPath);
+                File.Move(_filePath, backupPath);
+            }
+            catch (IOException ex)
+            {
+                Serilog.Log.Warning($"Ошибка создания резервной копии: {ex.Message}");
+            }
+        }
         var json = JsonSerializer.Serialize(persist, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(_filePath, json);
     }

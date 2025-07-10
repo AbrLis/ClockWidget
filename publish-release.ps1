@@ -32,10 +32,6 @@ if (Test-Path "$publishPath/ClockWidgetApp.exe") {
     Get-ChildItem -Path $publishPath -Directory | 
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-    # Удаляем временные папки artifacts/ClockWidget*, кроме итоговой папки публикации
-    Get-ChildItem -Path "artifacts" -Directory | 
-        Where-Object { $_.Name -like "ClockWidget*" -and $_.FullName -ne (Resolve-Path $publishPath).Path } | 
-        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 } else {
     Write-Host "Ошибка: EXE-файл не найден!"
     exit 1
