@@ -387,8 +387,13 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         if (Helpers.DialogHelper.ConfirmLongTimerDelete())
         {
+            _logger.LogInformation($"[SettingsWindowViewModel] Пользователь подтвердил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
             timer.Dispose();
             LongTimersVM.LongTimers.Remove(timer);
+        }
+        else
+        {
+            _logger.LogInformation($"[SettingsWindowViewModel] Пользователь отменил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
         }
     }
 } 

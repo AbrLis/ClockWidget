@@ -43,6 +43,11 @@ public static class Constants
     public const int LongTimerMaxYear = 2090;
 
     /// <summary>
+    /// Максимальная длина названия длинного таймера.
+    /// </summary>
+    public const int LongTimerNameMaxLength = 60;
+
+    /// <summary>
     /// Индекс вкладки 'Общие настройки' в окне настроек.
     /// </summary>
     public const int SETTINGS_TAB_INDEX_GENERAL = 0;
@@ -55,6 +60,11 @@ public static class Constants
     /// Время отображения уведомления о дублирующемся будильнике (мс).
     /// </summary>
     public const int DuplicateAlarmNotificationDurationMs = 3000;
+
+    /// <summary>
+    /// Время отображения ошибки выбора времени в LongTimerInputWindow (мс).
+    /// </summary>
+    public const int LongTimerInputErrorDurationMs = 3000;
 
     /// <summary>
     /// Настройки окна виджета.

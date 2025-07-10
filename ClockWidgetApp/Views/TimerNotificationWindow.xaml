@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         Title="{Binding TitleText}"
-        Height="180" Width="340"
+        Height="Auto" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
@@ -13,27 +13,37 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <!-- Заголовок -->
         <TextBlock x:Name="TitleTextBlock"
+                   Grid.Row="0"
                    Text="{Binding TitleText}"
                    FontWeight="Bold"
                    FontSize="18"
                    HorizontalAlignment="Center"
-                   Margin="0,0,0,10"/>
-        <!-- Время сработавшего таймера или будильника -->
-        <TextBlock x:Name="TimeTextBlock"
+                   Margin="0,0,0,6"/>
+        <!-- Имя таймера -->
+        <TextBlock x:Name="NameLineTextBlock"
                    Grid.Row="1"
-                   Text="{Binding TimeText}"
+                   Text="{Binding NameLine}"
+                   FontWeight="Bold"
+                   FontSize="18"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,4"/>
+        <!-- Время сработавшего таймера -->
+        <TextBlock x:Name="TimeLineTextBlock"
+                   Grid.Row="2"
+                   Text="{Binding TimeLine}"
                    TextWrapping="Wrap"
                    FontSize="16"
                    HorizontalAlignment="Center"
                    Margin="0,0,0,10"/>
         <!-- Кнопка Stop -->
         <Button x:Name="StopButton"
-                Grid.Row="2"
+                Grid.Row="3"
                 Content="{Binding Localized.TimerNotification_StopButton}"
                 Width="100"
                 Height="32"

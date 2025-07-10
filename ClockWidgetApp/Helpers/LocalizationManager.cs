@@ -116,4 +116,17 @@ public class LocalizedStrings
     /// </summary>
     public string Tray_Stop => LocalizationManager.GetString("Tray_Stop", _lang);
     public string Alarms_DuplicateNotification => LocalizationManager.GetString("Alarms_DuplicateNotification", _lang);
+    public string LongTimerInput_Title => LocalizationManager.GetString("LongTimerInput_Title", _lang);
+    public string LongTimerInput_SelectDate => LocalizationManager.GetString("LongTimerInput_SelectDate", _lang);
+    public string LongTimerInput_Time => LocalizationManager.GetString("LongTimerInput_Time", _lang);
+    public string LongTimerInput_Name => LocalizationManager.GetString("LongTimerInput_Name", _lang);
+    public string LongTimerInput_Ok => LocalizationManager.GetString("LongTimerInput_Ok", _lang);
+    public string LongTimerInput_Cancel => LocalizationManager.GetString("LongTimerInput_Cancel", _lang);
+    public string LongTimers_Title => LocalizationManager.GetString("LongTimers_Title", _lang);
+    public string LongTimers_Add => LocalizationManager.GetString("LongTimers_Add", _lang);
+    public string LongTimers_TriggerDateTime => LocalizationManager.GetString("LongTimers_TriggerDateTime", _lang);
+    /// <summary>
+    /// Ошибка: выбранное время в прошлом (используется в LongTimerInputWindow).
+    /// </summary>
+    public string LongTimerInput_ErrorInPast => LocalizationManager.GetString("LongTimerInput_ErrorInPast", _lang);
 } 

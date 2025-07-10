@@ -17,6 +17,35 @@ namespace ClockWidgetApp.Views
         {
             InitializeComponent();
             this.DataContext = viewModel;
+            // Подписка на событие закрытия окна
+            this.Closing += TimerNotificationWindow_Closing;
+            // Подписка на клик по кнопке Stop
+            this.StopButton.Click += StopButton_Click;
+        }
+
+        /// <summary>
+        /// Обработчик закрытия окна. При закрытии по крестику вызывает StopCommand из ViewModel.
+        /// </summary>
+        private void TimerNotificationWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.DataContext is TimerNotificationViewModel vm)
+            {
+                if (vm.StopCommand.CanExecute(null))
+                    vm.StopCommand.Execute(null);
+            }
+        }
+
+        /// <summary>
+        /// Обработчик нажатия на кнопку 'Стоп': выполняет StopCommand и закрывает окно.
+        /// </summary>
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is TimerNotificationViewModel vm)
+            {
+                if (vm.StopCommand.CanExecute(null))
+                    vm.StopCommand.Execute(null);
+            }
+            this.Close();
         }
 
         /// <summary>

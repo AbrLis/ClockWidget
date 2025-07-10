@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.Views
 {
@@ -51,9 +52,25 @@ namespace ClockWidgetApp.Views
         private string _timerName = string.Empty;
         public string TimerName { get => _timerName; set { _timerName = value; OnPropertyChanged(nameof(TimerName)); } }
 
+        private string _errorText = string.Empty;
+        public string ErrorText { get => _errorText; set { _errorText = value; OnPropertyChanged(nameof(ErrorText)); } }
+        private bool _errorVisible = false;
+        public bool ErrorVisible { get => _errorVisible; set { _errorVisible = value; OnPropertyChanged(nameof(ErrorVisible)); } }
+        private System.Windows.Threading.DispatcherTimer? _errorTimer;
+
+        public LocalizedStrings Localized { get; } = LocalizationManager.GetLocalizedStrings();
+
         public LongTimerInputWindow()
         {
             InitializeComponent();
+            _selectedDate = DateTime.Now.Date;
+            _selectedHour = "0";
+            _selectedMinute = "0";
+            _selectedSecond = "0";
+            OnPropertyChanged(nameof(SelectedDate));
+            OnPropertyChanged(nameof(SelectedHour));
+            OnPropertyChanged(nameof(SelectedMinute));
+            OnPropertyChanged(nameof(SelectedSecond));
             DataContext = this;
         }
 
@@ -62,6 +79,16 @@ namespace ClockWidgetApp.Views
         /// </summary>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedDateTime <= DateTime.Now)
+            {
+                ErrorText = Localized.LongTimerInput_ErrorInPast;
+                ErrorVisible = true;
+                _errorTimer?.Stop();
+                _errorTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(Helpers.Constants.LongTimerInputErrorDurationMs) };
+                _errorTimer.Tick += (s, args) => { ErrorVisible = false; _errorTimer.Stop(); };
+                _errorTimer.Start();
+                return;
+            }
             DialogResult = true;
             Close();
         }

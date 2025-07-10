@@ -18,11 +18,20 @@ namespace ClockWidgetApp.ViewModels
         /// <summary>
         /// Описание или имя таймера/будильника.
         /// </summary>
-        public string TimerDescription { get; }
+        public string? TimerDescription { get; } = string.Empty;
         /// <summary>
         /// Тип уведомления: "timer" или "alarm".
         /// </summary>
         public string NotificationType { get; }
+
+        /// <summary>
+        /// Первая строка — имя таймера/будильника.
+        /// </summary>
+        public string NameLine { get; }
+        /// <summary>
+        /// Вторая строка — время срабатывания.
+        /// </summary>
+        public string TimeLine { get; }
 
         /// <summary>
         /// Локализованные строки для окна.
@@ -42,7 +51,7 @@ namespace ClockWidgetApp.ViewModels
         /// <summary>
         /// Текст времени для отображения в окне.
         /// </summary>
-        public string TimeText => TimerDescription;
+        public string TimeText => TimerDescription ?? string.Empty;
 
         /// <summary>
         /// Команда для остановки звука и закрытия окна.
@@ -64,10 +73,14 @@ namespace ClockWidgetApp.ViewModels
         public TimerNotificationViewModel(ISoundHandle soundHandle, string description, string notificationType = "timer", Action? closeWindowCallback = null)
         {
             _soundHandle = soundHandle;
-            TimerDescription = description;
             NotificationType = notificationType;
             _closeWindowCallback = closeWindowCallback;
             StopCommand = new RelayCommand(Stop);
+            // Парсим description на две строки
+            var lines = (description ?? string.Empty).Split('\n');
+            NameLine = lines.Length > 0 ? lines[0] : string.Empty;
+            TimeLine = lines.Length > 1 ? lines[1] : string.Empty;
+            TimerDescription = description ?? string.Empty;
             LocalizationManager.LanguageChanged += (s, e) =>
             {
                 Localized = LocalizationManager.GetLocalizedStrings();
@@ -83,12 +96,12 @@ namespace ClockWidgetApp.ViewModels
         }
 
         /// <summary>
-        /// Останавливает звук и инициирует закрытие окна (без параметров).
+        /// Останавливает звук и выполняет всю бизнес-логику завершения уведомления. Закрытие окна должно происходить только из View.
         /// </summary>
         private void Stop()
         {
             _soundHandle.Stop();
-            _closeWindowCallback?.Invoke();
+            // _closeWindowCallback?.Invoke(); // Закрытие окна теперь только из View
         }
 
         /// <inheritdoc/>

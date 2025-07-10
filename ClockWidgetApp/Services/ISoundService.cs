@@ -46,4 +46,15 @@ public interface ISoundHandle
     /// Останавливает воспроизведение звука.
     /// </summary>
     void Stop();
+}
+
+/// <summary>
+/// Заглушка для ISoundHandle, не выполняющая никаких действий (Null Object Pattern).
+/// </summary>
+public class NullSoundHandle : ISoundHandle
+{
+    /// <summary>
+    /// Не выполняет никаких действий.
+    /// </summary>
+    public void Stop() { /* ничего не делаем */ }
 } 

@@ -42,13 +42,10 @@ public class LongTimersViewModel : INotifyPropertyChanged
         if (inputWindow.ShowDialog() == true)
         {
             var selectedDateTime = inputWindow.SelectedDateTime;
-            var timerName = inputWindow.TimerName; // Получаем имя таймера из окна
-            if (selectedDateTime > DateTime.Now)
-            {
-                // Передаём имя таймера в модель
-                var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
-                LongTimers.Insert(0, timer);
-            }
+            var timerName = inputWindow.TimerName;
+            // Добавляем таймер без дополнительной проверки времени (валидация уже в окне)
+            var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
+            LongTimers.Insert(0, timer);
         }
     }
 
@@ -59,20 +56,18 @@ public class LongTimersViewModel : INotifyPropertyChanged
     {
         var inputWindow = new Views.LongTimerInputWindow();
         inputWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+        // Окно появляется строго над кнопкой: центрируем по X, нижний край окна совпадает с верхом кнопки
         inputWindow.Left = screenPosition.X - inputWindow.Width / 2;
-        inputWindow.Top = screenPosition.Y - inputWindow.Height / 2;
+        inputWindow.Top = screenPosition.Y - inputWindow.Height;
         inputWindow.ShowInTaskbar = false;
         inputWindow.Topmost = true;
         if (inputWindow.ShowDialog() == true)
         {
             var selectedDateTime = inputWindow.SelectedDateTime;
-            var timerName = inputWindow.TimerName; // Получаем имя таймера из окна
-            if (selectedDateTime > DateTime.Now)
-            {
-                // Передаём имя таймера в модель
-                var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
-                LongTimers.Insert(0, timer);
-            }
+            var timerName = inputWindow.TimerName;
+            // Добавляем таймер без дополнительной проверки времени (валидация уже в окне)
+            var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
+            LongTimers.Insert(0, timer);
         }
     }
 

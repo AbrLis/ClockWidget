@@ -59,13 +59,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _trayIconManager.StopRequested += OnTrayIconStopRequested;
         TimersVM.Timers.CollectionChanged += Timers_CollectionChanged;
         AlarmsVM.Alarms.CollectionChanged += Alarms_CollectionChanged;
-        LongTimersVM.LongTimers.CollectionChanged += LongTimers_CollectionChanged;
-        foreach (var timer in TimersVM.Timers)
-            SubscribeTimer(timer);
-        foreach (var alarm in AlarmsVM.Alarms)
-            SubscribeAlarm(alarm);
         foreach (var longTimer in LongTimersVM.LongTimers)
+        {
             AddLongTimerTray(longTimer);
+            longTimer.RequestExpire += OnLongTimerExpired;
+        }
+        LongTimersVM.LongTimers.CollectionChanged += LongTimers_CollectionChanged;
         _trayUpdateTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _trayUpdateTimer.Tick += (s, e) => UpdateTrayTooltips();
         _trayUpdateTimer.Start();
@@ -92,7 +91,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         };
         _persistenceService.Save(persist);
         Serilog.Log.Information("[TimersAndAlarmsViewModel] Сохранение timers/alarms завершено.");
-        
+
     }
 
     /// <summary>
@@ -133,15 +132,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
                 // Истёкший длинный таймер: звук, уведомление, не добавлять в коллекцию
                 var services = ((App)System.Windows.Application.Current).Services;
                 var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
-                var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                if (!string.IsNullOrEmpty(baseDir) && soundService != null)
-                {
-                    string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "timer.mp3");
-                    var soundHandle = soundService.PlaySoundInstance(soundPath, true);
-                    var description = $"{lt.Name} ({lt.TargetDateTime:dd.MM.yyyy HH:mm:ss})";
-                    var notification = ClockWidgetApp.Views.TimerNotificationWindow.CreateWithCloseCallback(soundHandle, description, "timer");
-                    notification.Show();
-                }
+                LongTimerEntryViewModel.ShowLongTimerNotification(soundService!, lt.Name, lt.TargetDateTime);
                 expiredLongTimers.Add(lt);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён истёкший длинный таймер: {lt.TargetDateTime}");
             }
@@ -228,35 +219,121 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         foreach (var longTimer in LongTimersVM.LongTimers)
         {
             string id = GetLongTimerId(longTimer);
-            string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "timer.ico");
+            string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
             // Используем TrayTooltip (имя + время)
             _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, longTimer.TrayTooltip);
         }
     }
 
+    #region Collection event handlers
     private void Timers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
-            foreach (TimerEntryViewModel t in e.NewItems) SubscribeTimer(t);
+            foreach (TimerEntryViewModel t in e.NewItems)
+            {
+                SubscribeTimer(t);
+                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен таймер: {t.Duration}");
+            }
         if (e.OldItems != null)
-            foreach (TimerEntryViewModel t in e.OldItems) RemoveTimerTray(t);
+            foreach (TimerEntryViewModel t in e.OldItems)
+            {
+                RemoveTimerTray(t);
+                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён таймер: {t.Duration}");
+            }
     }
 
     private void Alarms_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
-            foreach (AlarmEntryViewModel a in e.NewItems) SubscribeAlarm(a);
+            foreach (AlarmEntryViewModel a in e.NewItems)
+            {
+                SubscribeAlarm(a);
+                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен будильник: {a.AlarmTime}");
+            }
         if (e.OldItems != null)
-            foreach (AlarmEntryViewModel a in e.OldItems) RemoveAlarmTray(a);
+            foreach (AlarmEntryViewModel a in e.OldItems)
+            {
+                RemoveAlarmTray(a);
+                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён будильник: {a.AlarmTime}");
+            }
     }
 
     private void LongTimers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
-            foreach (LongTimerEntryViewModel t in e.NewItems) AddLongTimerTray(t);
+            foreach (LongTimerEntryViewModel t in e.NewItems)
+            {
+                AddLongTimerTray(t);
+                t.RequestExpire += OnLongTimerExpired;
+                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен длинный таймер: {t.Name} ({t.TargetDateTime})");
+            }
         if (e.OldItems != null)
-            foreach (LongTimerEntryViewModel t in e.OldItems) RemoveLongTimerTray(t);
+            foreach (LongTimerEntryViewModel t in e.OldItems)
+            {
+                RemoveLongTimerTray(t);
+                t.Dispose();
+                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён из коллекции: {t.Name} ({t.TargetDateTime})");
+            }
     }
+    #endregion
+
+    #region Tray icon management
+    private void AddTimerTray(TimerEntryViewModel timer)
+    {
+        string id = GetTimerId(timer);
+        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "timer.ico");
+        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.DisplayTime);
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для таймера: {id}");
+    }
+    private void RemoveTimerTray(TimerEntryViewModel timer)
+    {
+        _trayIconManager.RemoveTrayIcon(GetTimerId(timer));
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для таймера: {timer.Duration}");
+    }
+    private void AddAlarmTray(AlarmEntryViewModel alarm)
+    {
+        string id = GetAlarmId(alarm);
+        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
+        var left = alarm.NextTriggerDateTime.HasValue ? alarm.NextTriggerDateTime.Value - DateTime.Now : TimeSpan.Zero;
+        string text = left > TimeSpan.Zero ? left.ToString(@"hh\:mm\:ss") : "00:00:00";
+        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, text);
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для будильника: {id}");
+    }
+    private void RemoveAlarmTray(AlarmEntryViewModel alarm)
+    {
+        _trayIconManager.RemoveTrayIcon(GetAlarmId(alarm));
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для будильника: {alarm.AlarmTime}");
+    }
+    private void AddLongTimerTray(LongTimerEntryViewModel timer)
+    {
+        string id = GetLongTimerId(timer);
+        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
+        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.TrayTooltip);
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для длинного таймера: {timer.Name} ({timer.TargetDateTime})");
+    }
+    private void RemoveLongTimerTray(LongTimerEntryViewModel timer)
+    {
+        _trayIconManager.RemoveTrayIcon(GetLongTimerId(timer));
+        timer.Dispose(); // Освобождаем ресурсы
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для длинного таймера: {timer.Name} ({timer.TargetDateTime})");
+    }
+    #endregion
+
+    #region Long timer event handlers
+    /// <summary>
+    /// Обработчик истечения длинного таймера: удаляет из коллекции и трея.
+    /// </summary>
+    private void OnLongTimerExpired(LongTimerEntryViewModel timer)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            RemoveLongTimerTray(timer);
+            LongTimersVM.LongTimers.Remove(timer);
+            Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён после истечения: {timer.Name} ({timer.TargetDateTime})");
+        });
+    }
+
+    #endregion
 
     /// <summary>
     /// Подписывает таймер на события для отображения/удаления иконки в трее.
@@ -292,57 +369,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             }
         };
         if (alarm.IsEnabled) AddAlarmTray(alarm);
-    }
-    /// <summary>
-    /// Добавляет иконку трея для таймера.
-    /// </summary>
-    private void AddTimerTray(TimerEntryViewModel timer)
-    {
-        string id = GetTimerId(timer);
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "timer.ico");
-        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.DisplayTime);
-    }
-
-    /// <summary>
-    /// Удаляет иконку трея для таймера.
-    /// </summary>
-    private void RemoveTimerTray(TimerEntryViewModel timer)
-    {
-        _trayIconManager.RemoveTrayIcon(GetTimerId(timer));
-    }
-
-    /// <summary>
-    /// Добавляет иконку трея для будильника.
-    /// </summary>
-    private void AddAlarmTray(AlarmEntryViewModel alarm)
-    {
-        string id = GetAlarmId(alarm);
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
-        var left = alarm.NextTriggerDateTime.HasValue ? alarm.NextTriggerDateTime.Value - DateTime.Now : TimeSpan.Zero;
-        string text = left > TimeSpan.Zero ? left.ToString(@"hh\:mm\:ss") : "00:00:00";
-        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, text);
-    }
-
-    /// <summary>
-    /// Удаляет иконку трея для будильника.
-    /// </summary>
-    private void RemoveAlarmTray(AlarmEntryViewModel alarm)
-    {
-        _trayIconManager.RemoveTrayIcon(GetAlarmId(alarm));
-    }
-
-    private void AddLongTimerTray(LongTimerEntryViewModel timer)
-    {
-        string id = GetLongTimerId(timer);
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "timer.ico");
-        // Используем TrayTooltip (имя + время)
-        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.TrayTooltip);
-    }
-
-    private void RemoveLongTimerTray(LongTimerEntryViewModel timer)
-    {
-        _trayIconManager.RemoveTrayIcon(GetLongTimerId(timer));
-        timer.Dispose(); // Освобождаем ресурсы
     }
 
     /// <summary>
