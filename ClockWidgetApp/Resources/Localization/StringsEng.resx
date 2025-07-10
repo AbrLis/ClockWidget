@@ -115,4 +115,7 @@
   <data name="LongTimers_Tooltip_Target" xml:space="preserve">
     <value>Set for:</value>
   </data>
+  <data name="LongTimers_Tooltip_More" xml:space="preserve">
+    <value>more running</value>
+  </data>
 </root> 

@@ -110,4 +110,7 @@
   <data name="LongTimers_Tooltip_Target" xml:space="preserve">
     <value>Поставлен на:</value>
   </data>
+  <data name="LongTimers_Tooltip_More" xml:space="preserve">
+    <value>ещё запущено</value>
+  </data>
 </root>

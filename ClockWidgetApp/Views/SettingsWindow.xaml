@@ -259,57 +259,62 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding TimersVM.IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                             <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Timers_Add}" Command="{Binding TimersVM.ShowTimerInputCommand}"/>
                         </StackPanel>
-                        <!-- Список таймеров -->
-                        <ItemsControl x:Name="TimersList" Margin="0,10,0,0" ItemsSource="{Binding TimersVM.Timers}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFF9E79F" Margin="0,0,0,8">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#FFFFFDE7"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                                        <Setter Property="Background" Value="#E6FFE6"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <Border.Triggers>
-                                            <EventTrigger RoutedEvent="Border.Loaded">
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Border.Triggers>
-                                        <Grid MouseLeftButtonDown="TimerItem_MouseLeftButtonDown">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Timers_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                                <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsRepeatAvailable}" Value="True">
-                                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
-                                                <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
-                                                <Button Content="🔄" Width="28" Height="28" Margin="4,0" Click="TimerResetButton_Click"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <!-- Список таймеров с авторазмером и скроллом при превышении 5 -->
+                        <!-- MaxHeight ограничивает высоту области таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если таймеров ≤ 5 — область растёт по содержимому. -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="240">
+                            <!-- MaxHeight = 5 * (высота одного таймера + отступы). Здесь 240px выбрано исходя из текущего дизайна. -->
+                            <ItemsControl x:Name="TimersList" Margin="0,10,0,0" ItemsSource="{Binding TimersVM.Timers}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFF9E79F" Margin="0,0,0,8">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#FFFFFDE7"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                            <Setter Property="Background" Value="#E6FFE6"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Border.Triggers>
+                                                <EventTrigger RoutedEvent="Border.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Border.Triggers>
+                                            <Grid MouseLeftButtonDown="TimerItem_MouseLeftButtonDown">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Timers_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
+                                                    <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsRepeatAvailable}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                    <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                    <Button Content="🔄" Width="28" Height="28" Margin="4,0" Click="TimerResetButton_Click"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <!-- Конец блока таймеров с авторазмером и скроллом -->
                     </StackPanel>
                 </GroupBox>
 
@@ -371,46 +376,51 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding AlarmsVM.IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                             <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Alarms_Add}" Command="{Binding AlarmsVM.ShowAlarmInputCommand}"/>
                         </StackPanel>
-                        <!-- Список будильников -->
-                        <ItemsControl x:Name="AlarmsList" Margin="0,10,0,0" ItemsSource="{Binding AlarmsVM.Alarms}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFB3E5FC" Margin="0,0,0,8">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#FFE3F2FD"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsEnabled}" Value="True">
-                                                        <Setter Property="Background" Value="#E6FFE6"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <Border.Triggers>
-                                            <EventTrigger RoutedEvent="Border.Loaded">
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Border.Triggers>
-                                        <Grid MouseLeftButtonDown="AlarmItem_MouseLeftButtonDown">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding AlarmTime, StringFormat='{}{0:hh\\:mm}'}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                                <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <!-- Список будильников с авторазмером и скроллом при превышении 5 -->
+                        <!-- MaxHeight ограничивает высоту области будильников, чтобы при превышении 5 элементов появлялся скроллбар. Если будильников ≤ 5 — область растёт по содержимому. -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="240">
+                            <!-- MaxHeight = 5 * (высота одного будильника + отступы). Здесь 240px выбрано исходя из текущего дизайна. -->
+                            <ItemsControl x:Name="AlarmsList" Margin="0,10,0,0" ItemsSource="{Binding AlarmsVM.Alarms}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="6" BorderThickness="2" BorderBrush="#FFB3E5FC" Margin="0,0,0,8">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#FFE3F2FD"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                            <Setter Property="Background" Value="#E6FFE6"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Border.Triggers>
+                                                <EventTrigger RoutedEvent="Border.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Border.Triggers>
+                                            <Grid MouseLeftButtonDown="AlarmItem_MouseLeftButtonDown">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding AlarmTime, StringFormat='{}{0:hh\\:mm}'}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
+                                                    <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                    <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
+                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <!-- Конец блока будильников с авторазмером и скроллом -->
                     </StackPanel>
                 </GroupBox>
                 <!-- === Разделитель === -->
@@ -422,35 +432,40 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
                             <Button x:Name="LongTimerAddButton" Content="+" Width="28" Height="28" ToolTip="{Binding Localized.LongTimers_Add}" Click="LongTimerAddButton_Click"/>
                         </StackPanel>
-                        <!-- Список длинных таймеров -->
-                        <ItemsControl x:Name="LongTimersList" Margin="0,10,0,0" ItemsSource="{Binding LongTimersVM.LongTimers}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,8" ToolTip="{Binding SettingsTooltip}">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#F1F8E9"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                                        <Setter Property="Background" Value="#E6FFE6"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0"/>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                                <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <!-- Список длинных таймеров с авторазмером и скроллом при превышении 5 -->
+                        <!-- MaxHeight ограничивает высоту области длинных таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если длинных таймеров ≤ 5 — область растёт по содержимому. -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="240">
+                            <!-- MaxHeight = 5 * (высота одного длинного таймера + отступы). Здесь 240px выбрано исходя из текущего дизайна. -->
+                            <ItemsControl x:Name="LongTimersList" Margin="0,10,0,0" ItemsSource="{Binding LongTimersVM.LongTimers}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,8" ToolTip="{Binding SettingsTooltip}">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#F1F8E9"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                            <Setter Property="Background" Value="#E6FFE6"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
+                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <!-- Конец блока длинных таймеров с авторазмером и скроллом -->
                     </StackPanel>
                 </GroupBox>
             </Grid>

@@ -123,7 +123,7 @@ namespace ClockWidgetApp.Services
             _mainNotifyIcon = new NotifyIcon();
             _mainNotifyIcon.Icon = new System.Drawing.Icon(iconPath);
             _mainNotifyIcon.Visible = true;
-            _mainNotifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
+            _mainNotifyIcon.Text = TrimTooltip(Helpers.LocalizationManager.GetString("Tray_IconText", lang));
             _mainNotifyIcon.ContextMenuStrip = _mainTrayMenu;
             _mainNotifyIcon.MouseUp += NotifyIcon_MouseUp;
             Helpers.LocalizationManager.LanguageChanged += (s, e) => UpdateMainTrayMenuItems();
@@ -155,7 +155,7 @@ namespace ClockWidgetApp.Services
             if (_exitItem != null)
                 _exitItem.Text = Helpers.LocalizationManager.GetString("Tray_Exit", lang);
             if (_mainNotifyIcon != null)
-                _mainNotifyIcon.Text = Helpers.LocalizationManager.GetString("Tray_IconText", lang);
+                _mainNotifyIcon.Text = TrimTooltip(Helpers.LocalizationManager.GetString("Tray_IconText", lang));
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace ClockWidgetApp.Services
                 // Обновляем тултип
                 var icon = _trayIcons[id].Icon;
                 if (icon != null)
-                    icon.Text = tooltip;
+                    icon.Text = TrimTooltip(tooltip);
                 return;
             }
 
@@ -241,7 +241,7 @@ namespace ClockWidgetApp.Services
             var notifyIcon = new NotifyIcon
             {
                 Icon = new System.Drawing.Icon(iconPath),
-                Text = tooltip,
+                Text = TrimTooltip(tooltip),
                 Visible = true,
                 ContextMenuStrip = contextMenu
             };
@@ -277,7 +277,7 @@ namespace ClockWidgetApp.Services
         {
             if (_trayIcons.TryGetValue(id, out var info) && info.Icon != null)
             {
-                info.Icon.Text = tooltip;
+                info.Icon.Text = TrimTooltip(tooltip);
             }
         }
 
@@ -328,5 +328,18 @@ namespace ClockWidgetApp.Services
             Helpers.LocalizationManager.LanguageChanged += (s, e) => UpdateMenuLanguage();
         }
         #endregion
+
+        /// <summary>
+        /// Обрезает строку тултипа до максимально допустимой длины для NotifyIcon (127 символов).
+        /// </summary>
+        /// <param name="tooltip">Исходный текст тултипа.</param>
+        /// <returns>Обрезанный текст тултипа.</returns>
+        private static string TrimTooltip(string tooltip)
+        {
+            const int maxTooltipLength = 127;
+            if (!string.IsNullOrEmpty(tooltip) && tooltip.Length > maxTooltipLength)
+                return tooltip.Substring(0, maxTooltipLength - 3) + "...";
+            return tooltip;
+        }
     }
 } 

@@ -437,25 +437,27 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Генерирует агрегированный тултип для всех длинных таймеров.
+    /// Генерирует тултип для ближайшего длинного таймера и краткую сводку о количестве остальных.
     /// </summary>
     private string GetLongTimersTooltip()
     {
-        var sb = new System.Text.StringBuilder();
-        bool first = true;
-        string remainingLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Remaining");
-        string noNameLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_NoName");
-        string targetLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Target");
-        foreach (var t in LongTimersVM.LongTimers)
+        int count = LongTimersVM.LongTimers.Count;
+        if (count == 0)
+            return string.Empty;
+        // Находим ближайший по времени длинный таймер
+        var nextTimer = LongTimersVM.LongTimers
+            .OrderBy(t => t.TargetDateTime)
+            .FirstOrDefault();
+        if (nextTimer == null)
+            return string.Empty;
+        // Формируем тултип: ближайший таймер + сводка
+        string tooltip = nextTimer.TrayTooltip;
+        if (count > 1)
         {
-            if (!first)
-                sb.AppendLine("----------");
-            first = false;
-            sb.AppendLine(string.IsNullOrWhiteSpace(t.Name) ? noNameLabel : t.Name);
-            sb.AppendLine($"{targetLabel} {t.TargetDateTime:dd.MM.yyyy HH:mm:ss}");
-            sb.AppendLine($"{remainingLabel} {t.DisplayTime}");
+            string moreLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_More");
+            tooltip += $"\n+ {count - 1} {moreLabel}";
         }
-        return sb.ToString().TrimEnd();
+        return tooltip;
     }
 
     /// <summary>

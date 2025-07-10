@@ -38,7 +38,7 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public string DisplayTime => FormatRemaining(Remaining);
 
     /// <summary>
-    /// Тултип для иконки трея: имя таймера, время окончания и оставшееся время (локализовано).
+    /// Тултип для иконки трея: имя таймера (до 10 символов), время окончания и оставшееся время (локализовано).
     /// </summary>
     public string TrayTooltip
     {
@@ -48,6 +48,9 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
             string targetLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Target");
             string remainingLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Remaining");
             string name = string.IsNullOrWhiteSpace(Name) ? nameLabel : Name;
+            // Обрезаем имя до 10 символов, если оно длиннее
+            if (name.Length > 10)
+                name = name.Substring(0, 10) + "...";
             return $"{name}\n{targetLabel} {TargetDateTime:dd.MM.yyyy HH:mm:ss}\n{remainingLabel} {DisplayTime}";
         }
     }
