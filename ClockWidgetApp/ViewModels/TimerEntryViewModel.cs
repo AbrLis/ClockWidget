@@ -28,6 +28,14 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     /// Флаг, показывающий, видим ли виджет таймера.
     /// </summary>
     private bool _isWidgetVisible = true;
+    /// <summary>
+    /// Длительность таймера. При изменении выставляет dirty-флаг.
+    /// </summary>
+    private TimeSpan _duration;
+    /// <summary>
+    /// Активен ли таймер. При изменении выставляет dirty-флаг.
+    /// </summary>
+    private bool _isActive = true;
     #endregion
 
     #region Constructors
@@ -49,9 +57,13 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
 
     #region Public properties
     /// <summary>
-    /// Длительность таймера.
+    /// Длительность таймера. При изменении выставляет dirty-флаг.
     /// </summary>
-    public TimeSpan Duration { get; set; }
+    public TimeSpan Duration
+    {
+        get => _duration;
+        set { _duration = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+    }
 
     /// <summary>
     /// Оставшееся время таймера.
@@ -59,13 +71,17 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public TimeSpan Remaining
     {
         get => _remaining;
-        set { _remaining = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayTime)); }
+        set { _remaining = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayTime)); App.MarkTimersAlarmsDirty(); }
     }
 
     /// <summary>
-    /// Активен ли таймер.
+    /// Активен ли таймер. При изменении выставляет dirty-флаг.
     /// </summary>
-    public bool IsActive { get; set; } = true;
+    public bool IsActive
+    {
+        get => _isActive;
+        set { _isActive = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+    }
 
     /// <summary>
     /// Строка для отображения оставшегося времени.
@@ -99,7 +115,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public bool IsRunning
     {
         get => _isRunning;
-        set { _isRunning = value; OnPropertyChanged(); }
+        set { _isRunning = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
     }
 
     /// <summary>
@@ -121,7 +137,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public bool IsWidgetVisible
     {
         get => _isWidgetVisible;
-        set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); }
+        set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); App.MarkTimersAlarmsDirty(); }
     }
 
     /// <summary>
@@ -153,6 +169,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
             _timer.AutoReset = true;
         }
         _timer.Start();
+        App.MarkTimersAlarmsDirty();
     }
 
     /// <summary>
@@ -165,6 +182,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
         _timer?.Stop();
+        App.MarkTimersAlarmsDirty();
     }
 
     /// <summary>
@@ -178,6 +196,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         OnPropertyChanged(nameof(IsStopAvailable));
         OnPropertyChanged(nameof(IsHideAvailable));
         RequestDeactivate?.Invoke(this);
+        App.MarkTimersAlarmsDirty();
     }
 
     /// <summary>
@@ -189,6 +208,7 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         Remaining = Duration;
         OnPropertyChanged(nameof(Remaining));
         OnPropertyChanged(nameof(DisplayTime));
+        App.MarkTimersAlarmsDirty();
     }
 
     /// <summary>

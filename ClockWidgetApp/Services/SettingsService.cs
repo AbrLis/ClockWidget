@@ -76,6 +76,7 @@ public class SettingsService : ISettingsService
         try
         {
             updateAction(_currentSettings);
+            App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
             _logger.LogDebug("[SettingsService] Settings updated in buffer: {Settings}",
                 JsonSerializer.Serialize(_currentSettings));
         }

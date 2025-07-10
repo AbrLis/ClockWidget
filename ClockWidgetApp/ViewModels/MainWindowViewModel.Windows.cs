@@ -54,16 +54,6 @@ public partial class MainWindowViewModel
         return WindowPositionHelper.GetWindowPosition(_settingsService, false);
     }
 
-    /// <summary>
-    /// Сохраняет позицию главного окна.
-    /// </summary>
-    /// <param name="left">Координата Left.</param>
-    /// <param name="top">Координата Top.</param>
-    public void SaveWindowPosition(double left, double top)
-    {
-        WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
-    }
-
     private void UpdateAnalogClockSize()
     {
         var analogWindow = _windowService.GetAnalogClockWindow();

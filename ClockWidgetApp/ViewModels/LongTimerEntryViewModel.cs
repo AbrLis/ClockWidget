@@ -25,7 +25,12 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Дата и время срабатывания таймера.
     /// </summary>
-    public DateTime TargetDateTime { get; set; }
+    public DateTime TargetDateTime
+    {
+        get => _targetDateTime;
+        set { _targetDateTime = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+    }
+    private DateTime _targetDateTime;
 
     /// <summary>
     /// Оставшееся время до срабатывания таймера.
@@ -84,7 +89,12 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
     /// </summary>
     public event Action<LongTimerEntryViewModel>? RequestExpire;
 
-    public string Name { get; set; } = string.Empty;
+    public string Name
+    {
+        get => _name;
+        set { _name = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+    }
+    private string _name = string.Empty;
 
     public LongTimerEntryViewModel(DateTime targetDateTime, ISoundService soundService, string name = "")
     {
@@ -127,6 +137,7 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
         OnPropertyChanged(nameof(TargetDateTime));
         OnPropertyChanged(nameof(Remaining));
         OnPropertyChanged(nameof(DisplayTime));
+        App.MarkTimersAlarmsDirty();
     }
 
     private void Timer_Elapsed(object? sender, ElapsedEventArgs e)

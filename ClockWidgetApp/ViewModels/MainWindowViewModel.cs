@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -82,6 +83,15 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
             return (diff.X, diff.Y);
         }
         return null;
+    }
+
+    /// <summary>
+    /// Сохраняет позицию окна и помечает настройки как изменённые.
+    /// </summary>
+    public void SaveWindowPosition(double left, double top)
+    {
+        WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
+        App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
     }
 
     /// <summary>

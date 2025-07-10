@@ -220,8 +220,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
 
     #region Collection event handlers
+    /// <summary>
+    /// Обработчик изменений коллекции таймеров. Помечает таймеры/будильники как изменённые.
+    /// </summary>
     private void Timers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
             foreach (TimerEntryViewModel t in e.NewItems)
             {
@@ -236,8 +240,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             }
     }
 
+    /// <summary>
+    /// Обработчик изменений коллекции будильников. Помечает таймеры/будильники как изменённые.
+    /// </summary>
     private void Alarms_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
             foreach (AlarmEntryViewModel a in e.NewItems)
             {
@@ -252,8 +260,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             }
     }
 
+    /// <summary>
+    /// Обработчик изменений коллекции длинных таймеров. Помечает таймеры/будильники как изменённые.
+    /// </summary>
     private void LongTimers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
             foreach (LongTimerEntryViewModel t in e.NewItems)
             {

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.IO;
 using ClockWidgetApp.Helpers;
+using System.Threading;
 
 namespace ClockWidgetApp;
 
@@ -25,6 +26,18 @@ public partial class App : System.Windows.Application
     /// <summary>Временный логгер для single instance событий (до инициализации DI/основного логгера).</summary>
     private static Serilog.ILogger? _earlyLogger;
     private ApplicationLifecycleService? _lifecycleService;
+    /// <summary>
+    /// Потокобезопасный флаг наличия несохранённых изменений настроек виджетов.
+    /// </summary>
+    private static int _widgetSettingsDirty = 0;
+    /// <summary>
+    /// Потокобезопасный флаг наличия несохранённых изменений таймеров и будильников.
+    /// </summary>
+    private static int _timersAlarmsDirty = 0;
+    /// <summary>
+    /// Таймер для периодического сохранения настроек и таймеров.
+    /// </summary>
+    private System.Windows.Threading.DispatcherTimer? _periodicSaveTimer;
 
     #endregion
 
@@ -63,6 +76,15 @@ public partial class App : System.Windows.Application
         var windowService = _serviceProvider.GetRequiredService<IWindowService>();
         windowService.OpenAnalogClockWindow();
     }
+
+    /// <summary>
+    /// Устанавливает флаг наличия несохранённых изменений настроек виджетов.
+    /// </summary>
+    public static void MarkWidgetSettingsDirty() => Interlocked.Exchange(ref _widgetSettingsDirty, 1);
+    /// <summary>
+    /// Устанавливает флаг наличия несохранённых изменений таймеров и будильников.
+    /// </summary>
+    public static void MarkTimersAlarmsDirty() => Interlocked.Exchange(ref _timersAlarmsDirty, 1);
 
     #endregion
 
@@ -118,6 +140,11 @@ public partial class App : System.Windows.Application
         var timeService = _serviceProvider.GetRequiredService<ITimeService>();
         timeService.Start();
 
+        // Запуск глобального таймера для периодического сохранения
+        _periodicSaveTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+        _periodicSaveTimer.Tick += PeriodicSaveTimer_Tick;
+        _periodicSaveTimer.Start();
+
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
             _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
@@ -152,6 +179,40 @@ public partial class App : System.Windows.Application
 
         base.OnStartup(e);
         _logger?.LogInformation("[App] Application starting");
+    }
+
+    /// <summary>
+    /// Обработчик периодического таймера сохранения.
+    /// </summary>
+    private void PeriodicSaveTimer_Tick(object? sender, EventArgs e)
+    {
+        // Потокобезопасно проверяем и сбрасываем флаги
+        if (Interlocked.Exchange(ref _widgetSettingsDirty, 0) == 1)
+        {
+            try
+            {
+                var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
+                settingsService.SaveBufferedSettings();
+                _logger?.LogInformation("[App] Widget settings saved by periodic timer");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "[App] Error saving widget settings by periodic timer");
+            }
+        }
+        if (Interlocked.Exchange(ref _timersAlarmsDirty, 0) == 1)
+        {
+            try
+            {
+                var timersVm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
+                timersVm.SaveTimersAndAlarms();
+                _logger?.LogInformation("[App] Timers/alarms saved by periodic timer");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "[App] Error saving timers/alarms by periodic timer");
+            }
+        }
     }
 
     /// <summary>
