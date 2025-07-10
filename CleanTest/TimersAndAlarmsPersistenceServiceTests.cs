@@ -25,7 +25,8 @@ public class TimersAndAlarmsPersistenceServiceTests
         var model = new TimersAndAlarmsPersistModel
         {
             Timers = new List<TimerPersistModel> { new TimerPersistModel { Duration = TimeSpan.FromMinutes(5) } },
-            Alarms = new List<AlarmPersistModel> { new AlarmPersistModel { AlarmTime = new TimeSpan(7, 30, 0), IsEnabled = true, NextTriggerDateTime = DateTime.Now.AddDays(1) } }
+            Alarms = new List<AlarmPersistModel> { new AlarmPersistModel { AlarmTime = new TimeSpan(7, 30, 0), IsEnabled = true, NextTriggerDateTime = DateTime.Now.AddDays(1) } },
+            LongTimers = new List<LongTimerPersistModel> { new LongTimerPersistModel { TargetDateTime = DateTime.Now.AddHours(2), Name = "TestLongTimer" } }
         };
 
         // Act
@@ -36,10 +37,13 @@ public class TimersAndAlarmsPersistenceServiceTests
         Assert.NotNull(loaded);
         Assert.Single(loaded.Timers);
         Assert.Single(loaded.Alarms);
+        Assert.Single(loaded.LongTimers);
         Assert.Equal(model.Timers[0].Duration, loaded.Timers[0].Duration);
         Assert.Equal(model.Alarms[0].AlarmTime, loaded.Alarms[0].AlarmTime);
         Assert.Equal(model.Alarms[0].IsEnabled, loaded.Alarms[0].IsEnabled);
         Assert.Equal(model.Alarms[0].NextTriggerDateTime?.ToString(), loaded.Alarms[0].NextTriggerDateTime?.ToString());
+        Assert.Equal(model.LongTimers[0].TargetDateTime, loaded.LongTimers[0].TargetDateTime);
+        Assert.Equal(model.LongTimers[0].Name, loaded.LongTimers[0].Name);
 
         // Clean up
         Directory.Delete(tempDir, true);
@@ -81,7 +85,7 @@ public class TimersAndAlarmsPersistenceServiceTests
         var service = new TimersAndAlarmsPersistenceService(file);
 
         // Act & Assert
-        Assert.ThrowsAny<System.Text.Json.JsonException>(() => service.Load());
+        Assert.ThrowsAny<System.IO.InvalidDataException>(() => service.Load());
 
         // Clean up
         Directory.Delete(tempDir, true);
@@ -101,7 +105,7 @@ public class TimersAndAlarmsPersistenceServiceTests
         var service = new TimersAndAlarmsPersistenceService(file);
 
         // Act & Assert
-        Assert.ThrowsAny<System.Text.Json.JsonException>(() => service.Load());
+        Assert.ThrowsAny<System.IO.InvalidDataException>(() => service.Load());
 
         // Clean up
         Directory.Delete(tempDir, true);
