@@ -426,7 +426,7 @@
                         <ItemsControl x:Name="LongTimersList" Margin="0,10,0,0" ItemsSource="{Binding LongTimersVM.LongTimers}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,8" ToolTip="{Binding Name}">
+                                    <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,8" ToolTip="{Binding SettingsTooltip}">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="#F1F8E9"/>

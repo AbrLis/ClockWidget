@@ -104,4 +104,7 @@
   <data name="LongTimers_Tooltip_NoName" xml:space="preserve">
     <value>(Без имени)</value>
   </data>
+  <data name="LongTimers_Tooltip_Target" xml:space="preserve">
+    <value>Поставлен на:</value>
+  </data>
 </root>

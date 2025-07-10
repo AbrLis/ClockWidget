@@ -109,4 +109,7 @@
   <data name="LongTimers_Tooltip_NoName" xml:space="preserve">
     <value>(No name)</value>
   </data>
+  <data name="LongTimers_Tooltip_Target" xml:space="preserve">
+    <value>Set for:</value>
+  </data>
 </root> 

@@ -38,9 +38,33 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
     public string DisplayTime => FormatRemaining(Remaining);
 
     /// <summary>
-    /// Тултип для иконки трея: имя таймера и оставшееся время на второй строке.
+    /// Тултип для иконки трея: имя таймера, время окончания и оставшееся время (локализовано).
     /// </summary>
-    public string TrayTooltip => $"{(string.IsNullOrWhiteSpace(Name) ? "(Без имени)" : Name)}\n{DisplayTime}";
+    public string TrayTooltip
+    {
+        get
+        {
+            string nameLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_NoName");
+            string targetLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Target");
+            string remainingLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Remaining");
+            string name = string.IsNullOrWhiteSpace(Name) ? nameLabel : Name;
+            return $"{name}\n{targetLabel} {TargetDateTime:dd.MM.yyyy HH:mm:ss}\n{remainingLabel} {DisplayTime}";
+        }
+    }
+
+    /// <summary>
+    /// Тултип для окна настроек: имя таймера и время, на которое он был установлен (локализовано).
+    /// </summary>
+    public string SettingsTooltip
+    {
+        get
+        {
+            string nameLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_NoName");
+            string targetLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Target");
+            string name = string.IsNullOrWhiteSpace(Name) ? nameLabel : Name;
+            return $"{name}\n{targetLabel} {TargetDateTime:dd.MM.yyyy HH:mm:ss}";
+        }
+    }
 
     /// <summary>
     /// Команда удаления таймера.

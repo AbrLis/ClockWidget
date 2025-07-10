@@ -445,12 +445,14 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         bool first = true;
         string remainingLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Remaining");
         string noNameLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_NoName");
+        string targetLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Target");
         foreach (var t in LongTimersVM.LongTimers)
         {
             if (!first)
                 sb.AppendLine("----------");
             first = false;
             sb.AppendLine(string.IsNullOrWhiteSpace(t.Name) ? noNameLabel : t.Name);
+            sb.AppendLine($"{targetLabel} {t.TargetDateTime:dd.MM.yyyy HH:mm:ss}");
             sb.AppendLine($"{remainingLabel} {t.DisplayTime}");
         }
         return sb.ToString().TrimEnd();
