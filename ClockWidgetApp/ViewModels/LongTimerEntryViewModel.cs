@@ -53,9 +53,9 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
             string targetLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Target");
             string remainingLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_Remaining");
             string name = string.IsNullOrWhiteSpace(Name) ? nameLabel : Name;
-            // Обрезаем имя до 10 символов, если оно длиннее
-            if (name.Length > 10)
-                name = name.Substring(0, 10) + "...";
+            // Обрезаем имя до максимальной длины, если оно длиннее
+            if (name.Length > Helpers.Constants.LongTimerTooltipNameMaxLength)
+                name = name.Substring(0, Helpers.Constants.LongTimerTooltipNameMaxLength) + "...";
             return $"{name}\n{targetLabel} {TargetDateTime:dd.MM.yyyy HH:mm:ss}\n{remainingLabel} {DisplayTime}";
         }
     }

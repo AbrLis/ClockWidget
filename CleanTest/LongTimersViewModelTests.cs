@@ -3,6 +3,7 @@ using Xunit;
 using ClockWidgetApp.ViewModels;
 using Moq;
 using ClockWidgetApp.Services;
+using ClockWidgetApp.Helpers;
 
 namespace CleanTest;
 
@@ -68,16 +69,18 @@ public class LongTimersViewModelTests
     }
 
     /// <summary>
-    /// Проверяет, что имя длинного таймера в тултипе обрезается до 10 символов с многоточием.
+    /// Проверяет, что имя длинного таймера в тултипе обрезается до максимальной длины (Constants.LongTimerTooltipNameMaxLength) с многоточием.
     /// </summary>
     [Fact]
     public void TrayTooltip_ShouldTruncateLongName()
     {
         var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddHours(1);
-        var timer = new LongTimerEntryViewModel(dt, soundService, "VeryLongTimerName123");
+        var timer = new LongTimerEntryViewModel(dt, soundService, "VeryLongTimerName12356");
         string tooltip = timer.TrayTooltip;
-        Assert.StartsWith("VeryLongTi...", tooltip); // Имя обрезано до 10 символов + ...
+        // Имя обрезано до максимальной длины + ...
+        string expectedStart = "VeryLongTimerName12356".Substring(0, Constants.LongTimerTooltipNameMaxLength) + "...";
+        Assert.StartsWith(expectedStart, tooltip);
     }
 
     /// <summary>

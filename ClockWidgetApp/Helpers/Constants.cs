@@ -48,6 +48,11 @@ public static class Constants
     public const int LongTimerNameMaxLength = 60;
 
     /// <summary>
+    /// Максимальная длина имени длинного таймера для отображения в тултипе (до обрезки и добавления ...).
+    /// </summary>
+    public const int LongTimerTooltipNameMaxLength = 20;
+
+    /// <summary>
     /// Индекс вкладки 'Общие настройки' в окне настроек.
     /// </summary>
     public const int SETTINGS_TAB_INDEX_GENERAL = 0;
