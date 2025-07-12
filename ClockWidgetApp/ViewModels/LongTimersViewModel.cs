@@ -43,9 +43,8 @@ public class LongTimersViewModel : INotifyPropertyChanged
         {
             var selectedDateTime = inputWindow.SelectedDateTime;
             var timerName = inputWindow.TimerName;
-            // Добавляем таймер без дополнительной проверки времени (валидация уже в окне)
             var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
-            LongTimers.Insert(0, timer);
+            LongTimers.Add(timer);
         }
     }
 
@@ -65,9 +64,8 @@ public class LongTimersViewModel : INotifyPropertyChanged
         {
             var selectedDateTime = inputWindow.SelectedDateTime;
             var timerName = inputWindow.TimerName;
-            // Добавляем таймер без дополнительной проверки времени (валидация уже в окне)
             var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
-            LongTimers.Insert(0, timer);
+            LongTimers.Add(timer);
         }
     }
 

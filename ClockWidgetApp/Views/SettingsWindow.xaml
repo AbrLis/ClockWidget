@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:ClockWidgetApp"
         xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
         xmlns:viewModels="clr-namespace:ClockWidgetApp.ViewModels"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="{Binding Localized.SettingsWindow_Title}"
         MinHeight="300"
@@ -21,6 +22,12 @@
         <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <helpers:StringNotEmptyToBoolConverter x:Key="StringNotEmptyToBoolConverter"/>
         <helpers:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
+        <!-- CollectionViewSource для сортировки длинных таймеров по Remaining -->
+        <CollectionViewSource x:Key="SortedLongTimersView" Source="{Binding LongTimersVM.LongTimers}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Remaining" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </Window.Resources>
     <TabControl x:Name="MainTabControl" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
         <!-- Вкладка настроек -->
@@ -256,8 +263,8 @@
                                 <Button Content="✖️" Command="{Binding TimersVM.CancelTimerInputCommand}" Margin="4,0,0,0"/>
                             </StackPanel>
                         </Border>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding TimersVM.IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                            <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Timers_Add}" Command="{Binding TimersVM.ShowTimerInputCommand}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" Visibility="{Binding TimersVM.IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                            <Button Content="+" Width="20" Height="20" ToolTip="{Binding Localized.Timers_Add}" Command="{Binding TimersVM.ShowTimerInputCommand}"/>
                         </StackPanel>
                         <!-- Список таймеров с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если таймеров ≤ 5 — область растёт по содержимому. -->
@@ -373,8 +380,8 @@
                                            Visibility="{Binding AlarmsVM.DuplicateAlarmNotification, Converter={StaticResource StringNotEmptyToBoolConverter}, ConverterParameter=True}"/>
                             </StackPanel>
                         </Border>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="{Binding AlarmsVM.IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                            <Button Content="+" Width="28" Height="28" ToolTip="{Binding Localized.Alarms_Add}" Command="{Binding AlarmsVM.ShowAlarmInputCommand}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" Visibility="{Binding AlarmsVM.IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                            <Button Content="+" Width="20" Height="20" ToolTip="{Binding Localized.Alarms_Add}" Command="{Binding AlarmsVM.ShowAlarmInputCommand}"/>
                         </StackPanel>
                         <!-- Список будильников с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области будильников, чтобы при превышении 5 элементов появлялся скроллбар. Если будильников ≤ 5 — область растёт по содержимому. -->
@@ -429,38 +436,52 @@
                 <GroupBox Header="{Binding Localized.LongTimers_Title}" Grid.Row="3" Margin="0,10,0,10">
                     <StackPanel>
                         <TextBlock Text="{Binding Localized.LongTimers_TriggerDateTime}" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
-                            <Button x:Name="LongTimerAddButton" Content="+" Width="28" Height="28" ToolTip="{Binding Localized.LongTimers_Add}" Click="LongTimerAddButton_Click"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0">
+                            <Button x:Name="LongTimerAddButton" Content="+" Width="20" Height="20" ToolTip="{Binding Localized.LongTimers_Add}" Click="LongTimerAddButton_Click"/>
                         </StackPanel>
                         <!-- Список длинных таймеров с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области длинных таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если длинных таймеров ≤ 5 — область растёт по содержимому. -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="240">
                             <!-- MaxHeight = 5 * (высота одного длинного таймера + отступы). Здесь 240px выбрано исходя из текущего дизайна. -->
-                            <ItemsControl x:Name="LongTimersList" Margin="0,10,0,0" ItemsSource="{Binding LongTimersVM.LongTimers}">
+                            <ItemsControl x:Name="LongTimersList" Margin="0,10,0,0" ItemsSource="{Binding Source={StaticResource SortedLongTimersView}}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,8" ToolTip="{Binding SettingsTooltip}">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#F1F8E9"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                                            <Setter Property="Background" Value="#E6FFE6"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0"/>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock FontWeight="Bold" FontSize="10" Margin="0,0,0,2" Text="{Binding Name}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Name}" Value="">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,4" ToolTip="{Binding SettingsTooltip}">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#F1F8E9"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                                <Setter Property="Background" Value="#E6FFE6"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0"/>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
+                                                        <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DataContext.DeleteLongTimerCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>

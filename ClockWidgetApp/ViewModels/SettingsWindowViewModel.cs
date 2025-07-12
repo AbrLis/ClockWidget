@@ -44,16 +44,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Localized));
         };
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-        foreach (var timer in LongTimersVM.LongTimers)
-            timer.RequestDelete += OnLongTimerRequestDelete;
         LongTimersVM.LongTimers.CollectionChanged += (s, e) =>
         {
-            if (e.NewItems != null)
-                foreach (var item in e.NewItems)
-                    (item as LongTimerEntryViewModel)!.RequestDelete += OnLongTimerRequestDelete;
-            if (e.OldItems != null)
-                foreach (var item in e.OldItems)
-                    (item as LongTimerEntryViewModel)!.RequestDelete -= OnLongTimerRequestDelete;
+            OnPropertyChanged(nameof(LongTimersVM));
         };
     }
     #endregion
@@ -249,6 +242,26 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     public TimersViewModel TimersVM => _timersAndAlarmsViewModel.TimersVM;
     public AlarmsViewModel AlarmsVM => _timersAndAlarmsViewModel.AlarmsVM;
     public LongTimersViewModel LongTimersVM => _timersAndAlarmsViewModel.LongTimersVM;
+
+    /// <summary>
+    /// Команда для удаления длинного таймера с подтверждением.
+    /// </summary>
+    public RelayCommand DeleteLongTimerCommand => new RelayCommand(obj =>
+    {
+        if (obj is LongTimerEntryViewModel timer)
+        {
+            if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Пользователь подтвердил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
+                timer.Dispose();
+                LongTimersVM.LongTimers.Remove(timer);
+            }
+            else
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Пользователь отменил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
+            }
+        }
+    });
     #endregion
 
     #region Private Methods
@@ -326,22 +339,6 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             System.Windows.Application.Current.Shutdown();
         }
     }
-
-    /// <summary>
-    /// Обработчик запроса на удаление длинного таймера с подтверждением.
-    /// </summary>
-    private void OnLongTimerRequestDelete(LongTimerEntryViewModel timer)
-    {
-        if (Helpers.DialogHelper.ConfirmLongTimerDelete())
-        {
-            _logger.LogInformation($"[SettingsWindowViewModel] Пользователь подтвердил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
-            timer.Dispose();
-            LongTimersVM.LongTimers.Remove(timer);
-        }
-        else
-        {
-            _logger.LogInformation($"[SettingsWindowViewModel] Пользователь отменил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
-        }
-    }
+    
     #endregion
 } 
