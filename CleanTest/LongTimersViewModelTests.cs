@@ -4,6 +4,7 @@ using ClockWidgetApp.ViewModels;
 using Moq;
 using ClockWidgetApp.Services;
 using ClockWidgetApp.Helpers;
+using System.IO;
 
 namespace CleanTest;
 
@@ -121,17 +122,17 @@ public class LongTimersViewModelTests
         var tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());
         System.IO.Directory.CreateDirectory(tempDir);
         var file = System.IO.Path.Combine(tempDir, "timers_alarms.json");
-        var service = new ClockWidgetApp.Services.TimersAndAlarmsPersistenceService(file);
-        var model = new ClockWidgetApp.Models.TimersAndAlarmsPersistModel();
+        var settingsFile = Path.Combine(Path.GetDirectoryName(file)!, "widget_settings.json");
+        var service = new AppDataService(settingsFile, file);
         var dt = DateTime.Now.AddHours(2);
         var name = "PersistTest";
-        model.LongTimers.Add(new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name });
-        service.Save(model);
-        var loaded = service.Load();
-        Assert.NotNull(loaded);
-        Assert.Single(loaded.LongTimers);
-        Assert.Equal(name, loaded.LongTimers[0].Name);
-        Assert.Equal(dt, loaded.LongTimers[0].TargetDateTime, TimeSpan.FromSeconds(1));
+        service.Data.LongTimers.Add(new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name });
+        service.Save();
+        service.Data.LongTimers.Clear();
+        service.Load();
+        Assert.Single(service.Data.LongTimers);
+        Assert.Equal(name, service.Data.LongTimers[0].Name);
+        Assert.Equal(dt, service.Data.LongTimers[0].TargetDateTime, TimeSpan.FromSeconds(1));
         System.IO.Directory.Delete(tempDir, true);
     }
 } 
