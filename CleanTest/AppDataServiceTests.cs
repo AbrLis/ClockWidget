@@ -147,4 +147,46 @@ public class AppDataServiceTests
         Assert.Equal(goodSettings.Language, loaded.Language);
         Directory.Delete(tempDir, true);
     }
+
+    /// <summary>
+    /// Проверяет, что если и основной, и резервный файл настроек повреждены — возвращаются значения по умолчанию.
+    /// </summary>
+    [Fact]
+    public void Load_WidgetSettings_ShouldReturnDefault_WhenFileAndBackupAreCorrupted()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(tempDir);
+        var settingsFile = Path.Combine(tempDir, "widget_settings.json");
+        var timersFile = Path.Combine(tempDir, "timers_alarms.json");
+        var backupFile = Path.ChangeExtension(settingsFile, ".bak");
+        File.WriteAllText(settingsFile, "{ not valid json }");
+        File.WriteAllText(backupFile, "{ not valid json }");
+        var service = new AppDataService(settingsFile, timersFile);
+        service.Load();
+        var loaded = service.Data.WidgetSettings;
+        Assert.Equal(new WidgetSettings().BackgroundOpacity, loaded.BackgroundOpacity, 5);
+        Assert.Equal(new WidgetSettings().Language, loaded.Language);
+        Directory.Delete(tempDir, true);
+    }
+
+    /// <summary>
+    /// Проверяет, что если и основной, и резервный файл таймеров повреждены — коллекции остаются пустыми.
+    /// </summary>
+    [Fact]
+    public void Load_TimersAndAlarms_ShouldBeEmpty_WhenFileAndBackupAreCorrupted()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(tempDir);
+        var settingsFile = Path.Combine(tempDir, "widget_settings.json");
+        var timersFile = Path.Combine(tempDir, "timers_alarms.json");
+        var backupFile = Path.ChangeExtension(timersFile, ".bak");
+        File.WriteAllText(timersFile, "{ not valid json }");
+        File.WriteAllText(backupFile, "{ not valid json }");
+        var service = new AppDataService(settingsFile, timersFile);
+        service.Load();
+        Assert.Empty(service.Data.Timers);
+        Assert.Empty(service.Data.Alarms);
+        Assert.Empty(service.Data.LongTimers);
+        Directory.Delete(tempDir, true);
+    }
 } 
