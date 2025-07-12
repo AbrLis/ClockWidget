@@ -77,32 +77,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
-    public double TextOpacity
-    {
-        get => _mainViewModel.TextOpacity;
-        set
-        {
-            if (_mainViewModel.TextOpacity != value)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] Text opacity changed: {value}");
-                _mainViewModel.TextOpacity = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-    public double FontSize
-    {
-        get => _mainViewModel.FontSize;
-        set
-        {
-            if (_mainViewModel.FontSize != value)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] Font size changed: {value}");
-                _mainViewModel.FontSize = value;
-                OnPropertyChanged();
-            }
-        }
-    }
+    /// <summary>
+    /// Показывать секунды. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
     public bool ShowSeconds
     {
         get => _mainViewModel.ShowSeconds;
@@ -116,6 +93,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
+    /// <summary>
+    /// Показывать цифровые часы. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
     public bool ShowDigitalClock
     {
         get => _mainViewModel.ShowDigitalClock;
@@ -129,6 +109,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
+    /// <summary>
+    /// Показывать аналоговые часы. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
     public bool ShowAnalogClock
     {
         get => _mainViewModel.ShowAnalogClock;
@@ -142,6 +125,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
+    /// <summary>
+    /// Размер аналоговых часов. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
     public double AnalogClockSize
     {
         get => _mainViewModel.AnalogClockSize;
@@ -155,32 +141,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
-    public bool CuckooEveryHour
-    {
-        get => _mainViewModel.CuckooEveryHour;
-        set
-        {
-            if (_mainViewModel.CuckooEveryHour != value)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] CuckooEveryHour changed: {value}");
-                _mainViewModel.CuckooEveryHour = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-    public bool DigitalClockTopmost
-    {
-        get => _mainViewModel.DigitalClockTopmost;
-        set
-        {
-            if (_mainViewModel.DigitalClockTopmost != value)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] DigitalClockTopmost changed: {value}");
-                _mainViewModel.DigitalClockTopmost = value;
-                OnPropertyChanged();
-            }
-        }
-    }
+    /// <summary>
+    /// Аналоговые часы поверх всех окон. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
     public bool AnalogClockTopmost
     {
         get => _mainViewModel.AnalogClockTopmost;
@@ -194,6 +157,41 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
+    /// <summary>
+    /// Цифровые часы поверх всех окон. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
+    public bool DigitalClockTopmost
+    {
+        get => _mainViewModel.DigitalClockTopmost;
+        set
+        {
+            if (_mainViewModel.DigitalClockTopmost != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] DigitalClockTopmost changed: {value}");
+                _mainViewModel.DigitalClockTopmost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    /// <summary>
+    /// Воспроизводить звук кукушки каждый час. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
+    public bool CuckooEveryHour
+    {
+        get => _mainViewModel.CuckooEveryHour;
+        set
+        {
+            if (_mainViewModel.CuckooEveryHour != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] CuckooEveryHour changed: {value}");
+                _mainViewModel.CuckooEveryHour = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    /// <summary>
+    /// Воспроизводить сигнал каждые полчаса. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
     public bool HalfHourChimeEnabled
     {
         get => _mainViewModel.HalfHourChimeEnabled;
@@ -203,6 +201,22 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             {
                 _logger.LogInformation($"[SettingsWindowViewModel] HalfHourChimeEnabled changed: {value}");
                 _mainViewModel.HalfHourChimeEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    /// <summary>
+    /// Размер шрифта. Dirty-флаг выставляется в MainWindowViewModel.
+    /// </summary>
+    public double FontSize
+    {
+        get => _mainViewModel.FontSize;
+        set
+        {
+            if (_mainViewModel.FontSize != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Font size changed: {value}");
+                _mainViewModel.FontSize = value;
                 OnPropertyChanged();
             }
         }

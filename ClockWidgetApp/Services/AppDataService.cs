@@ -3,6 +3,7 @@ using System.Text.Json;
 using ClockWidgetApp.Models;
 using System.Collections.Specialized;
 using System.Windows.Threading;
+using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.Services
 {
@@ -80,11 +81,11 @@ namespace ClockWidgetApp.Services
 
         #region Private Methods
         /// <summary>
-        /// Запускает таймер автосохранения, который каждую минуту сохраняет данные, если dirty-флаг выставлен.
+        /// Запускает таймер автосохранения, который в заданном интервале сохраняет данные, если dirty-флаг выставлен.
         /// </summary>
         private void StartAutoSaveTimer()
         {
-            _autoSaveTimer = new DispatcherTimer { Interval = System.TimeSpan.FromMinutes(1) };
+            _autoSaveTimer = new DispatcherTimer { Interval = System.TimeSpan.FromMinutes(Constants.DEFAULT_AUTO_SAVE_INTERVAL_MINUTES) };
             _autoSaveTimer.Tick += (s, e) =>
             {
                 bool needSave = false;

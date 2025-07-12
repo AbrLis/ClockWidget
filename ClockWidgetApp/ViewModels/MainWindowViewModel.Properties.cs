@@ -78,7 +78,7 @@ public partial class MainWindowViewModel
     }
 
     /// <summary>
-    /// Размер шрифта. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Размер шрифта. При изменении выставляется dirty-флаг.
     /// </summary>
     public double FontSize
     {
@@ -91,12 +91,13 @@ public partial class MainWindowViewModel
                 _logger.LogInformation($"[FontSize] Changed: {validatedValue}");
                 _appDataService.Data.WidgetSettings.FontSize = validatedValue;
                 OnPropertyChanged();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Показывать секунды. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Показывать секунды. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool ShowSeconds
     {
@@ -107,11 +108,12 @@ public partial class MainWindowViewModel
             _showSeconds = value;
             _logger.LogInformation($"[ShowSeconds] Changed: {value}");
             OnPropertyChanged();
+            App.MarkWidgetSettingsDirty();
         }
     }
 
     /// <summary>
-    /// Показывать цифровые часы. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Показывать цифровые часы. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool ShowDigitalClock
     {
@@ -124,12 +126,13 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.ShowDigitalClock = value;
                 OnPropertyChanged(nameof(ShowDigitalClock));
                 UpdateWindowsVisibility();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Показывать аналоговые часы. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Показывать аналоговые часы. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool ShowAnalogClock
     {
@@ -142,12 +145,13 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.ShowAnalogClock = value;
                 OnPropertyChanged(nameof(ShowAnalogClock));
                 UpdateWindowsVisibility();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Размер аналоговых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Размер аналоговых часов. При изменении выставляется dirty-флаг.
     /// </summary>
     public double AnalogClockSize
     {
@@ -162,12 +166,13 @@ public partial class MainWindowViewModel
                 _analogClockSize = validatedValue;
                 OnPropertyChanged();
                 UpdateAnalogClockSize();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Аналоговые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Аналоговые часы поверх всех окон. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool AnalogClockTopmost
     {
@@ -180,12 +185,13 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.AnalogClockTopmost = value;
                 OnPropertyChanged();
                 UpdateAnalogClockTopmost();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Цифровые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Цифровые часы поверх всех окон. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool DigitalClockTopmost
     {
@@ -198,12 +204,13 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.DigitalClockTopmost = value;
                 OnPropertyChanged();
                 UpdateDigitalClockTopmost();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Воспроизводить звук кукушки каждый час. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Воспроизводить звук кукушки каждый час. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool CuckooEveryHour
     {
@@ -215,12 +222,13 @@ public partial class MainWindowViewModel
             {
                 _appDataService.Data.WidgetSettings.CuckooEveryHour = value;
                 OnPropertyChanged();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Воспроизводить сигнал каждые полчаса. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
+    /// Воспроизводить сигнал каждые полчаса. При изменении выставляется dirty-флаг.
     /// </summary>
     public bool HalfHourChimeEnabled
     {
@@ -232,6 +240,7 @@ public partial class MainWindowViewModel
             {
                 _appDataService.Data.WidgetSettings.HalfHourChimeEnabled = value;
                 OnPropertyChanged();
+                App.MarkWidgetSettingsDirty();
             }
         }
     }

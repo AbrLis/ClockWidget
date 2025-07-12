@@ -103,8 +103,14 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Получает сохраненную позицию окна.</summary>
     public (double Left, double Top) GetWindowPosition() => WindowPositionHelper.GetWindowPosition(_appDataService, true);
 
-    /// <summary>Сохраняет позицию окна аналоговых часов.</summary>
-    public void SaveWindowPosition(double left, double top) => WindowPositionHelper.SaveWindowPosition(_appDataService, left, top, true);
+    /// <summary>
+    /// Сохраняет позицию окна аналоговых часов и помечает настройки как изменённые (dirty-флаг).
+    /// </summary>
+    public void SaveWindowPosition(double left, double top)
+    {
+        WindowPositionHelper.SaveWindowPosition(_appDataService, left, top, true);
+        App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
+    }
 
     /// <summary>Вызывает событие изменения свойства.</summary>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

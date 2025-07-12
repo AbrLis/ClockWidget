@@ -5,6 +5,11 @@ namespace ClockWidgetApp.Helpers;
 /// </summary>
 public static class Constants
 {
+    /// <summary>
+    /// Интервал автосохранения (в минутах) для AppDataService.
+    /// </summary>
+    public const int DEFAULT_AUTO_SAVE_INTERVAL_MINUTES = 3;
+
     // Свойства для доступа из XAML
     public static double MIN_WINDOW_OPACITY => WindowSettings.MIN_WINDOW_OPACITY;
     public static double MAX_WINDOW_OPACITY => WindowSettings.MAX_WINDOW_OPACITY;
