@@ -96,7 +96,6 @@ public class TimersViewModel : INotifyPropertyChanged
             TryParseOrZero(NewTimerSeconds, out int s);
             var ts = new TimeSpan(h, m, s);
             var timer = new TimerEntryViewModel(ts);
-            timer.RequestDelete += t => { t.Dispose(); Timers.Remove(t); };
             timer.RequestDeactivate += t => t.IsActive = false;
             Timers.Insert(0, timer);
             IsTimerInputVisible = false;

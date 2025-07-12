@@ -312,7 +312,7 @@
                                                         </Button.Style>
                                                     </Button>
                                                     <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DataContext.DeleteTimerCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
                                                     <Button Content="🔄" Width="28" Height="28" Margin="4,0" Click="TimerResetButton_Click"/>
                                                 </StackPanel>
                                             </Grid>
@@ -419,7 +419,7 @@
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
                                                     <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
                                                     <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
-                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DeleteCommand}"/>
+                                                    <Button Content="🗑️" Width="28" Height="28" Margin="4,0" Command="{Binding DataContext.DeleteAlarmCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>

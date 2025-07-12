@@ -35,6 +35,8 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         _appDataService = appDataService;
         _timersAndAlarmsViewModel = timersAndAlarmsViewModel;
         _logger = logger;
+        TimersVM = _timersAndAlarmsViewModel.TimersVM;
+        AlarmsVM = _timersAndAlarmsViewModel.AlarmsVM;
         _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
         Localized = LocalizationManager.GetLocalizedStrings();
         LocalizationManager.LanguageChanged += (s, e) =>
@@ -239,8 +241,8 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     });
     public RelayCommand ShowLogsCommand => new RelayCommand(_ => ShowLogs());
     public RelayCommand CloseAppCommand => new RelayCommand(_ => CloseApp());
-    public TimersViewModel TimersVM => _timersAndAlarmsViewModel.TimersVM;
-    public AlarmsViewModel AlarmsVM => _timersAndAlarmsViewModel.AlarmsVM;
+    public TimersViewModel TimersVM { get; set; }
+    public AlarmsViewModel AlarmsVM { get; set; }
     public LongTimersViewModel LongTimersVM => _timersAndAlarmsViewModel.LongTimersVM;
 
     /// <summary>
@@ -260,6 +262,28 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             {
                 _logger.LogInformation($"[SettingsWindowViewModel] Пользователь отменил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
             }
+        }
+    });
+
+    /// <summary>
+    /// Команда для удаления обычного таймера без подтверждения.
+    /// </summary>
+    public RelayCommand DeleteTimerCommand => new RelayCommand(obj =>
+    {
+        if (obj is TimerEntryViewModel timer)
+        {
+            TimersVM.Timers.Remove(timer);
+        }
+    });
+    
+    /// <summary>
+    /// Команда для удаления будильника без подтверждения.
+    /// </summary>
+    public RelayCommand DeleteAlarmCommand => new RelayCommand(obj =>
+    {
+        if (obj is AlarmEntryViewModel alarm)
+        {
+            AlarmsVM.Alarms.Remove(alarm);
         }
     });
     #endregion

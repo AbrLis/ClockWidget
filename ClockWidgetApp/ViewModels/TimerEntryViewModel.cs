@@ -49,7 +49,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         Remaining = duration;
         StartCommand = new RelayCommand(_ => { if (IsStartAvailable) Start(); });
         StopCommand = new RelayCommand(_ => { if (IsStopAvailable) Stop(); });
-        DeleteCommand = new RelayCommand(_ => RequestDelete?.Invoke(this));
         DeactivateCommand = new RelayCommand(_ => { if (IsHideAvailable) Deactivate(); });
         ResetCommand = new RelayCommand(_ => Reset());
     }
@@ -97,10 +96,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
     /// </summary>
     public ICommand StopCommand { get; }
     /// <summary>
-    /// Команда удаления таймера.
-    /// </summary>
-    public ICommand DeleteCommand { get; }
-    /// <summary>
     /// Команда деактивации (скрытия) таймера.
     /// </summary>
     public ICommand DeactivateCommand { get; }
@@ -140,10 +135,6 @@ public class TimerEntryViewModel : INotifyPropertyChanged, IDisposable
         set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); App.MarkTimersAlarmsDirty(); }
     }
 
-    /// <summary>
-    /// Событие запроса удаления таймера.
-    /// </summary>
-    public event Action<TimerEntryViewModel>? RequestDelete;
     /// <summary>
     /// Событие запроса деактивации таймера.
     /// </summary>

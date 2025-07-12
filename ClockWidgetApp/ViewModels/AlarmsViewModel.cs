@@ -112,7 +112,6 @@ public class AlarmsViewModel : INotifyPropertyChanged
                 return;
             }
             var alarm = new AlarmEntryViewModel(ts);
-            alarm.RequestDelete += a => Alarms.Remove(a);
             Alarms.Insert(0, alarm);
             IsAlarmInputVisible = false;
             NewAlarmHours = "";

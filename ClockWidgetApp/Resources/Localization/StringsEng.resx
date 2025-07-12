@@ -127,4 +127,6 @@
   <data name="LongTimers_Days" xml:space="preserve">
     <value>d</value>
   </data>
+  <data name="LongTimers_ConfirmDelete" xml:space="preserve"><value>Delete long timer? This action cannot be undone.</value></data>
+  <data name="LongTimers_ConfirmDeleteTitle" xml:space="preserve"><value>Delete confirmation</value></data>
 </root> 

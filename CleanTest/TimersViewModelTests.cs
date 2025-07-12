@@ -1,6 +1,11 @@
 using ClockWidgetApp.ViewModels;
 using Xunit;
 using System;
+using Moq;
+using ClockWidgetApp.Services;
+using ClockWidgetApp.Models;
+using ClockWidgetApp.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace CleanTest;
 
@@ -44,22 +49,6 @@ public class TimersViewModelTests
     }
 
     /// <summary>
-    /// Проверяет удаление таймера через команду DeleteCommand.
-    /// </summary>
-    [Fact]
-    public void TimerEntryViewModel_RequestDelete_ShouldRemoveTimer()
-    {
-        var vm = new TimersViewModel();
-        vm.NewTimerHours = "0";
-        vm.NewTimerMinutes = "0";
-        vm.NewTimerSeconds = "10";
-        vm.AddTimerCommand.Execute(null);
-        var timer = vm.Timers[0];
-        timer.DeleteCommand.Execute(null);
-        Assert.Empty(vm.Timers);
-    }
-
-    /// <summary>
     /// Проверяет запуск и остановку таймера через команды.
     /// </summary>
     [Fact]
@@ -88,5 +77,34 @@ public class TimersViewModelTests
         Assert.Equal("23", vm.NewTimerHours);
         Assert.Equal("59", vm.NewTimerMinutes);
         Assert.Equal("0", vm.NewTimerSeconds);
+    }
+
+    /// <summary>
+    /// Проверяет удаление таймера через DeleteTimerCommand в SettingsWindowViewModel.
+    /// </summary>
+    [Fact]
+    public void SettingsWindowViewModel_DeleteTimerCommand_ShouldRemoveTimer()
+    {
+        var timersVM = new TimersViewModel();
+        timersVM.NewTimerHours = "0";
+        timersVM.NewTimerMinutes = "0";
+        timersVM.NewTimerSeconds = "10";
+        timersVM.AddTimerCommand.Execute(null);
+        var timer = timersVM.Timers[0];
+        var timeService = new Mock<ITimeService>().Object;
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var appDataService = appDataServiceMock.Object;
+        var soundService = new Mock<ISoundService>().Object;
+        var windowService = new Mock<IWindowService>().Object;
+        var mainLogger = new Mock<ILogger<MainWindowViewModel>>().Object;
+        var mainVM = new MainWindowViewModel(timeService, appDataService, soundService, windowService, mainLogger);
+        var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
+        var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
+        var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
+        var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
+        settingsVM.TimersVM = timersVM;
+        settingsVM.DeleteTimerCommand.Execute(timer);
+        Assert.Empty(timersVM.Timers);
     }
 } 

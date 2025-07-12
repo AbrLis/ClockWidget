@@ -92,7 +92,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         foreach (var t in persist.Timers)
         {
             var timer = new TimerEntryViewModel(t.Duration);
-            timer.RequestDelete += tt => { tt.Dispose(); TimersVM.Timers.Remove(tt); };
             timer.RequestDeactivate += tt => tt.IsActive = false;
             TimersVM.Timers.Add(timer);
             Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен таймер: {t.Duration}");
@@ -108,7 +107,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
                 nextTrigger = null;
             }
             var alarm = new AlarmEntryViewModel(a.AlarmTime, isEnabled, nextTrigger);
-            alarm.RequestDelete += aa => AlarmsVM.Alarms.Remove(aa);
             AlarmsVM.Alarms.Add(alarm);
             Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен будильник: {a.AlarmTime}");
         }
@@ -346,9 +344,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         if (timer.IsRunning) AddTimerTray(timer);
     }
 
-    /// <summary>
-    /// Подписывает будильник на события для отображения/удаления иконки в трее.
-    /// </summary>
     private void SubscribeAlarm(AlarmEntryViewModel alarm)
     {
         alarm.PropertyChanged += (s, e) =>

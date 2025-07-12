@@ -58,16 +58,6 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
 
     public ICommand ToggleEnabledCommand { get; }
 
-    /// <summary>
-    /// Команда для удаления будильника.
-    /// </summary>
-    public ICommand DeleteCommand { get; }
-
-    /// <summary>
-    /// Событие, вызываемое при запросе на удаление будильника.
-    /// </summary>
-    public event Action<AlarmEntryViewModel>? RequestDelete;
-
     public AlarmEntryViewModel(TimeSpan alarmTime, bool isEnabled = false, DateTime? nextTriggerDateTime = null)
     {
         AlarmTime = alarmTime;
@@ -76,7 +66,6 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
         ToggleEnabledCommand = new RelayCommand(_ => ToggleEnabled());
         StartCommand = new RelayCommand(_ => Start(), _ => !IsEnabled);
         StopCommand = new RelayCommand(_ => Stop(), _ => IsEnabled);
-        DeleteCommand = new RelayCommand(_ => RequestDelete?.Invoke(this));
         if (IsEnabled && NextTriggerDateTime == null)
             UpdateNextTrigger();
         if (!IsEnabled)

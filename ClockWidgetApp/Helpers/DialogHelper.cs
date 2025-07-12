@@ -9,24 +9,14 @@ namespace ClockWidgetApp.Helpers
     public static class DialogHelper
     {
         /// <summary>
-        /// Показывает окно подтверждения удаления длинного таймера с owner = SettingsWindow, если оно открыто.
+        /// Делегат для подтверждения удаления длинного таймера. Можно подменять в тестах.
         /// </summary>
-        /// <returns>true, если пользователь подтвердил удаление; иначе false.</returns>
-        public static bool ConfirmLongTimerDelete()
+        public static Func<bool> ConfirmLongTimerDelete = () =>
         {
-            Window? owner = null;
-            // Получаем окно настроек через IWindowService из DI
-            if (System.Windows.Application.Current is App app)
-            {
-                var windowService = app.Services.GetService(typeof(ClockWidgetApp.Services.IWindowService)) as ClockWidgetApp.Services.IWindowService;
-                owner = windowService?.GetSettingsWindow();
-            }
-            return System.Windows.MessageBox.Show(
-                owner,
-                "Удалить длинный таймер? Это действие нельзя отменить.",
-                "Подтверждение удаления",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning) == MessageBoxResult.Yes;
-        }
+            var message = LocalizationManager.GetString("LongTimers_ConfirmDelete");
+            var title = LocalizationManager.GetString("LongTimers_ConfirmDeleteTitle");
+            var result = System.Windows.MessageBox.Show(message, title, System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
+            return result == System.Windows.MessageBoxResult.Yes;
+        };
     }
 } 

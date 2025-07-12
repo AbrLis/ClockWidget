@@ -1,6 +1,11 @@
 using ClockWidgetApp.ViewModels;
 using Xunit;
 using System;
+using Moq;
+using ClockWidgetApp.Services;
+using ClockWidgetApp.Helpers;
+using ClockWidgetApp.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CleanTest;
 
@@ -47,13 +52,7 @@ public class AlarmsViewModelTests
     [Fact]
     public void AlarmEntryViewModel_RequestDelete_ShouldRemoveAlarm()
     {
-        var vm = new AlarmsViewModel();
-        vm.NewAlarmHours = "6";
-        vm.NewAlarmMinutes = "0";
-        vm.AddAlarmCommand.Execute(null);
-        var alarm = vm.Alarms[0];
-        alarm.DeleteCommand.Execute(null);
-        Assert.Empty(vm.Alarms);
+        // Удалён тест, так как DeleteCommand больше не существует
     }
 
     /// <summary>
@@ -106,5 +105,33 @@ public class AlarmsViewModelTests
         Assert.Single(vm.Alarms);
         // Должно появиться уведомление о дублировании
         Assert.False(string.IsNullOrWhiteSpace(vm.DuplicateAlarmNotification));
+    }
+
+    /// <summary>
+    /// Проверяет удаление будильника через DeleteAlarmCommand в SettingsWindowViewModel.
+    /// </summary>
+    [Fact]
+    public void SettingsWindowViewModel_DeleteAlarmCommand_ShouldRemoveAlarm()
+    {
+        var alarmsVM = new AlarmsViewModel();
+        alarmsVM.NewAlarmHours = "6";
+        alarmsVM.NewAlarmMinutes = "0";
+        alarmsVM.AddAlarmCommand.Execute(null);
+        var alarm = alarmsVM.Alarms[0];
+        var timeService = new Mock<ITimeService>().Object;
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var appDataService = appDataServiceMock.Object;
+        var soundService = new Mock<ISoundService>().Object;
+        var windowService = new Mock<IWindowService>().Object;
+        var mainLogger = new Mock<ILogger<MainWindowViewModel>>().Object;
+        var mainVM = new MainWindowViewModel(timeService, appDataService, soundService, windowService, mainLogger);
+        var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
+        var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
+        var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
+        var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
+        settingsVM.AlarmsVM = alarmsVM;
+        settingsVM.DeleteAlarmCommand.Execute(alarm);
+        Assert.Empty(alarmsVM.Alarms);
     }
 } 

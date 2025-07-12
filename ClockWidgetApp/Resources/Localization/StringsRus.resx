@@ -122,4 +122,6 @@
   <data name="LongTimers_Days" xml:space="preserve">
     <value>д</value>
   </data>
+  <data name="LongTimers_ConfirmDelete" xml:space="preserve"><value>Удалить длинный таймер? Это действие нельзя отменить.</value></data>
+  <data name="LongTimers_ConfirmDeleteTitle" xml:space="preserve"><value>Подтверждение удаления</value></data>
 </root>
