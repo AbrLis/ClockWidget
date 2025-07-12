@@ -184,7 +184,29 @@ namespace ClockWidgetApp.Services
             var settingsDir = Path.GetDirectoryName(_settingsFilePath);
             if (!string.IsNullOrEmpty(settingsDir) && !Directory.Exists(settingsDir))
                 Directory.CreateDirectory(settingsDir);
+            bool doBackup = false;
             if (File.Exists(_settingsFilePath))
+            {
+                // Проверяем валидность текущего settings-файла перед созданием .bak
+                try
+                {
+                    var json = File.ReadAllText(_settingsFilePath);
+                    var obj = System.Text.Json.JsonSerializer.Deserialize<ClockWidgetApp.Models.WidgetSettings>(json);
+                    if (obj != null)
+                    {
+                        doBackup = true;
+                    }
+                    else
+                    {
+                        Serilog.Log.Warning($"[AppDataService] Текущий settings-файл повреждён, .bak не обновляется");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Serilog.Log.Warning(ex, $"[AppDataService] Ошибка при проверке валидности settings-файла, .bak не обновляется");
+                }
+            }
+            if (doBackup)
             {
                 string backupPath = Path.ChangeExtension(_settingsFilePath, ".bak");
                 try
@@ -199,11 +221,19 @@ namespace ClockWidgetApp.Services
                     Serilog.Log.Error(ex, $"[AppDataService] Ошибка создания резервной копии настроек: {backupPath}");
                 }
             }
+            // Сохраняем новые настройки в основной файл
+            bool backupAfterSave = !doBackup && File.Exists(_settingsFilePath); // если был повреждён, нужно сделать .bak после сохранения
             try
             {
-                var settingsJson = JsonSerializer.Serialize(Data.WidgetSettings, new JsonSerializerOptions { WriteIndented = true });
+                var settingsJson = System.Text.Json.JsonSerializer.Serialize(Data.WidgetSettings, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(_settingsFilePath, settingsJson);
                 Serilog.Log.Information($"[AppDataService] Настройки успешно сохранены: {_settingsFilePath}");
+                if (backupAfterSave)
+                {
+                    string backupPath = Path.ChangeExtension(_settingsFilePath, ".bak");
+                    File.Copy(_settingsFilePath, backupPath, overwrite: true);
+                    Serilog.Log.Information($"[AppDataService] После повреждения создан новый .bak из свежих настроек: {backupPath}");
+                }
             }
             catch (System.Exception ex)
             {
