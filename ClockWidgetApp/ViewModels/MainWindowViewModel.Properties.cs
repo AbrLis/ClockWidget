@@ -7,9 +7,6 @@ namespace ClockWidgetApp.ViewModels;
 public partial class MainWindowViewModel
 {
     private string _timeText = string.Empty;
-    private double _backgroundOpacity;
-    private double _textOpacity;
-    private double _fontSize;
     private bool _showSeconds;
     private bool _showDigitalClock = true;
     private bool _showAnalogClock = true;
@@ -30,18 +27,17 @@ public partial class MainWindowViewModel
     /// </summary>
     public double BackgroundOpacity
     {
-        get => _backgroundOpacity;
+        get => _appDataService.Data.WidgetSettings.BackgroundOpacity;
         set
         {
             var validatedValue = ValidateOpacity(value, 
                 Constants.WindowSettings.MIN_WINDOW_OPACITY, 
                 Constants.WindowSettings.MAX_WINDOW_OPACITY, 
                 Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
-            if (_backgroundOpacity != validatedValue)
+            if (_appDataService.Data.WidgetSettings.BackgroundOpacity != validatedValue)
             {
-                _backgroundOpacity = validatedValue;
+                _appDataService.Data.WidgetSettings.BackgroundOpacity = validatedValue;
                 OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.BackgroundOpacity = validatedValue);
             }
         }
     }
@@ -50,18 +46,17 @@ public partial class MainWindowViewModel
     /// </summary>
     public double TextOpacity
     {
-        get => _textOpacity;
+        get => _appDataService.Data.WidgetSettings.TextOpacity;
         set
         {
             var validatedValue = ValidateOpacity(value, 
                 Constants.TextSettings.MIN_TEXT_OPACITY, 
                 Constants.TextSettings.MAX_TEXT_OPACITY, 
                 Constants.TextSettings.DEFAULT_TEXT_OPACITY);
-            if (_textOpacity != validatedValue)
+            if (_appDataService.Data.WidgetSettings.TextOpacity != validatedValue)
             {
-                _textOpacity = validatedValue;
+                _appDataService.Data.WidgetSettings.TextOpacity = validatedValue;
                 OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.TextOpacity = validatedValue);
             }
         }
     }
@@ -70,15 +65,14 @@ public partial class MainWindowViewModel
     /// </summary>
     public double FontSize
     {
-        get => _fontSize;
+        get => _appDataService.Data.WidgetSettings.FontSize;
         set
         {
             var validatedValue = ValidateFontSize(value);
-            if (_fontSize != validatedValue)
+            if (_appDataService.Data.WidgetSettings.FontSize != validatedValue)
             {
-                _fontSize = validatedValue;
+                _appDataService.Data.WidgetSettings.FontSize = validatedValue;
                 OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.FontSize = validatedValue);
             }
         }
     }
@@ -87,23 +81,27 @@ public partial class MainWindowViewModel
     /// </summary>
     public bool ShowSeconds
     {
-        get => _showSeconds;
-        set { _showSeconds = value; OnPropertyChanged(); _settingsService.UpdateSettings(s => s.ShowSeconds = _showSeconds); }
+        get => _appDataService.Data.WidgetSettings.ShowSeconds;
+        set
+        {
+            _appDataService.Data.WidgetSettings.ShowSeconds = value;
+            _showSeconds = value;
+            OnPropertyChanged();
+        }
     }
     /// <summary>
     /// Показывать цифровые часы. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
     /// </summary>
     public bool ShowDigitalClock
     {
-        get => _showDigitalClock;
+        get => _appDataService.Data.WidgetSettings.ShowDigitalClock;
         set
         {
-            _logger.LogDebug("[ShowDigitalClock SET] old={0}, new={1} (property changed)", _showDigitalClock, value);
-            if (_showDigitalClock != value)
+            _logger.LogDebug("[ShowDigitalClock SET] old={0}, new={1} (property changed)", _appDataService.Data.WidgetSettings.ShowDigitalClock, value);
+            if (_appDataService.Data.WidgetSettings.ShowDigitalClock != value)
             {
-                _showDigitalClock = value;
+                _appDataService.Data.WidgetSettings.ShowDigitalClock = value;
                 OnPropertyChanged(nameof(ShowDigitalClock));
-                _settingsService.UpdateSettings(s => s.ShowDigitalClock = _showDigitalClock);
                 UpdateWindowsVisibility();
             }
         }
@@ -113,14 +111,13 @@ public partial class MainWindowViewModel
     /// </summary>
     public bool ShowAnalogClock
     {
-        get => _showAnalogClock;
+        get => _appDataService.Data.WidgetSettings.ShowAnalogClock;
         set
         {
-            if (_showAnalogClock != value)
+            if (_appDataService.Data.WidgetSettings.ShowAnalogClock != value)
             {
-                _showAnalogClock = value;
+                _appDataService.Data.WidgetSettings.ShowAnalogClock = value;
                 OnPropertyChanged(nameof(ShowAnalogClock));
-                _settingsService.UpdateSettings(s => s.ShowAnalogClock = _showAnalogClock);
                 UpdateWindowsVisibility();
             }
         }
@@ -130,25 +127,16 @@ public partial class MainWindowViewModel
     /// </summary>
     public double AnalogClockSize
     {
-        get => _analogClockSize;
+        get => _appDataService.Data.WidgetSettings.AnalogClockSize;
         set
         {
-            if (Math.Abs(_analogClockSize - value) > 0.001)
+            var validatedValue = ValidateFontSize(value);
+            if (_appDataService.Data.WidgetSettings.AnalogClockSize != validatedValue)
             {
-                try
-                {
-                    _logger.LogDebug($"[MainWindowViewModel.Properties] Updating analog clock size: {value}");
-                    _analogClockSize = value;
-                    OnPropertyChanged();
-                    _settingsService.UpdateSettings(s => s.AnalogClockSize = value);
-                    UpdateAnalogClockSize();
-                }
-                catch (Exception)
-                {
-                    _logger.LogError("[MainWindowViewModel.Properties] Error updating analog clock size");
-                    _analogClockSize = value;
-                    OnPropertyChanged();
-                }
+                _appDataService.Data.WidgetSettings.AnalogClockSize = validatedValue;
+                _analogClockSize = validatedValue;
+                OnPropertyChanged();
+                UpdateAnalogClockSize();
             }
         }
     }
@@ -157,14 +145,13 @@ public partial class MainWindowViewModel
     /// </summary>
     public bool AnalogClockTopmost
     {
-        get => _analogClockTopmost;
+        get => _appDataService.Data.WidgetSettings.AnalogClockTopmost;
         set
         {
-            if (_analogClockTopmost != value)
+            if (_appDataService.Data.WidgetSettings.AnalogClockTopmost != value)
             {
-                _analogClockTopmost = value;
+                _appDataService.Data.WidgetSettings.AnalogClockTopmost = value;
                 OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.AnalogClockTopmost = value);
                 UpdateAnalogClockTopmost();
             }
         }
@@ -174,14 +161,13 @@ public partial class MainWindowViewModel
     /// </summary>
     public bool DigitalClockTopmost
     {
-        get => _digitalClockTopmost;
+        get => _appDataService.Data.WidgetSettings.DigitalClockTopmost;
         set
         {
-            if (_digitalClockTopmost != value)
+            if (_appDataService.Data.WidgetSettings.DigitalClockTopmost != value)
             {
-                _digitalClockTopmost = value;
+                _appDataService.Data.WidgetSettings.DigitalClockTopmost = value;
                 OnPropertyChanged();
-                _settingsService.UpdateSettings(s => s.DigitalClockTopmost = value);
                 UpdateDigitalClockTopmost();
             }
         }
@@ -191,13 +177,13 @@ public partial class MainWindowViewModel
     /// </summary>
     public bool CuckooEveryHour
     {
-        get => _settingsService.CurrentSettings.CuckooEveryHour;
+        get => _appDataService.Data.WidgetSettings.CuckooEveryHour;
         set
         {
-            if (_settingsService.CurrentSettings.CuckooEveryHour != value)
+            if (_appDataService.Data.WidgetSettings.CuckooEveryHour != value)
             {
                 _logger.LogDebug($"[MainWindowViewModel.Properties] Updating CuckooEveryHour: {value}");
-                _settingsService.UpdateSettings(s => s.CuckooEveryHour = value);
+                _appDataService.Data.WidgetSettings.CuckooEveryHour = value;
                 OnPropertyChanged();
             }
         }
@@ -207,32 +193,30 @@ public partial class MainWindowViewModel
     /// </summary>
     public bool HalfHourChimeEnabled
     {
-        get => _settingsService.CurrentSettings.HalfHourChimeEnabled;
+        get => _appDataService.Data.WidgetSettings.HalfHourChimeEnabled;
         set
         {
-            if (_settingsService.CurrentSettings.HalfHourChimeEnabled != value)
+            if (_appDataService.Data.WidgetSettings.HalfHourChimeEnabled != value)
             {
                 _logger.LogDebug($"[MainWindowViewModel.Properties] Updating HalfHourChimeEnabled: {value}");
-                _settingsService.UpdateSettings(s => s.HalfHourChimeEnabled = value);
+                _appDataService.Data.WidgetSettings.HalfHourChimeEnabled = value;
                 OnPropertyChanged();
             }
         }
     }
     public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
 
-    public ISettingsService SettingsService => _settingsService;
-
     private void UpdateAnalogClockTopmost()
     {
         var analogWindow = _windowService.GetAnalogClockWindow();
         if (analogWindow != null)
         {
-            analogWindow.Topmost = _analogClockTopmost;
+            analogWindow.Topmost = AnalogClockTopmost;
         }
     }
     private void UpdateDigitalClockTopmost()
     {
-        _windowService.SetMainWindowTopmost(_digitalClockTopmost);
+        _windowService.SetMainWindowTopmost(DigitalClockTopmost);
     }
 
     private void SubscribeToLanguageChanges()

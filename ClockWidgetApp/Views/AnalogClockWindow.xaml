@@ -30,13 +30,13 @@
                     Opacity="{Binding BackgroundOpacity}"/>
                 <!-- Основной Canvas для размещения элементов часов -->
                 <Canvas x:Name="ClockCanvas" 
-                        Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                        Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                         Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                         Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_MARGIN}}">
                     
                     <!-- Контур циферблата -->
-                    <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
-                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}" 
+                    <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
+                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
                              Stroke="White" 
                              StrokeThickness="2"
                              Opacity="{Binding TextOpacity}"/>

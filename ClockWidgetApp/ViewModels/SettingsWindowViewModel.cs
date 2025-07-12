@@ -3,10 +3,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using ClockWidgetApp.Helpers;
 using System.Windows;
-using System.Windows.Input;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -15,271 +12,30 @@ namespace ClockWidgetApp.ViewModels;
 /// </summary>
 public class SettingsWindowViewModel : INotifyPropertyChanged
 {
+    #region Private Fields
+    /// <summary>Главная ViewModel для передачи настроек.</summary>
     private readonly MainWindowViewModel _mainViewModel;
+    /// <summary>Сервис доступа к данным приложения.</summary>
+    private readonly IAppDataService _appDataService;
+    /// <summary>Логгер для событий ViewModel.</summary>
     private readonly ILogger<SettingsWindowViewModel> _logger;
-
-    /// <summary>
-    /// Событие, возникающее при изменении значения свойства.
-    /// </summary>
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    /// <summary>
-    /// Получает или задает прозрачность фона. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public double BackgroundOpacity
-    {
-        get => _mainViewModel.BackgroundOpacity;
-        set
-        {
-            if (_mainViewModel.BackgroundOpacity != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating background opacity: {Value}", value);
-                _mainViewModel.BackgroundOpacity = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Получает или задает прозрачность текста. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public double TextOpacity
-    {
-        get => _mainViewModel.TextOpacity;
-        set
-        {
-            if (_mainViewModel.TextOpacity != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating text opacity: {Value}", value);
-                _mainViewModel.TextOpacity = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Получает или задает размер шрифта. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public double FontSize
-    {
-        get => _mainViewModel.FontSize;
-        set
-        {
-            if (_mainViewModel.FontSize != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating font size: {Value}", value);
-                _mainViewModel.FontSize = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Получает или задает отображение секунд. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool ShowSeconds
-    {
-        get => _mainViewModel.ShowSeconds;
-        set
-        {
-            if (_mainViewModel.ShowSeconds != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating show seconds: {Value}", value);
-                _mainViewModel.ShowSeconds = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Получает или задает отображение цифровых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool ShowDigitalClock
-    {
-        get => _mainViewModel.ShowDigitalClock;
-        set
-        {
-            if (_mainViewModel.ShowDigitalClock != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating show digital clock: {Value}", value);
-                _mainViewModel.ShowDigitalClock = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Получает или задает отображение аналоговых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool ShowAnalogClock
-    {
-        get => _mainViewModel.ShowAnalogClock;
-        set
-        {
-            if (_mainViewModel.ShowAnalogClock != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating show analog clock: {Value}", value);
-                _mainViewModel.ShowAnalogClock = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Получает или устанавливает размер окна аналоговых часов. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public double AnalogClockSize
-    {
-        get => _mainViewModel.AnalogClockSize;
-        set
-        {
-            if (Math.Abs(_mainViewModel.AnalogClockSize - value) > 0.001)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating analog clock size: {Value}", value);
-                _mainViewModel.AnalogClockSize = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Воспроизводить звук кукушки каждый час. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool CuckooEveryHour
-    {
-        get => _mainViewModel.CuckooEveryHour;
-        set
-        {
-            if (_mainViewModel.CuckooEveryHour != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating CuckooEveryHour: {Value}", value);
-                _mainViewModel.CuckooEveryHour = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Цифровые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool DigitalClockTopmost
-    {
-        get => _mainViewModel.DigitalClockTopmost;
-        set
-        {
-            if (_mainViewModel.DigitalClockTopmost != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating DigitalClockTopmost: {Value}", value);
-                _mainViewModel.DigitalClockTopmost = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Аналоговые часы поверх всех окон. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool AnalogClockTopmost
-    {
-        get => _mainViewModel.AnalogClockTopmost;
-        set
-        {
-            if (_mainViewModel.AnalogClockTopmost != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating AnalogClockTopmost: {Value}", value);
-                _mainViewModel.AnalogClockTopmost = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Воспроизводить сигнал каждые полчаса. Изменения сохраняются только в буфере и будут записаны на диск при закрытии приложения.
-    /// </summary>
-    public bool HalfHourChimeEnabled
-    {
-        get => _mainViewModel.HalfHourChimeEnabled;
-        set
-        {
-            if (_mainViewModel.HalfHourChimeEnabled != value)
-            {
-                _logger.LogDebug("[SettingsWindowViewModel] Updating HalfHourChimeEnabled: {Value}", value);
-                _mainViewModel.HalfHourChimeEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Текущий язык интерфейса ("ru" или "en").
-    /// </summary>
-    public string Language
-    {
-        get => LocalizationManager.CurrentLanguage;
-        set
-        {
-            if (LocalizationManager.CurrentLanguage != value)
-            {
-                LocalizationManager.SetLanguage(value);
-                _mainViewModel.SettingsService.UpdateSettings(s => s.Language = value);
-                _mainViewModel.SettingsService.SaveBufferedSettings();
-            }
-        }
-    }
-    public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
-
-    /// <summary>
-    /// Индекс выбранной вкладки.
-    /// </summary>
+    /// <summary>ViewModel для таймеров и будильников.</summary>
+    private readonly TimersAndAlarmsViewModel _timersAndAlarmsViewModel;
+    /// <summary>Индекс выбранной вкладки.</summary>
     private int _selectedTabIndex;
-    public int SelectedTabIndex
-    {
-        get => _selectedTabIndex;
-        set { _selectedTabIndex = value; OnPropertyChanged(); }
-    }
+    #endregion
 
+    #region Constructor
     /// <summary>
-    /// Команда для выбора вкладки по индексу.
+    /// Создаёт новый экземпляр SettingsWindowViewModel.
     /// </summary>
-    public RelayCommand SelectTabCommand => new RelayCommand(idx =>
-    {
-        if (idx is int i)
-            SelectedTabIndex = i;
-    });
-
-    /// <summary>
-    /// Команда для открытия последнего лог-файла.
-    /// </summary>
-    public RelayCommand ShowLogsCommand => new RelayCommand(_ => ShowLogs());
-
-    /// <summary>
-    /// Команда для завершения работы приложения.
-    /// </summary>
-    public RelayCommand CloseAppCommand => new RelayCommand(_ => CloseApp());
-
-    /// <summary>
-    /// ViewModel для таймеров (для биндинга в XAML).
-    /// </summary>
-    public TimersViewModel TimersVM => TimersAndAlarmsViewModel.Instance.TimersVM;
-    /// <summary>
-    /// ViewModel для будильников (для биндинга в XAML).
-    /// </summary>
-    public AlarmsViewModel AlarmsVM => TimersAndAlarmsViewModel.Instance.AlarmsVM;
-    /// <summary>
-    /// ViewModel для длинных таймеров (для биндинга в XAML).
-    /// </summary>
-    public LongTimersViewModel LongTimersVM => TimersAndAlarmsViewModel.Instance.LongTimersVM;
-
-    /// <summary>
-    /// Создает новый экземпляр <see cref="SettingsWindowViewModel"/>.
-    /// </summary>
-    /// <param name="mainViewModel">Главная ViewModel для передачи настроек.</param>
-    /// <param name="logger">Логгер для SettingsWindowViewModel.</param>
-    public SettingsWindowViewModel(MainWindowViewModel mainViewModel, ILogger<SettingsWindowViewModel> logger)
+    public SettingsWindowViewModel(MainWindowViewModel mainViewModel, IAppDataService appDataService, TimersAndAlarmsViewModel timersAndAlarmsViewModel, ILogger<SettingsWindowViewModel> logger)
     {
         _mainViewModel = mainViewModel;
+        _appDataService = appDataService;
+        _timersAndAlarmsViewModel = timersAndAlarmsViewModel;
         _logger = logger;
-        _logger.LogDebug("[SettingsWindowViewModel] Settings window view model initialized");
+        _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
         Localized = LocalizationManager.GetLocalizedStrings();
         LocalizationManager.LanguageChanged += (s, e) =>
         {
@@ -288,12 +44,8 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Localized));
         };
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-
-        // Подписка на удаление длинных таймеров с подтверждением
         foreach (var timer in LongTimersVM.LongTimers)
-        {
             timer.RequestDelete += OnLongTimerRequestDelete;
-        }
         LongTimersVM.LongTimers.CollectionChanged += (s, e) =>
         {
             if (e.NewItems != null)
@@ -304,7 +56,188 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
                     (item as LongTimerEntryViewModel)!.RequestDelete -= OnLongTimerRequestDelete;
         };
     }
+    #endregion
 
+    #region Public Properties
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Прозрачность фона главного окна. Связывает значение из MainWindowViewModel с UI окна настроек.
+    /// </summary>
+    public double BackgroundOpacity
+    {
+        get => _mainViewModel.BackgroundOpacity;
+        set
+        {
+            if (_mainViewModel.BackgroundOpacity != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Background opacity changed: {value}");
+                _mainViewModel.BackgroundOpacity = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public double TextOpacity
+    {
+        get => _mainViewModel.TextOpacity;
+        set
+        {
+            if (_mainViewModel.TextOpacity != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Text opacity changed: {value}");
+                _mainViewModel.TextOpacity = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public double FontSize
+    {
+        get => _mainViewModel.FontSize;
+        set
+        {
+            if (_mainViewModel.FontSize != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Font size changed: {value}");
+                _mainViewModel.FontSize = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool ShowSeconds
+    {
+        get => _mainViewModel.ShowSeconds;
+        set
+        {
+            if (_mainViewModel.ShowSeconds != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Show seconds changed: {value}");
+                _mainViewModel.ShowSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool ShowDigitalClock
+    {
+        get => _mainViewModel.ShowDigitalClock;
+        set
+        {
+            if (_mainViewModel.ShowDigitalClock != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Show digital clock changed: {value}");
+                _mainViewModel.ShowDigitalClock = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool ShowAnalogClock
+    {
+        get => _mainViewModel.ShowAnalogClock;
+        set
+        {
+            if (_mainViewModel.ShowAnalogClock != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Show analog clock changed: {value}");
+                _mainViewModel.ShowAnalogClock = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public double AnalogClockSize
+    {
+        get => _mainViewModel.AnalogClockSize;
+        set
+        {
+            if (System.Math.Abs(_mainViewModel.AnalogClockSize - value) > 0.001)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] Analog clock size changed: {value}");
+                _mainViewModel.AnalogClockSize = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool CuckooEveryHour
+    {
+        get => _mainViewModel.CuckooEveryHour;
+        set
+        {
+            if (_mainViewModel.CuckooEveryHour != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] CuckooEveryHour changed: {value}");
+                _mainViewModel.CuckooEveryHour = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool DigitalClockTopmost
+    {
+        get => _mainViewModel.DigitalClockTopmost;
+        set
+        {
+            if (_mainViewModel.DigitalClockTopmost != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] DigitalClockTopmost changed: {value}");
+                _mainViewModel.DigitalClockTopmost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool AnalogClockTopmost
+    {
+        get => _mainViewModel.AnalogClockTopmost;
+        set
+        {
+            if (_mainViewModel.AnalogClockTopmost != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] AnalogClockTopmost changed: {value}");
+                _mainViewModel.AnalogClockTopmost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public bool HalfHourChimeEnabled
+    {
+        get => _mainViewModel.HalfHourChimeEnabled;
+        set
+        {
+            if (_mainViewModel.HalfHourChimeEnabled != value)
+            {
+                _logger.LogInformation($"[SettingsWindowViewModel] HalfHourChimeEnabled changed: {value}");
+                _mainViewModel.HalfHourChimeEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    public string Language
+    {
+        get => LocalizationManager.CurrentLanguage;
+        set
+        {
+            if (LocalizationManager.CurrentLanguage != value)
+            {
+                LocalizationManager.SetLanguage(value);
+                _appDataService.Data.WidgetSettings.Language = value;
+            }
+        }
+    }
+    public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
+    public int SelectedTabIndex
+    {
+        get => _selectedTabIndex;
+        set { _selectedTabIndex = value; OnPropertyChanged(); }
+    }
+    public RelayCommand SelectTabCommand => new RelayCommand(idx =>
+    {
+        if (idx is int i)
+            SelectedTabIndex = i;
+    });
+    public RelayCommand ShowLogsCommand => new RelayCommand(_ => ShowLogs());
+    public RelayCommand CloseAppCommand => new RelayCommand(_ => CloseApp());
+    public TimersViewModel TimersVM => _timersAndAlarmsViewModel.TimersVM;
+    public AlarmsViewModel AlarmsVM => _timersAndAlarmsViewModel.AlarmsVM;
+    public LongTimersViewModel LongTimersVM => _timersAndAlarmsViewModel.LongTimersVM;
+    #endregion
+
+    #region Private Methods
     private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(LocalizationManager.CurrentLanguage))
@@ -331,32 +264,32 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         try
         {
-            string logsDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            string logsDir = System.IO.Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
                 "ClockWidget",
                 "logs");
-            if (!Directory.Exists(logsDir))
+            if (!System.IO.Directory.Exists(logsDir))
             {
                 System.Windows.MessageBox.Show(Localized.SettingsWindow_LogsNotFound, Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            var logFiles = Directory.GetFiles(logsDir, "clock-widget-*.log");
+            var logFiles = System.IO.Directory.GetFiles(logsDir, "clock-widget-*.log");
             if (logFiles.Length == 0)
             {
                 System.Windows.MessageBox.Show(Localized.SettingsWindow_LogsNotFound, Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var lastLog = logFiles
-                .Select(f => new FileInfo(f))
+                .Select(f => new System.IO.FileInfo(f))
                 .OrderByDescending(f => f.LastWriteTime)
                 .First().FullName;
-            Process.Start(new ProcessStartInfo
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = lastLog,
                 UseShellExecute = true
             });
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
             _logger.LogError(ex, "[SettingsWindowViewModel] Ошибка при открытии файла логов");
             System.Windows.MessageBox.Show($"Ошибка при открытии файла логов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -370,10 +303,10 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         try
         {
-            _logger.LogDebug("[SettingsWindowViewModel] Shutting down application");
+            _logger.LogInformation("[SettingsWindowViewModel] Shutting down application");
             System.Windows.Application.Current.Shutdown();
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
             _logger.LogError(ex, "[SettingsWindowViewModel] Error during application shutdown");
             System.Windows.Application.Current.Shutdown();
@@ -396,4 +329,5 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             _logger.LogInformation($"[SettingsWindowViewModel] Пользователь отменил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
         }
     }
+    #endregion
 } 

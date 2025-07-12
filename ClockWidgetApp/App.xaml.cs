@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.IO;
 using ClockWidgetApp.Helpers;
-using System.Threading;
 
 namespace ClockWidgetApp;
 
@@ -29,15 +28,11 @@ public partial class App : System.Windows.Application
     /// <summary>
     /// Потокобезопасный флаг наличия несохранённых изменений настроек виджетов.
     /// </summary>
-    private static int _widgetSettingsDirty = 0;
+    internal static int _widgetSettingsDirty = 0;
     /// <summary>
     /// Потокобезопасный флаг наличия несохранённых изменений таймеров и будильников.
     /// </summary>
-    private static int _timersAlarmsDirty = 0;
-    /// <summary>
-    /// Таймер для периодического сохранения настроек и таймеров.
-    /// </summary>
-    private System.Windows.Threading.DispatcherTimer? _periodicSaveTimer;
+    internal static int _timersAlarmsDirty = 0;
 
     #endregion
 
@@ -96,6 +91,7 @@ public partial class App : System.Windows.Application
     /// <param name="e">Аргументы запуска.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
+        System.Console.WriteLine("=== App OnStartup: begin ===");
         // Временный логгер для single instance событий
         _earlyLogger = new LoggerConfiguration()
             .WriteTo.File(Path.Combine(
@@ -104,10 +100,12 @@ public partial class App : System.Windows.Application
                 rollingInterval: RollingInterval.Day,
                 outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
+        System.Console.WriteLine("[OnStartup] Early logger created");
 
         // Проверка на единственный экземпляр
         if (!SingleInstance.Start())
         {
+            System.Console.WriteLine("[OnStartup] Duplicate instance detected, shutting down");
             _earlyLogger.Information("[App] Application instance already running (early logger)");
             var current = System.Diagnostics.Process.GetCurrentProcess();
             foreach (var process in System.Diagnostics.Process.GetProcessesByName(current.ProcessName))
@@ -124,26 +122,50 @@ public partial class App : System.Windows.Application
             Shutdown();
             return;
         }
+        System.Console.WriteLine("[OnStartup] Single instance check passed");
+
+        var logsDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ClockWidget",
+            "logs");
+        if (!Directory.Exists(logsDir))
+            Directory.CreateDirectory(logsDir);
+        System.Console.WriteLine("[OnStartup] Logs directory ensured");
 
         var logLevel = LoggingConfigurator.ParseLogLevelFromArgs(Environment.GetCommandLineArgs());
+        System.Console.WriteLine($"[OnStartup] Parsed log level: {logLevel}");
         LoggingConfigurator.ConfigureLogging(logLevel);
-        _serviceProvider = ServiceConfigurator.ConfigureServices();
+        System.Console.WriteLine("[OnStartup] Logging configured");
+        try
+        {
+            _serviceProvider = ServiceConfigurator.ConfigureServices();
+            System.Console.WriteLine("[OnStartup] DI ServiceProvider configured");
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine($"[OnStartup] DI error: {ex}");
+            throw;
+        }
         _trayIconManager = _serviceProvider.GetRequiredService<TrayIconManager>();
+        System.Console.WriteLine("[OnStartup] TrayIconManager resolved");
         _logger = _serviceProvider.GetRequiredService<ILogger<App>>();
+        System.Console.WriteLine("[OnStartup] App logger resolved");
         _lifecycleService = _serviceProvider.GetRequiredService<ApplicationLifecycleService>();
+        System.Console.WriteLine("[OnStartup] LifecycleService resolved");
         _lifecycleService.RegisterLifecycleHandlers(this);
+        System.Console.WriteLine("[OnStartup] Lifecycle handlers registered");
 
-        // Загрузка таймеров и будильников
-        ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.LoadTimersAndAlarms();
+        // Загрузка всех данных приложения через единый сервис
+        var appDataService = _serviceProvider.GetRequiredService<IAppDataService>();
+        System.Console.WriteLine("[OnStartup] AppDataService resolved");
+        appDataService.Load();
+        System.Console.WriteLine("[OnStartup] AppDataService loaded");
 
         // Запуск сервиса времени для обновления виджетов
         var timeService = _serviceProvider.GetRequiredService<ITimeService>();
+        System.Console.WriteLine("[OnStartup] TimeService resolved");
         timeService.Start();
-
-        // Запуск глобального таймера для периодического сохранения
-        _periodicSaveTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
-        _periodicSaveTimer.Tick += PeriodicSaveTimer_Tick;
-        _periodicSaveTimer.Start();
+        System.Console.WriteLine("[OnStartup] TimeService started");
 
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
@@ -154,65 +176,45 @@ public partial class App : System.Windows.Application
             _logger?.LogError(args.Exception, "[App] Unhandled exception (Dispatcher)");
             args.Handled = true;
         };
+        System.Console.WriteLine("[OnStartup] Exception handlers registered");
 
-        _serviceProvider.GetRequiredService<ISettingsService>();
         var mainVm = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+        System.Console.WriteLine("[OnStartup] MainWindowViewModel resolved");
         var mainLogger = _serviceProvider.GetRequiredService<ILogger<MainWindow>>();
+        System.Console.WriteLine("[OnStartup] MainWindow logger resolved");
         var settingsVm = _serviceProvider.GetRequiredService<SettingsWindowViewModel>();
+        System.Console.WriteLine("[OnStartup] SettingsWindowViewModel resolved");
         var logger = _serviceProvider.GetRequiredService<ILogger<SettingsWindow>>();
-        var prewarmedSettingsWindow = new SettingsWindow(settingsVm, logger);
+        System.Console.WriteLine("[OnStartup] SettingsWindow logger resolved");
+        var timersAndAlarmsVm = _serviceProvider.GetRequiredService<TimersAndAlarmsViewModel>();
+        timersAndAlarmsVm.SyncCollections();
+        System.Console.WriteLine("[OnStartup] TimersAndAlarmsViewModel collections synced from data");
+        var prewarmedSettingsWindow = new SettingsWindow(settingsVm, timersAndAlarmsVm, logger);
         prewarmedSettingsWindow.Hide();
+        System.Console.WriteLine("[OnStartup] Prewarmed SettingsWindow created and hidden");
         var windowService = _serviceProvider.GetRequiredService<IWindowService>();
+        System.Console.WriteLine("[OnStartup] WindowService resolved");
         if (windowService is WindowService wsImpl)
         {
             wsImpl.SetSettingsWindow(prewarmedSettingsWindow);
+            System.Console.WriteLine("[OnStartup] Prewarmed SettingsWindow injected into WindowService");
         }
         if (mainVm.ShowDigitalClock)
         {
             windowService.OpenMainWindow();
+            System.Console.WriteLine("[OnStartup] MainWindow opened");
         }
         _trayIconManager.InitializeMainTrayIcon(mainVm, _serviceProvider, _logger);
+        System.Console.WriteLine("[OnStartup] Tray icon initialized");
         if (mainVm.ShowAnalogClock)
         {
             windowService.OpenAnalogClockWindow();
+            System.Console.WriteLine("[OnStartup] AnalogClockWindow opened");
         }
 
         base.OnStartup(e);
         _logger?.LogInformation("[App] Application starting");
-    }
-
-    /// <summary>
-    /// Обработчик периодического таймера сохранения.
-    /// </summary>
-    private void PeriodicSaveTimer_Tick(object? sender, EventArgs e)
-    {
-        // Потокобезопасно проверяем и сбрасываем флаги
-        if (Interlocked.Exchange(ref _widgetSettingsDirty, 0) == 1)
-        {
-            try
-            {
-                var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
-                settingsService.SaveBufferedSettings();
-                _logger?.LogInformation("[App] Widget settings saved by periodic timer");
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "[App] Error saving widget settings by periodic timer");
-            }
-        }
-        if (Interlocked.Exchange(ref _timersAlarmsDirty, 0) == 1)
-        {
-            try
-            {
-                var timersVm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance;
-                timersVm.SaveTimersAndAlarms();
-                _logger?.LogInformation("[App] Timers/alarms saved by periodic timer");
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "[App] Error saving timers/alarms by periodic timer");
-            }
-        }
+        System.Console.WriteLine("=== App OnStartup: end ===");
     }
 
     /// <summary>

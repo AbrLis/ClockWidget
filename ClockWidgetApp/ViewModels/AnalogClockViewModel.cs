@@ -18,7 +18,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Сервис времени.</summary>
     private readonly ITimeService _timeService;
     /// <summary>Сервис настроек.</summary>
-    private readonly ISettingsService _settingsService;
+    private readonly IAppDataService _appDataService;
     /// <summary>Главный ViewModel приложения.</summary>
     private readonly MainWindowViewModel _mainViewModel;
     /// <summary>Логгер.</summary>
@@ -83,11 +83,11 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="AnalogClockViewModel"/>.
     /// </summary>
-    public AnalogClockViewModel(ITimeService timeService, ISettingsService settingsService, MainWindowViewModel mainViewModel, ILogger<AnalogClockViewModel> logger, IWindowService? windowService = null)
+    public AnalogClockViewModel(ITimeService timeService, IAppDataService appDataService, MainWindowViewModel mainViewModel, ILogger<AnalogClockViewModel> logger, IWindowService? windowService = null)
     {
         _logger = logger;
         _timeService = timeService;
-        _settingsService = settingsService;
+        _appDataService = appDataService;
         _mainViewModel = mainViewModel;
         _windowService = windowService;
         _hourHandTransform = new TransformGroup();
@@ -101,10 +101,10 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>Получает сохраненную позицию окна.</summary>
-    public (double Left, double Top) GetWindowPosition() => WindowPositionHelper.GetWindowPosition(_settingsService, true);
+    public (double Left, double Top) GetWindowPosition() => WindowPositionHelper.GetWindowPosition(_appDataService, true);
 
     /// <summary>Сохраняет позицию окна аналоговых часов.</summary>
-    public void SaveWindowPosition(double left, double top) => WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, true);
+    public void SaveWindowPosition(double left, double top) => WindowPositionHelper.SaveWindowPosition(_appDataService, left, top, true);
 
     /// <summary>Вызывает событие изменения свойства.</summary>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

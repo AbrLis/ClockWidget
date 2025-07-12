@@ -92,8 +92,9 @@ namespace ClockWidgetApp.Services
             {
                 var services = ((App)System.Windows.Application.Current).Services;
                 var settingsVm = services.GetRequiredService<ClockWidgetApp.ViewModels.SettingsWindowViewModel>();
+                var timersAndAlarmsVm = services.GetRequiredService<ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel>();
                 var logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SettingsWindow>>();
-                _settingsWindow = new SettingsWindow(settingsVm, logger);
+                _settingsWindow = new SettingsWindow(settingsVm, timersAndAlarmsVm, logger);
                 // При попытке закрытия окна — скрываем его, не уничтожая
                 _settingsWindow.Closing += (s, e) => { e.Cancel = true; _settingsWindow.Hide(); };
                 _settingsWindow.Closed += (s, e) => _settingsWindow = null;

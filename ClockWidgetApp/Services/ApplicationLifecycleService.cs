@@ -11,20 +11,20 @@ namespace ClockWidgetApp.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ApplicationLifecycleService> _logger;
-        private readonly ISettingsService _settingsService;
+        private readonly IAppDataService _appDataService;
         private readonly ITimeService _timeService;
         private readonly TimersAndAlarmsViewModel _timersAndAlarmsViewModel;
 
         public ApplicationLifecycleService(
             IServiceProvider serviceProvider,
             ILogger<ApplicationLifecycleService> logger,
-            ISettingsService settingsService,
+            IAppDataService appDataService,
             ITimeService timeService,
             TimersAndAlarmsViewModel timersAndAlarmsViewModel)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _settingsService = settingsService;
+            _appDataService = appDataService;
             _timeService = timeService;
             _timersAndAlarmsViewModel = timersAndAlarmsViewModel;
         }
@@ -53,7 +53,6 @@ namespace ClockWidgetApp.Services
         {
             try
             {
-                _settingsService?.SaveBufferedSettings();
                 _timersAndAlarmsViewModel.SaveTimersAndAlarms();
                 _logger?.LogInformation("[App] Settings and timers/alarms saved on shutdown/session ending");
             }

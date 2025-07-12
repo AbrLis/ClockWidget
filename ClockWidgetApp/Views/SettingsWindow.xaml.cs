@@ -16,6 +16,7 @@ public partial class SettingsWindow : Window
     private readonly SettingsWindowViewModel _viewModel = null!;
     /// <summary>Логгер для событий окна.</summary>
     private readonly ILogger<SettingsWindow> _logger;
+    private readonly TimersAndAlarmsViewModel _timersAndAlarmsViewModel;
     #endregion
 
     /// <summary>
@@ -23,10 +24,11 @@ public partial class SettingsWindow : Window
     /// </summary>
     /// <param name="viewModel">ViewModel окна настроек.</param>
     /// <param name="logger">ILogger<SettingsWindow> для логирования.</param>
-    public SettingsWindow(SettingsWindowViewModel viewModel, ILogger<SettingsWindow> logger)
+    public SettingsWindow(SettingsWindowViewModel viewModel, TimersAndAlarmsViewModel timersAndAlarmsViewModel, ILogger<SettingsWindow> logger)
         : base()
     {
         _viewModel = viewModel;
+        _timersAndAlarmsViewModel = timersAndAlarmsViewModel;
         _logger = logger;
         try
         {
@@ -111,7 +113,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void TimerTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.TimersVM.CorrectTimerTime();
+        _timersAndAlarmsViewModel.TimersVM.CorrectTimerTime();
     }
 
     /// <summary>
@@ -119,7 +121,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void AlarmTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.AlarmsVM.CorrectAlarmTime();
+        _timersAndAlarmsViewModel.AlarmsVM.CorrectAlarmTime();
     }
 
     /// <summary>
@@ -129,7 +131,7 @@ public partial class SettingsWindow : Window
     {
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
         {
-            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.TimersVM;
+            var vm = _timersAndAlarmsViewModel.TimersVM;
             if (vm.EditTimerCommand.CanExecute(timer))
                 vm.EditTimerCommand.Execute(timer);
         }
@@ -142,7 +144,7 @@ public partial class SettingsWindow : Window
     {
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is AlarmEntryViewModel alarm)
         {
-            var vm = ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel.Instance.AlarmsVM;
+            var vm = _timersAndAlarmsViewModel.AlarmsVM;
             if (vm.EditAlarmCommand.CanExecute(alarm))
                 vm.EditAlarmCommand.Execute(alarm);
         }

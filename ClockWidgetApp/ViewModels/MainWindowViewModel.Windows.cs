@@ -13,10 +13,10 @@ public partial class MainWindowViewModel
     {
         try
         {
-            _logger.LogDebug("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", _showDigitalClock, _showAnalogClock);
+            _logger.LogDebug("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", ShowDigitalClock, ShowAnalogClock);
             var mainWindow = _windowService.GetMainWindow();
             // --- Цифровое окно ---
-            if (_showDigitalClock)
+            if (ShowDigitalClock)
             {
                 _windowService?.OpenMainWindow();
                 _logger.LogDebug("[MainWindowViewModel.Windows] Main window ensured visible and activated");
@@ -28,7 +28,7 @@ public partial class MainWindowViewModel
             }
 
             // --- Аналоговое окно ---
-            if (_showAnalogClock)
+            if (ShowAnalogClock)
             {
                 _windowService?.OpenAnalogClockWindow();
                 _logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated");
@@ -51,7 +51,7 @@ public partial class MainWindowViewModel
     /// <returns>Кортеж с координатами Left и Top.</returns>
     public (double Left, double Top) GetWindowPosition()
     {
-        return WindowPositionHelper.GetWindowPosition(_settingsService, false);
+        return WindowPositionHelper.GetWindowPosition(_appDataService, false);
     }
 
     private void UpdateAnalogClockSize()

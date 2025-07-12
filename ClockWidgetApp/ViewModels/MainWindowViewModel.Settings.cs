@@ -99,9 +99,9 @@ public partial class MainWindowViewModel
     private void InitializeFromSettings(WidgetSettings settings)
     {
         var validated = WidgetSettings.ValidateSettings(settings);
-        _backgroundOpacity = validated.BackgroundOpacity;
-        _textOpacity = validated.TextOpacity;
-        _fontSize = validated.FontSize;
+        BackgroundOpacity = validated.BackgroundOpacity;
+        TextOpacity = validated.TextOpacity;
+        FontSize = validated.FontSize;
         _showSeconds = validated.ShowSeconds;
         _showDigitalClock = validated.ShowDigitalClock;
         _showAnalogClock = validated.ShowAnalogClock;

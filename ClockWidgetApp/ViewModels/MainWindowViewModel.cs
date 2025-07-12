@@ -10,13 +10,13 @@ namespace ClockWidgetApp.ViewModels;
 /// ViewModel для главного окна виджета часов.
 /// Управляет отображением времени, прозрачностью и другими настройками виджета.
 /// </summary>
-public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsViewModel, IDisposable
+public partial class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 {
     #region Private Fields
     /// <summary>Сервис времени.</summary>
     private readonly ITimeService _timeService;
     /// <summary>Сервис настроек.</summary>
-    private readonly ISettingsService _settingsService;
+    private readonly IAppDataService _appDataService;
     /// <summary>Сервис звука.</summary>
     private readonly ISoundService _soundService;
     /// <summary>Сервис управления окнами.</summary>
@@ -90,7 +90,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     /// </summary>
     public void SaveWindowPosition(double left, double top)
     {
-        WindowPositionHelper.SaveWindowPosition(_settingsService, left, top, false);
+        WindowPositionHelper.SaveWindowPosition(_appDataService.Data.WidgetSettings, left, top, false);
         App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
     }
 
@@ -98,22 +98,22 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, ISettingsView
     /// Инициализирует новый экземпляр класса <see cref="MainWindowViewModel"/>.
     /// Загружает сохранённые настройки и запускает сервис обновления времени.
     /// </summary>
-    public MainWindowViewModel(ITimeService timeService, ISettingsService settingsService, ISoundService soundService, IWindowService windowService, ILogger<MainWindowViewModel> logger)
+    public MainWindowViewModel(ITimeService timeService, IAppDataService appDataService, ISoundService soundService, IWindowService windowService, ILogger<MainWindowViewModel> logger)
     {
         System.Diagnostics.Debug.Assert(logger != null, "_logger is null");
         System.Diagnostics.Debug.Assert(timeService != null, "_timeService is null");
-        System.Diagnostics.Debug.Assert(settingsService != null, "_settingsService is null");
+        System.Diagnostics.Debug.Assert(appDataService != null, "_appDataService is null");
         System.Diagnostics.Debug.Assert(soundService != null, "_soundService is null");
         System.Diagnostics.Debug.Assert(windowService != null, "_windowService is null");
         _logger = logger;
         _timeService = timeService;
-        _settingsService = settingsService;
+        _appDataService = appDataService;
         _soundService = soundService;
         _windowService = windowService;
         try
         {
             _logger.LogDebug("[MainWindowViewModel] Initializing main window view model");
-            var settings = _settingsService.CurrentSettings;
+            var settings = _appDataService.Data.WidgetSettings;
             InitializeFromSettings(settings);
             SubscribeToLanguageChanges();
             _timeService.TimeUpdated += OnTimeUpdated;
