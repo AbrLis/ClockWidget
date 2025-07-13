@@ -9,19 +9,29 @@ namespace ClockWidgetApp.Services;
 /// </summary>
 public class AlarmMonitorService : IDisposable
 {
+    #region Private fields
+    /// <summary>Коллекция отслеживаемых будильников.</summary>
     private readonly ObservableCollection<AlarmEntryViewModel> _alarms;
-    private readonly Lock _lock = new();
+    /// <summary>Объект блокировки для потокобезопасности.</summary>
+    private readonly object _lock = new();
+    /// <summary>Таймер для отслеживания времени срабатывания.</summary>
     private System.Threading.Timer? _timer;
+    /// <summary>Кэш ближайшего будильника.</summary>
     private AlarmEntryViewModel? _nextScheduledAlarm;
+    /// <summary>Время следующего срабатывания будильника.</summary>
     private DateTime? _nextScheduledTime;
+    /// <summary>Последнее зафиксированное системное время.</summary>
     private DateTime _lastSystemTime;
+    /// <summary>Флаг освобождения ресурсов.</summary>
     private bool _disposed;
+    #endregion
 
     /// <summary>
     /// Событие, возникающее при срабатывании будильника.
     /// </summary>
     public event Action<AlarmEntryViewModel>? AlarmTriggered;
 
+    #region Constructor
     /// <summary>
     /// Создаёт сервис и начинает отслеживание коллекции будильников.
     /// </summary>
@@ -33,10 +43,32 @@ public class AlarmMonitorService : IDisposable
         foreach (var alarm in _alarms)
             SubscribeAlarm(alarm);
         _lastSystemTime = DateTime.Now;
-        Log.Information("[AlarmMonitorService] Сервис запущен. Количество будильников: {Count}", _alarms.Count);
+        Log.Information("[AlarmMonitorService] Service started. Alarm count: {Count}", _alarms.Count);
         RecalculateNextAlarmAndRestartTimer();
     }
+    #endregion
 
+    #region Public methods
+    /// <summary>
+    /// Останавливает таймер и освобождает ресурсы.
+    /// </summary>
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            if (_disposed) return;
+            _disposed = true;
+            _timer?.Dispose();
+            _alarms.CollectionChanged -= OnAlarmsCollectionChanged;
+            foreach (var alarm in _alarms)
+                UnsubscribeAlarm(alarm);
+            Log.Information("[AlarmMonitorService] Service stopped and resources released.");
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+    #region Private methods and event handlers
     /// <summary>
     /// Пересчитывает ближайший будильник и перезапускает таймер.
     /// </summary>
@@ -57,11 +89,11 @@ public class AlarmMonitorService : IDisposable
                 dueTime = _nextScheduledTime.Value - now;
                 if (dueTime < TimeSpan.Zero)
                     dueTime = TimeSpan.Zero;
-                Log.Information("[AlarmMonitorService] Следующий будильник: {Time}", _nextScheduledTime);
+                Log.Information("[AlarmMonitorService] Next alarm: {Time}", _nextScheduledTime);
             }
             else
             {
-                // Нет активных будильников — проверяем раз в минуту
+                // No active alarms — check every minute
                 dueTime = TimeSpan.FromMinutes(1);
             }
 
@@ -80,11 +112,10 @@ public class AlarmMonitorService : IDisposable
         {
             if (_disposed) return;
             var now = DateTime.Now;
-            // Проверка на аномалию времени (например, перевод часов)
+            // Check for time anomaly (e.g., clock change)
             if (Math.Abs((now - _lastSystemTime).TotalMinutes) > 5)
             {
-                Log.Information("[AlarmMonitorService] Обнаружена аномалия времени. Пересчёт всех будильников.");
-                // Аномалия — пересчитываем все будильники
+                Log.Information("[AlarmMonitorService] Time anomaly detected. Recalculating all alarms.");
                 _lastSystemTime = now;
                 RecalculateNextAlarmAndRestartTimer();
                 return;
@@ -101,12 +132,12 @@ public class AlarmMonitorService : IDisposable
             {
                 try
                 {
-                    Log.Information("[AlarmMonitorService] Сработал будильник: {Alarm}", alarm);
-                    // Гарантируем вызов события в UI-потоке
+                    Log.Information("[AlarmMonitorService] Alarm triggered: {Alarm}", alarm);
+                    // Ensure event is invoked on UI thread
                     if (System.Windows.Application.Current?.Dispatcher != null)
                     {
                         System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                                AlarmTriggered?.Invoke(alarm)));
+                            AlarmTriggered?.Invoke(alarm)));
                     }
                     else
                     {
@@ -115,7 +146,7 @@ public class AlarmMonitorService : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "[AlarmMonitorService] Ошибка при обработке будильника: {Alarm}", alarm);
+                    Log.Error(ex, "[AlarmMonitorService] Error while handling alarm: {Alarm}", alarm);
                 }
 
                 try
@@ -124,7 +155,7 @@ public class AlarmMonitorService : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "[AlarmMonitorService] Ошибка при обновлении времени будильника: {Alarm}", alarm);
+                    Log.Error(ex, "[AlarmMonitorService] Error while updating alarm time: {Alarm}", alarm);
                 }
             }
 
@@ -167,24 +198,7 @@ public class AlarmMonitorService : IDisposable
     /// </summary>
     private void Alarm_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        // При любом изменении — пересчёт ближайшего будильника
         RecalculateNextAlarmAndRestartTimer();
     }
-
-    /// <summary>
-    /// Останавливает таймер и освобождает ресурсы.
-    /// </summary>
-    public void Dispose()
-    {
-        lock (_lock)
-        {
-            if (_disposed) return;
-            _disposed = true;
-            _timer?.Dispose();
-            _alarms.CollectionChanged -= OnAlarmsCollectionChanged;
-            foreach (var alarm in _alarms)
-                UnsubscribeAlarm(alarm);
-            Log.Information("[AlarmMonitorService] Сервис остановлен и ресурсы освобождены.");
-        }
-    }
+    #endregion
 }
