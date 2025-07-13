@@ -6,11 +6,10 @@
              mc:Ignorable="d">
     <Application.Resources>
         <ResourceDictionary>
-            <Image x:Key="AppIcon16" Source="/Resources/Icons/app_ico_16.ico"/>
-            <Image x:Key="AppIcon32" Source="/Resources/Icons/app_ico_32.ico"/>
-            <Image x:Key="AppIcon64" Source="/Resources/Icons/app_ico_64.ico"/>
-            <Image x:Key="AppIcon128" Source="/Resources/Icons/app_ico_128.ico"/>
-            <Image x:Key="AppIcon256" Source="/Resources/Icons/app_ico_256.ico"/>
+            <BitmapImage x:Key="AppIcon" UriSource="/Resources/Icons/app.ico"/>
+            <BitmapImage x:Key="AlarmIcon" UriSource="/Resources/Icons/alarm.ico"/>
+            <BitmapImage x:Key="LongIcon" UriSource="/Resources/Icons/long.ico"/>
+            <BitmapImage x:Key="TimerIcon" UriSource="/Resources/Icons/timer.ico"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

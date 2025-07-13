@@ -1,22 +1,25 @@
 <!-- Окно с аналоговыми часами -->
-<Window x:Class="ClockWidgetApp.AnalogClockWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ClockWidgetApp"
-        xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
-        xmlns:converters="clr-namespace:ClockWidgetApp.Helpers"
-        mc:Ignorable="d"
-        Title="{Binding Localized.AnalogClockWindow_Title}" 
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
-        ResizeMode="NoResize"
-        ShowInTaskbar="False"
-        ShowActivated="True"
-        WindowStartupLocation="Manual"
-        Visibility="Collapsed">
+<Window
+    x:Class="ClockWidgetApp.AnalogClockWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ClockWidgetApp"
+    xmlns:helpers="clr-namespace:ClockWidgetApp.Helpers"
+    xmlns:converters="clr-namespace:ClockWidgetApp.Helpers"
+    xmlns:viewModels="clr-namespace:ClockWidgetApp.ViewModels"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=viewModels:AnalogClockViewModel, IsDesignTimeCreatable=True}"
+    Title="{Binding Localized.AnalogClockWindow_Title}"
+    WindowStyle="None"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    ShowActivated="True"
+    WindowStartupLocation="Manual"
+    Visibility="Collapsed">
     
     <!-- Корневой Grid для масштабирования содержимого -->
     <Grid x:Name="RootGrid">
