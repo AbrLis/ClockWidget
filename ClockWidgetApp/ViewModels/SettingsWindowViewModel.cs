@@ -1,16 +1,16 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Helpers;
 using System.Windows;
+using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.ViewModels;
 
 /// <summary>
 /// ViewModel для окна настроек. Связывает настройки главного окна с UI.
 /// </summary>
-public class SettingsWindowViewModel : INotifyPropertyChanged
+public sealed class SettingsWindowViewModel : INotifyPropertyChanged
 {
     #region Private Fields
     /// <summary>Главная ViewModel для передачи настроек.</summary>
@@ -35,26 +35,32 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         _appDataService = appDataService;
         _timersAndAlarmsViewModel = timersAndAlarmsViewModel;
         _logger = logger;
-        TimersVM = _timersAndAlarmsViewModel.TimersVM;
-        AlarmsVM = _timersAndAlarmsViewModel.AlarmsVM;
+        TimersVm = _timersAndAlarmsViewModel.TimersVm;
+        AlarmsVm = _timersAndAlarmsViewModel.AlarmsVm;
         _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
         Localized = LocalizationManager.GetLocalizedStrings();
-        LocalizationManager.LanguageChanged += (s, e) =>
+        LocalizationManager.LanguageChanged += (_, _) =>
         {
             Localized = LocalizationManager.GetLocalizedStrings();
             OnPropertyChanged(nameof(Language));
             OnPropertyChanged(nameof(Localized));
         };
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-        LongTimersVM.LongTimers.CollectionChanged += (s, e) =>
+        LongTimersVm.LongTimers.CollectionChanged += (_, _) =>
         {
-            OnPropertyChanged(nameof(LongTimersVM));
+            OnPropertyChanged(nameof(LongTimersVm));
         };
     }
     #endregion
 
     #region Public Properties
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Сравнивает два значения double с заданной точностью (эпсилон).
+    /// </summary>
+    private static bool AreClose(double a, double b, double epsilon = 1e-6)
+        => Math.Abs(a - b) < epsilon;
 
     /// <summary>
     /// Прозрачность фона главного окна. Связывает значение из MainWindowViewModel с UI окна настроек.
@@ -64,12 +70,10 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         get => _mainViewModel.BackgroundOpacity;
         set
         {
-            if (_mainViewModel.BackgroundOpacity != value)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] Background opacity changed: {value}");
-                _mainViewModel.BackgroundOpacity = value;
-                OnPropertyChanged();
-            }
+            if (AreClose(_mainViewModel.BackgroundOpacity, value)) return;
+            _logger.LogInformation($"[SettingsWindowViewModel] Background opacity changed: {value}");
+            _mainViewModel.BackgroundOpacity = value;
+            OnPropertyChanged();
         }
     }
     /// <summary>
@@ -128,12 +132,10 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         get => _mainViewModel.AnalogClockSize;
         set
         {
-            if (System.Math.Abs(_mainViewModel.AnalogClockSize - value) > 0.001)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] Analog clock size changed: {value}");
-                _mainViewModel.AnalogClockSize = value;
-                OnPropertyChanged();
-            }
+            if (AreClose(_mainViewModel.AnalogClockSize, value)) return;
+            _logger.LogInformation($"[SettingsWindowViewModel] Analog clock size changed: {value}");
+            _mainViewModel.AnalogClockSize = value;
+            OnPropertyChanged();
         }
     }
     /// <summary>
@@ -208,12 +210,10 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         get => _mainViewModel.FontSize;
         set
         {
-            if (_mainViewModel.FontSize != value)
-            {
-                _logger.LogInformation($"[SettingsWindowViewModel] Font size changed: {value}");
-                _mainViewModel.FontSize = value;
-                OnPropertyChanged();
-            }
+            if (AreClose(_mainViewModel.FontSize, value)) return;
+            _logger.LogInformation($"[SettingsWindowViewModel] Font size changed: {value}");
+            _mainViewModel.FontSize = value;
+            OnPropertyChanged();
         }
     }
     public string Language
@@ -228,7 +228,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             }
         }
     }
-    public LocalizedStrings Localized { get; private set; } = LocalizationManager.GetLocalizedStrings();
+    public LocalizedStrings Localized { get; private set; }
     public int SelectedTabIndex
     {
         get => _selectedTabIndex;
@@ -241,9 +241,9 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     });
     public RelayCommand ShowLogsCommand => new RelayCommand(_ => ShowLogs());
     public RelayCommand CloseAppCommand => new RelayCommand(_ => CloseApp());
-    public TimersViewModel TimersVM { get; set; }
-    public AlarmsViewModel AlarmsVM { get; set; }
-    public LongTimersViewModel LongTimersVM => _timersAndAlarmsViewModel.LongTimersVM;
+    public TimersViewModel TimersVm { get; }
+    public AlarmsViewModel AlarmsVm { get; }
+    public LongTimersViewModel LongTimersVm => _timersAndAlarmsViewModel.LongTimersVm;
 
     /// <summary>
     /// Команда для удаления длинного таймера с подтверждением.
@@ -252,11 +252,11 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         if (obj is LongTimerEntryViewModel timer)
         {
-            if (Helpers.DialogHelper.ConfirmLongTimerDelete())
+            if (DialogHelper.ConfirmLongTimerDelete())
             {
                 _logger.LogInformation($"[SettingsWindowViewModel] Пользователь подтвердил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
                 timer.Dispose();
-                LongTimersVM.LongTimers.Remove(timer);
+                LongTimersVm.LongTimers.Remove(timer);
             }
             else
             {
@@ -272,7 +272,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         if (obj is TimerEntryViewModel timer)
         {
-            TimersVM.Timers.Remove(timer);
+            TimersVm.Timers.Remove(timer);
         }
     });
     
@@ -283,7 +283,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
     {
         if (obj is AlarmEntryViewModel alarm)
         {
-            AlarmsVM.Alarms.Remove(alarm);
+            AlarmsVm.Alarms.Remove(alarm);
         }
     });
     #endregion
@@ -303,7 +303,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -316,7 +316,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
         try
         {
             string logsDir = System.IO.Path.Combine(
-                System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "ClockWidget",
                 "logs");
             if (!System.IO.Directory.Exists(logsDir))
@@ -340,7 +340,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
                 UseShellExecute = true
             });
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "[SettingsWindowViewModel] Ошибка при открытии файла логов");
             System.Windows.MessageBox.Show($"Ошибка при открытии файла логов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -357,7 +357,7 @@ public class SettingsWindowViewModel : INotifyPropertyChanged
             _logger.LogInformation("[SettingsWindowViewModel] Shutting down application");
             System.Windows.Application.Current.Shutdown();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "[SettingsWindowViewModel] Error during application shutdown");
             System.Windows.Application.Current.Shutdown();

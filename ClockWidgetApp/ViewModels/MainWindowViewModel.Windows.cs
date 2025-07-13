@@ -1,6 +1,5 @@
 using ClockWidgetApp.Helpers;
 using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -13,35 +12,35 @@ public partial class MainWindowViewModel
     {
         try
         {
-            _logger.LogDebug("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", ShowDigitalClock, ShowAnalogClock);
-            var mainWindow = _windowService.GetMainWindow();
+            this._logger.LogDebug("[MainWindowViewModel.Windows] Updating windows visibility: Digital={0}, Analog={1}", ShowDigitalClock, ShowAnalogClock);
+
             // --- Цифровое окно ---
-            if (ShowDigitalClock)
+            if (this.ShowDigitalClock)
             {
-                _windowService?.OpenMainWindow();
-                _logger.LogDebug("[MainWindowViewModel.Windows] Main window ensured visible and activated");
+                this._windowService.OpenMainWindow();
+                this._logger.LogDebug("[MainWindowViewModel.Windows] Main window ensured visible and activated");
             }
             else
             {
-                _windowService?.HideMainWindow();
-                _logger.LogDebug("[MainWindowViewModel.Windows] Main window hidden");
+                this._windowService.HideMainWindow();
+                this._logger.LogDebug("[MainWindowViewModel.Windows] Main window hidden");
             }
 
             // --- Аналоговое окно ---
-            if (ShowAnalogClock)
+            if (this.ShowAnalogClock)
             {
-                _windowService?.OpenAnalogClockWindow();
-                _logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated");
+                this._windowService.OpenAnalogClockWindow();
+                this._logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window ensured visible and activated");
             }
             else
             {
-                _windowService?.HideAnalogClockWindow();
-                _logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window hidden");
+                this._windowService.HideAnalogClockWindow();
+                this._logger.LogDebug("[MainWindowViewModel.Windows] Analog clock window hidden");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[MainWindowViewModel.Windows] Error updating windows visibility");
+            this._logger.LogError(ex, "[MainWindowViewModel.Windows] Error updating windows visibility");
         }
     }
 

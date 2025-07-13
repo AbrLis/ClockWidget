@@ -1,9 +1,9 @@
-using System.Windows;
-using ClockWidgetApp.ViewModels;
-using ClockWidgetApp.Services;
-
 namespace ClockWidgetApp.Views
 {
+    using System.Windows;
+    using ClockWidgetApp.Services;
+    using ClockWidgetApp.ViewModels;
+
     /// <summary>
     /// Окно оповещения о сработавшем таймере или будильнике.
     /// </summary>
@@ -58,7 +58,7 @@ namespace ClockWidgetApp.Views
         public static TimerNotificationWindow CreateWithCloseCallback(ISoundHandle soundHandle, string description, string notificationType = "timer")
         {
             TimerNotificationWindow? window = null;
-            var viewModel = new TimerNotificationViewModel(soundHandle, description, notificationType, () => window?.Close());
+            var viewModel = new TimerNotificationViewModel(soundHandle, description, notificationType);
             window = new TimerNotificationWindow(viewModel);
             return window;
         }

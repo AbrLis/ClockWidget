@@ -1,7 +1,7 @@
-using System.Runtime.InteropServices;
-
 namespace ClockWidgetApp
 {
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// Класс для вызова WinAPI методов.
     /// </summary>

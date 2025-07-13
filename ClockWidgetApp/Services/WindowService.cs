@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
-using ClockWidgetApp.Helpers;
-
 namespace ClockWidgetApp.Services
 {
+    using ClockWidgetApp.Helpers;
+    using Microsoft.Extensions.DependencyInjection;
+
     /// <summary>
     /// Сервис для централизованного управления всеми окнами приложения (открытие, скрытие, активация, получение экземпляров).
     /// Гарантирует единственность экземпляров окон, скрытие вместо закрытия, и централизованный доступ.

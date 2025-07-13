@@ -1,7 +1,7 @@
-using System;
-
 namespace ClockWidgetApp.Models
 {
+    using System;
+
     /// <summary>
     /// Модель для сериализации длинного таймера. Сохраняет только дату и время окончания.
     /// </summary>

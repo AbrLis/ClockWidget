@@ -1,6 +1,6 @@
 using ClockWidgetApp.Helpers;
-using Microsoft.Extensions.Logging;
 using ClockWidgetApp.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -14,17 +14,15 @@ public partial class MainWindowViewModel
     private string _timeText = string.Empty;
     /// <summary>Флаг отображения секунд.</summary>
     private bool _showSeconds;
-    /// <summary>Флаг отображения цифровых часов.</summary>
-    private bool _showDigitalClock = true;
-    /// <summary>Флаг отображения аналоговых часов.</summary>
-    private bool _showAnalogClock = true;
     /// <summary>Размер аналоговых часов.</summary>
     private double _analogClockSize;
-    /// <summary>Флаг "поверх всех окон" для аналоговых часов.</summary>
-    private bool _analogClockTopmost = true;
-    /// <summary>Флаг "поверх всех окон" для цифровых часов.</summary>
-    private bool _digitalClockTopmost = true;
     #endregion
+
+    /// <summary>
+    /// Сравнивает два значения double с заданной точностью (эпсилон).
+    /// </summary>
+    private static bool AreClose(double a, double b, double epsilon = 1e-6)
+        => Math.Abs(a - b) < epsilon;
 
     /// <summary>
     /// Текст времени для отображения.
@@ -47,12 +45,10 @@ public partial class MainWindowViewModel
                 Constants.WindowSettings.MIN_WINDOW_OPACITY,
                 Constants.WindowSettings.MAX_WINDOW_OPACITY,
                 Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
-            if (_appDataService.Data.WidgetSettings.BackgroundOpacity != validatedValue)
-            {
-                _logger.LogInformation($"[BackgroundOpacity] Changed: {validatedValue}");
-                _appDataService.Data.WidgetSettings.BackgroundOpacity = validatedValue;
-                OnPropertyChanged();
-            }
+            if (AreClose(_appDataService.Data.WidgetSettings.BackgroundOpacity, validatedValue)) return;
+            _logger.LogInformation($"[BackgroundOpacity] Changed: {validatedValue}");
+            _appDataService.Data.WidgetSettings.BackgroundOpacity = validatedValue;
+            OnPropertyChanged();
         }
     }
 
@@ -68,12 +64,10 @@ public partial class MainWindowViewModel
                 Constants.TextSettings.MIN_TEXT_OPACITY,
                 Constants.TextSettings.MAX_TEXT_OPACITY,
                 Constants.TextSettings.DEFAULT_TEXT_OPACITY);
-            if (_appDataService.Data.WidgetSettings.TextOpacity != validatedValue)
-            {
-                _logger.LogInformation($"[TextOpacity] Changed: {validatedValue}");
-                _appDataService.Data.WidgetSettings.TextOpacity = validatedValue;
-                OnPropertyChanged();
-            }
+            if (AreClose(_appDataService.Data.WidgetSettings.TextOpacity, validatedValue)) return;
+            _logger.LogInformation($"[TextOpacity] Changed: {validatedValue}");
+            _appDataService.Data.WidgetSettings.TextOpacity = validatedValue;
+            OnPropertyChanged();
         }
     }
 
@@ -86,13 +80,11 @@ public partial class MainWindowViewModel
         set
         {
             var validatedValue = ValidateFontSize(value);
-            if (_appDataService.Data.WidgetSettings.FontSize != validatedValue)
-            {
-                _logger.LogInformation($"[FontSize] Changed: {validatedValue}");
-                _appDataService.Data.WidgetSettings.FontSize = validatedValue;
-                OnPropertyChanged();
-                App.MarkWidgetSettingsDirty();
-            }
+            if (AreClose(_appDataService.Data.WidgetSettings.FontSize, validatedValue)) return;
+            _logger.LogInformation($"[FontSize] Changed: {validatedValue}");
+            _appDataService.Data.WidgetSettings.FontSize = validatedValue;
+            OnPropertyChanged();
+            App.MarkWidgetSettingsDirty();
         }
     }
 
@@ -124,7 +116,7 @@ public partial class MainWindowViewModel
             if (_appDataService.Data.WidgetSettings.ShowDigitalClock != value)
             {
                 _appDataService.Data.WidgetSettings.ShowDigitalClock = value;
-                OnPropertyChanged(nameof(ShowDigitalClock));
+                OnPropertyChanged();
                 UpdateWindowsVisibility();
                 App.MarkWidgetSettingsDirty();
             }
@@ -143,7 +135,7 @@ public partial class MainWindowViewModel
             if (_appDataService.Data.WidgetSettings.ShowAnalogClock != value)
             {
                 _appDataService.Data.WidgetSettings.ShowAnalogClock = value;
-                OnPropertyChanged(nameof(ShowAnalogClock));
+                OnPropertyChanged();
                 UpdateWindowsVisibility();
                 App.MarkWidgetSettingsDirty();
             }
@@ -159,15 +151,13 @@ public partial class MainWindowViewModel
         set
         {
             var validatedValue = WidgetSettings.ValidateAnalogClockSize(value);
-            if (_appDataService.Data.WidgetSettings.AnalogClockSize != validatedValue)
-            {
-                _logger.LogInformation($"[AnalogClockSize] Changed: {validatedValue}");
-                _appDataService.Data.WidgetSettings.AnalogClockSize = validatedValue;
-                _analogClockSize = validatedValue;
-                OnPropertyChanged();
-                UpdateAnalogClockSize();
-                App.MarkWidgetSettingsDirty();
-            }
+            if (AreClose(_appDataService.Data.WidgetSettings.AnalogClockSize, validatedValue)) return;
+            _logger.LogInformation($"[AnalogClockSize] Changed: {validatedValue}");
+            _appDataService.Data.WidgetSettings.AnalogClockSize = validatedValue;
+            _analogClockSize = validatedValue;
+            OnPropertyChanged();
+            UpdateAnalogClockSize();
+            App.MarkWidgetSettingsDirty();
         }
     }
 
@@ -276,7 +266,7 @@ public partial class MainWindowViewModel
     /// </summary>
     private void SubscribeToLanguageChanges()
     {
-        LocalizationManager.LanguageChanged += (s, e) =>
+        LocalizationManager.LanguageChanged += (_, _) =>
         {
             Localized = LocalizationManager.GetLocalizedStrings();
             OnPropertyChanged(nameof(Localized));

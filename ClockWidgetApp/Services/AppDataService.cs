@@ -1,12 +1,12 @@
-using System.IO;
-using System.Text.Json;
-using ClockWidgetApp.Models;
-using System.Collections.Specialized;
-using System.Windows.Threading;
-using ClockWidgetApp.Helpers;
-
 namespace ClockWidgetApp.Services
 {
+    using System.Collections.Specialized;
+    using System.IO;
+    using System.Text.Json;
+    using System.Windows.Threading;
+    using ClockWidgetApp.Helpers;
+    using ClockWidgetApp.Models;
+
     /// <summary>
     /// Сервис управления всеми данными приложения: настройки, таймеры, будильники, длинные таймеры.
     /// Хранит данные в памяти, обеспечивает загрузку/сохранение, резервное копирование и автосохранение.

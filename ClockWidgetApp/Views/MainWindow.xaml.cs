@@ -1,7 +1,7 @@
 ﻿using System.Windows;
+using ClockWidgetApp.Services;
 using ClockWidgetApp.ViewModels;
 using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp;
 

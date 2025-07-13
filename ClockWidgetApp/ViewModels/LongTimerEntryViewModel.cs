@@ -1,10 +1,7 @@
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using System.Timers;
-using ClockWidgetApp.Services;
 using System.Windows.Threading;
+using ClockWidgetApp.Services;
 using ClockWidgetApp.Views;
 
 namespace ClockWidgetApp.ViewModels;
@@ -12,15 +9,15 @@ namespace ClockWidgetApp.ViewModels;
 /// <summary>
 /// ViewModel для отдельного длинного таймера.
 /// </summary>
-public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
+public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
 {
-    private readonly ISoundService _soundService;
-    private DispatcherTimer _uiTimer;
+    private readonly DispatcherTimer _uiTimer;
     private readonly DateTime _initialTargetDateTime;
     // Удалена переменная IsActive и все связанные с ней свойства и уведомления.
     // Длинный таймер всегда считается активным.
-    private bool _notified = false; // Флаг, чтобы не показывать уведомление повторно
+    private bool _notified; // Флаг, чтобы не показывать уведомление повторно
     private TimerNotificationWindow? _notificationWindow;
+    private bool _disposed;
 
     /// <summary>
     /// Дата и время срабатывания таймера.
@@ -75,16 +72,6 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>
-    /// Команда удаления таймера.
-    /// </summary>
-    public ICommand DeleteCommand { get; }
-
-    /// <summary>
-    /// Событие запроса удаления таймера.
-    /// </summary>
-    public event Action<LongTimerEntryViewModel>? RequestDelete;
-
-    /// <summary>
     /// Событие, вызываемое при истечении таймера (для удаления из коллекции).
     /// </summary>
     public event Action<LongTimerEntryViewModel>? RequestExpire;
@@ -100,29 +87,21 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
     {
         TargetDateTime = targetDateTime;
         _initialTargetDateTime = targetDateTime;
-        _soundService = soundService;
+        var soundService1 = soundService;
         Name = name;
-        DeleteCommand = new RelayCommand(_ =>
-        {
-            RequestDelete?.Invoke(this);
-        });
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _uiTimer.Tick += (s, e) =>
+        _uiTimer.Tick += (s, _) =>
         {
             OnPropertyChanged(nameof(Remaining));
             OnPropertyChanged(nameof(DisplayTime));
             OnPropertyChanged(nameof(TrayTooltip)); // Обновляем тултип для трея
-            if (!_notified && Remaining <= TimeSpan.Zero)
+            if (_notified || Remaining > TimeSpan.Zero) return;
+            _notified = true;
+            _notificationWindow ??= ShowLongTimerNotification(soundService1, Name, TargetDateTime, () =>
             {
-                _notified = true;
-                if (_notificationWindow == null)
-                {
-                    _notificationWindow = ShowLongTimerNotification(_soundService, Name, TargetDateTime, () => {
-                        _notificationWindow = null;
-                        RequestExpire?.Invoke(this);
-                    });
-                }
-            }
+                _notificationWindow = null;
+                RequestExpire?.Invoke(this);
+            });
         };
         _uiTimer.Start();
     }
@@ -140,30 +119,28 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
         App.MarkTimersAlarmsDirty();
     }
 
-    private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
-    {
-        OnPropertyChanged(nameof(Remaining));
-        OnPropertyChanged(nameof(DisplayTime));
-        if (Remaining <= TimeSpan.Zero)
-        {
-            // Воспроизведение звука окончания таймера
-            var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            if (!string.IsNullOrEmpty(baseDir))
-            {
-                string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "timer.mp3");
-                _soundService.PlaySoundInstance(soundPath, true);
-            }
-            // TODO: Вызвать окно оповещения, как в TimerEntryViewModel
-        }
-    }
-
+    /// <summary>
+    /// Освобождает ресурсы, используемые этим экземпляром.
+    /// </summary>
     public void Dispose()
     {
-        _uiTimer?.Stop();
+        Dispose(true);
+    }
+
+    /// <summary>
+    /// Защищённый метод освобождения ресурсов, поддерживающий наследование.
+    /// </summary>
+    /// <param name="disposing">True, если вызывается из Dispose; False — из финализатора.</param>
+    private void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+            _uiTimer.Stop();
+        _disposed = true;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
@@ -196,13 +173,8 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
         ISoundHandle soundHandle;
         if (!string.IsNullOrEmpty(baseDir))
         {
-            string soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "long.mp3");
+            var soundPath = System.IO.Path.Combine(baseDir, "Resources", "Sounds", "long.mp3");
             soundHandle = soundService.PlaySoundInstance(soundPath, true);
-            if (soundHandle == null)
-            {
-                soundHandle = new NullSoundHandle();
-                Serilog.Log.Warning($"[LongTimerEntryViewModel] Не удалось воспроизвести звук long.mp3 для длинного таймера: {name} ({targetDateTime:dd.MM.yyyy HH:mm:ss})");
-            }
         }
         else
         {
@@ -210,10 +182,10 @@ public class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposable
             Serilog.Log.Warning($"[LongTimerEntryViewModel] Не удалось определить базовую директорию для long.mp3: {name} ({targetDateTime:dd.MM.yyyy HH:mm:ss})");
         }
         var description = $"{(string.IsNullOrWhiteSpace(name) ? "(Без имени)" : name)}\n{targetDateTime:dd.MM.yyyy HH:mm:ss}";
-        TimerNotificationWindow notification = ClockWidgetApp.Views.TimerNotificationWindow.CreateWithCloseCallback(soundHandle, description, "timer");
+        var notification = TimerNotificationWindow.CreateWithCloseCallback(soundHandle, description);
         if (onClosed != null)
         {
-            notification.Closed += (s, e) => onClosed();
+            notification.Closed += (_, e) => onClosed();
         }
         notification.Show();
         notification.Topmost = true;

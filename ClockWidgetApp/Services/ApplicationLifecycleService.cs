@@ -1,9 +1,9 @@
-using System.Windows;
-using Microsoft.Extensions.Logging;
-using ClockWidgetApp.ViewModels;
-
 namespace ClockWidgetApp.Services
 {
+    using System.Windows;
+    using ClockWidgetApp.ViewModels;
+    using Microsoft.Extensions.Logging;
+
     /// <summary>
     /// Сервис для управления жизненным циклом приложения: graceful shutdown, сохранение настроек, обработка исключений.
     /// </summary>

@@ -1,10 +1,10 @@
-using System;
-using System.ComponentModel;
-using System.Windows;
-using ClockWidgetApp.Helpers;
-
 namespace ClockWidgetApp.Views
 {
+    using System;
+    using System.ComponentModel;
+    using System.Windows;
+    using ClockWidgetApp.Helpers;
+
     /// <summary>
     /// Окно для выбора даты и времени длинного таймера.
     /// </summary>

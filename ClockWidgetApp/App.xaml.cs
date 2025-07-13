@@ -1,11 +1,11 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
+using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
-using Microsoft.Extensions.Logging;
 using ClockWidgetApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
-using System.IO;
-using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp;
 

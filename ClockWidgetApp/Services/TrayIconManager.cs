@@ -1,9 +1,9 @@
-using System.IO;
-using Microsoft.Extensions.Logging;
-using ClockWidgetApp.ViewModels;
-
 namespace ClockWidgetApp.Services
 {
+    using System.IO;
+    using ClockWidgetApp.ViewModels;
+    using Microsoft.Extensions.Logging;
+
     /// <summary>
     /// Сервис для управления иконками трея для активных таймеров, будильников и главного приложения.
     /// </summary>

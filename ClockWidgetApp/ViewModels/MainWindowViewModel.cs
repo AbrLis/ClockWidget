@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
 using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -88,7 +88,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Сохраняет позицию окна и помечает настройки как изменённые.
     /// </summary>
-    public void SaveWindowPosition(double left, double top)
+    private void SaveWindowPosition(double left, double top)
     {
         WindowPositionHelper.SaveWindowPosition(_appDataService.Data.WidgetSettings, left, top, false);
         App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
@@ -151,20 +151,17 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!_disposed)
+        if (_disposed) return;
+        try
         {
-            try
-            {
-                _logger.LogDebug("[MainWindowViewModel] Disposing main window view model");
-                if (_timeService != null)
-                    _timeService.TimeUpdated -= OnTimeUpdated;
-                _disposed = true;
-                _logger.LogDebug("[MainWindowViewModel] Main window view model disposed");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[MainWindowViewModel] Error disposing main window view model");
-            }
+            _logger.LogDebug("[MainWindowViewModel] Disposing main window view model");
+            _timeService.TimeUpdated -= OnTimeUpdated;
+            _disposed = true;
+            _logger.LogDebug("[MainWindowViewModel] Main window view model disposed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[MainWindowViewModel] Error disposing main window view model");
         }
     }
 
@@ -178,7 +175,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private void OpenSettingsWindow()
     {
         _logger.LogDebug("[MainWindowViewModel] OpenSettingsWindow called");
-        _windowService?.OpenSettingsWindow();
+        _windowService.OpenSettingsWindow();
         IsSettingsWindowOpen = true;
     }
 

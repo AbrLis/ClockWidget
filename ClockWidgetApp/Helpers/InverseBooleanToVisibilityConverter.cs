@@ -1,9 +1,9 @@
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-
 namespace ClockWidgetApp.Helpers
 {
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Data;
+
     /// <summary>
     /// Инвертирует bool в Visibility.
     /// </summary>

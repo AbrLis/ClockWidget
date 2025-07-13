@@ -1,8 +1,8 @@
 using System.Windows;
+using System.Windows.Input;
+using ClockWidgetApp.Helpers;
 using ClockWidgetApp.ViewModels;
 using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Helpers;
-using System.Windows.Input;
 
 namespace ClockWidgetApp;
 
@@ -113,7 +113,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void TimerTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        _timersAndAlarmsViewModel.TimersVM.CorrectTimerTime();
+        _timersAndAlarmsViewModel.TimersVm.CorrectTimerTime();
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void AlarmTimeBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        _timersAndAlarmsViewModel.AlarmsVM.CorrectAlarmTime();
+        _timersAndAlarmsViewModel.AlarmsVm.CorrectAlarmTime();
     }
 
     /// <summary>
@@ -131,9 +131,8 @@ public partial class SettingsWindow : Window
     {
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is TimerEntryViewModel timer)
         {
-            var vm = _timersAndAlarmsViewModel.TimersVM;
-            if (vm.EditTimerCommand.CanExecute(timer))
-                vm.EditTimerCommand.Execute(timer);
+            var vm = _timersAndAlarmsViewModel.TimersVm;
+            vm.EditTimer(timer);
         }
     }
 
@@ -144,7 +143,7 @@ public partial class SettingsWindow : Window
     {
         if (sender is System.Windows.Controls.Grid grid && grid.DataContext is AlarmEntryViewModel alarm)
         {
-            var vm = _timersAndAlarmsViewModel.AlarmsVM;
+            var vm = _timersAndAlarmsViewModel.AlarmsVm;
             if (vm.EditAlarmCommand.CanExecute(alarm))
                 vm.EditAlarmCommand.Execute(alarm);
         }
@@ -155,14 +154,14 @@ public partial class SettingsWindow : Window
     /// </summary>
     private void LongTimerAddButton_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is ClockWidgetApp.ViewModels.SettingsWindowViewModel vm && vm.LongTimersVM != null)
+        if (DataContext is ClockWidgetApp.ViewModels.SettingsWindowViewModel vm && vm.LongTimersVm != null)
         {
             // Получаем позицию кнопки на экране
             var button = sender as System.Windows.Controls.Button;
             if (button != null)
             {
                 var point = button.PointToScreen(new System.Windows.Point(button.ActualWidth / 2, button.ActualHeight / 2));
-                vm.LongTimersVM.ShowInputWindowAt(point);
+                vm.LongTimersVm.ShowInputWindowAt(point);
             }
         }
     }

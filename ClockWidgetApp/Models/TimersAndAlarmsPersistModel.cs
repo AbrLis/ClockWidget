@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 namespace ClockWidgetApp.Models
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// Модель для сериализации всех таймеров, будильников и длинных таймеров.
     /// </summary>

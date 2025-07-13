@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
@@ -19,33 +18,11 @@ public class LongTimersViewModel : INotifyPropertyChanged
     private readonly ISoundService _soundService;
 
     /// <summary>
-    /// Команда для отображения окна добавления длинного таймера.
-    /// </summary>
-    public ICommand ShowInputCommand { get; }
-
-    /// <summary>
     /// Конструктор ViewModel длинных таймеров.
     /// </summary>
     public LongTimersViewModel(ISoundService soundService)
     {
         _soundService = soundService;
-        ShowInputCommand = new RelayCommand(_ => ShowInputWindow());
-    }
-
-    /// <summary>
-    /// Открывает окно для добавления нового длинного таймера по центру экрана.
-    /// </summary>
-    private void ShowInputWindow()
-    {
-        var inputWindow = new Views.LongTimerInputWindow();
-        inputWindow.ShowInTaskbar = false;
-        if (inputWindow.ShowDialog() == true)
-        {
-            var selectedDateTime = inputWindow.SelectedDateTime;
-            var timerName = inputWindow.TimerName;
-            var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
-            LongTimers.Add(timer);
-        }
     }
 
     /// <summary>
@@ -53,8 +30,10 @@ public class LongTimersViewModel : INotifyPropertyChanged
     /// </summary>
     public void ShowInputWindowAt(System.Windows.Point screenPosition)
     {
-        var inputWindow = new Views.LongTimerInputWindow();
-        inputWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+        var inputWindow = new Views.LongTimerInputWindow
+        {
+            WindowStartupLocation = System.Windows.WindowStartupLocation.Manual
+        };
         // Окно появляется строго над кнопкой: центрируем по X, нижний край окна совпадает с верхом кнопки
         inputWindow.Left = screenPosition.X - inputWindow.Width / 2;
         inputWindow.Top = screenPosition.Y - inputWindow.Height;

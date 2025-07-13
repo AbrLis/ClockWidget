@@ -1,7 +1,7 @@
-using ClockWidgetApp.Models;
-
 namespace ClockWidgetApp.Services
 {
+    using ClockWidgetApp.Models;
+
     /// <summary>
     /// Интерфейс единого сервиса управления всеми данными приложения (настройки, таймеры, будильники).
     /// </summary>

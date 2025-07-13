@@ -1,8 +1,8 @@
-using System.Windows;
-using System.Linq;
-
 namespace ClockWidgetApp.Helpers
 {
+    using System.Linq;
+    using System.Windows;
+
     /// <summary>
     /// Вспомогательные методы для диалоговых окон подтверждения.
     /// </summary>

@@ -128,10 +128,12 @@ public class AlarmsViewModelTests
         var mainVM = new MainWindowViewModel(timeService, appDataService, soundService, windowService, mainLogger);
         var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
         var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
+        // Копируем будильники в тестовый экземпляр
+        foreach (var a in alarmsVM.Alarms)
+            timersAndAlarmsVM.AlarmsVm.Alarms.Add(a);
         var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
         var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
-        settingsVM.AlarmsVM = alarmsVM;
-        settingsVM.DeleteAlarmCommand.Execute(alarm);
-        Assert.Empty(alarmsVM.Alarms);
+        settingsVM.DeleteAlarmCommand.Execute(timersAndAlarmsVM.AlarmsVm.Alarms[0]);
+        Assert.Empty(timersAndAlarmsVM.AlarmsVm.Alarms);
     }
 } 

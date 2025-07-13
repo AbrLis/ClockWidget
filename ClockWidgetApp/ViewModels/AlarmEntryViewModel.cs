@@ -56,14 +56,11 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
     /// </summary>
     public bool IsStopAvailable => IsEnabled;
 
-    public ICommand ToggleEnabledCommand { get; }
-
     public AlarmEntryViewModel(TimeSpan alarmTime, bool isEnabled = false, DateTime? nextTriggerDateTime = null)
     {
         AlarmTime = alarmTime;
         _isEnabled = isEnabled;
         NextTriggerDateTime = nextTriggerDateTime;
-        ToggleEnabledCommand = new RelayCommand(_ => ToggleEnabled());
         StartCommand = new RelayCommand(_ => Start(), _ => !IsEnabled);
         StopCommand = new RelayCommand(_ => Stop(), _ => IsEnabled);
         if (IsEnabled && NextTriggerDateTime == null)

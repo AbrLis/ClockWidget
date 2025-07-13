@@ -1,8 +1,8 @@
-using Serilog;
-using System.IO;
-
 namespace ClockWidgetApp.Helpers
 {
+    using System.IO;
+    using Serilog;
+
     /// <summary>
     /// Статический класс для конфигурации логирования приложения.
     /// </summary>

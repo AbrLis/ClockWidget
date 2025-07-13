@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Services;
-using System.IO;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -23,15 +22,15 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// <summary>
     /// ViewModel для управления таймерами.
     /// </summary>
-    public TimersViewModel TimersVM { get; }
+    public TimersViewModel TimersVm { get; }
     /// <summary>
     /// ViewModel для управления будильниками.
     /// </summary>
-    public AlarmsViewModel AlarmsVM { get; }
+    public AlarmsViewModel AlarmsVm { get; }
     /// <summary>
     /// ViewModel для управления длинными таймерами.
     /// </summary>
-    public LongTimersViewModel LongTimersVM { get; }
+    public LongTimersViewModel LongTimersVm { get; }
     /// <summary>
     /// Локализованные строки для UI.
     /// </summary>
@@ -43,27 +42,27 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         _appDataService = appDataService;
         _soundService = soundService;
-        TimersVM = new TimersViewModel();
-        AlarmsVM = new AlarmsViewModel();
-        LongTimersVM = new LongTimersViewModel(soundService);
+        TimersVm = new TimersViewModel();
+        AlarmsVm = new AlarmsViewModel();
+        LongTimersVm = new LongTimersViewModel(soundService);
         // Синхронизируем коллекции с данными из AppDataService
         SyncCollections();
-        _alarmMonitorService = new AlarmMonitorService(AlarmsVM.Alarms);
+        _alarmMonitorService = new AlarmMonitorService(AlarmsVm.Alarms);
         _alarmMonitorService.AlarmTriggered += OnAlarmTriggered;
         _trayIconManager = trayIconManager;
         _trayIconManager.StopRequested += OnTrayIconStopRequested;
-        TimersVM.Timers.CollectionChanged += Timers_CollectionChanged;
-        AlarmsVM.Alarms.CollectionChanged += Alarms_CollectionChanged;
-        foreach (var longTimer in LongTimersVM.LongTimers)
+        TimersVm.Timers.CollectionChanged += Timers_CollectionChanged;
+        AlarmsVm.Alarms.CollectionChanged += Alarms_CollectionChanged;
+        foreach (var longTimer in LongTimersVm.LongTimers)
         {
             AddLongTimerTray(longTimer);
             longTimer.RequestExpire += OnLongTimerExpired;
         }
-        LongTimersVM.LongTimers.CollectionChanged += LongTimers_CollectionChanged;
+        LongTimersVm.LongTimers.CollectionChanged += LongTimers_CollectionChanged;
         _trayUpdateTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _trayUpdateTimer.Tick += (s, e) => UpdateTrayTooltips();
+        _trayUpdateTimer.Tick += (_, _) => UpdateTrayTooltips();
         _trayUpdateTimer.Start();
-        LocalizationManager.LanguageChanged += (s, e) =>
+        LocalizationManager.LanguageChanged += (_, _) =>
         {
             Localized = LocalizationManager.GetLocalizedStrings();
             OnPropertyChanged(nameof(Localized));
@@ -80,98 +79,8 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         Serilog.Log.Information("[TimersAndAlarmsViewModel] Сохранение timers/alarms...");
         _appDataService.Save();
         Serilog.Log.Information("[TimersAndAlarmsViewModel] Сохранение timers/alarms завершено.");
-
     }
 
-    /// <summary>
-    /// Загружает коллекции таймеров, будильников и длинных таймеров из persist-модели.
-    /// </summary>
-    private void LoadCollectionsFromPersist(Models.TimersAndAlarmsPersistModel persist)
-    {
-        TimersVM.Timers.Clear();
-        foreach (var t in persist.Timers)
-        {
-            var timer = new TimerEntryViewModel(t.Duration);
-            timer.RequestDeactivate += tt => tt.IsActive = false;
-            TimersVM.Timers.Add(timer);
-            Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен таймер: {t.Duration}");
-        }
-        AlarmsVM.Alarms.Clear();
-        foreach (var a in persist.Alarms)
-        {
-            bool isEnabled = a.IsEnabled;
-            DateTime? nextTrigger = a.NextTriggerDateTime;
-            if (isEnabled && nextTrigger.HasValue && nextTrigger.Value <= DateTime.Now)
-            {
-                isEnabled = false;
-                nextTrigger = null;
-            }
-            var alarm = new AlarmEntryViewModel(a.AlarmTime, isEnabled, nextTrigger);
-            AlarmsVM.Alarms.Add(alarm);
-            Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен будильник: {a.AlarmTime}");
-        }
-        LongTimersVM.LongTimers.Clear();
-        var expiredLongTimers = new List<Models.LongTimerPersistModel>();
-        foreach (var lt in persist.LongTimers)
-        {
-            if (lt.TargetDateTime <= DateTime.Now)
-            {
-                // Истёкший длинный таймер: звук, уведомление, не добавлять в коллекцию
-                var services = ((App)System.Windows.Application.Current).Services;
-                var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
-                LongTimerEntryViewModel.ShowLongTimerNotification(soundService!, lt.Name, lt.TargetDateTime);
-                expiredLongTimers.Add(lt);
-                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён истёкший длинный таймер: {lt.TargetDateTime}");
-            }
-            else
-            {
-                var services = ((App)System.Windows.Application.Current).Services;
-                var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
-                var longTimer = new LongTimerEntryViewModel(lt.TargetDateTime, soundService!, lt.Name);
-                LongTimersVM.LongTimers.Add(longTimer);
-                Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен длинный таймер: {lt.TargetDateTime}");
-            }
-        }
-        // Удаляем истёкшие таймеры из persist и сохраняем
-        if (expiredLongTimers.Count > 0)
-        {
-            foreach (var expired in expiredLongTimers)
-                persist.LongTimers.Remove(expired);
-            SaveTimersAndAlarms();
-        }
-    }
-
-    /// <summary>
-    /// Загружает таймеры, длинные таймеры и будильники с обработкой ошибок повреждённого файла.
-    /// Показывает диалог при ошибке чтения и выполняет действия согласно выбору пользователя.
-    /// </summary>
-    public void LoadTimersAndAlarms()
-    {
-        Serilog.Log.Information("[TimersAndAlarmsViewModel] Начата загрузка timers/alarms");
-        try
-        {
-            _appDataService.Load();
-            SyncCollections();
-            Serilog.Log.Information("[TimersAndAlarmsViewModel] Успешная загрузка timers/alarms");
-        }
-        catch (InvalidDataException)
-        {
-            Serilog.Log.Warning("[TimersAndAlarmsViewModel] Повреждён файл timers/alarms. Восстановление дефолтных настроек.");
-            ResetToDefaults();
-        }
-    }
-
-    /// <summary>
-    /// Сбросить все таймеры, будильники и длинные таймеры к начальному состоянию.
-    /// </summary>
-    private void ResetToDefaults()
-    {
-        Serilog.Log.Information("[TimersAndAlarmsViewModel] Сброс всех таймеров, будильников и длинных таймеров к начальному состоянию.");
-        _appDataService.Data.Timers.Clear();
-        _appDataService.Data.Alarms.Clear();
-        _appDataService.Data.LongTimers.Clear();
-        SaveTimersAndAlarms();
-    }
     #endregion
 
     #region INotifyPropertyChanged
@@ -186,12 +95,12 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void UpdateTrayTooltips()
     {
-        foreach (var timer in TimersVM.Timers)
+        foreach (var timer in TimersVm.Timers)
         {
             if (timer.IsRunning)
                 _trayIconManager.UpdateTooltip(GetTimerId(timer), timer.DisplayTime);
         }
-        foreach (var alarm in AlarmsVM.Alarms)
+        foreach (var alarm in AlarmsVm.Alarms)
         {
             if (alarm.IsEnabled && alarm.NextTriggerDateTime.HasValue)
             {
@@ -272,7 +181,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     private void AddTimerTray(TimerEntryViewModel timer)
     {
         string id = GetTimerId(timer);
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "timer.ico");
+        string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "timer.ico");
         _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.DisplayTime);
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для таймера: {id}");
     }
@@ -283,10 +192,10 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
     private void AddAlarmTray(AlarmEntryViewModel alarm)
     {
-        string id = GetAlarmId(alarm);
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
+        var id = GetAlarmId(alarm);
+        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
         var left = alarm.NextTriggerDateTime.HasValue ? alarm.NextTriggerDateTime.Value - DateTime.Now : TimeSpan.Zero;
-        string text = left > TimeSpan.Zero ? left.ToString(@"hh\:mm\:ss") : "00:00:00";
+        var text = left > TimeSpan.Zero ? left.ToString(@"hh\:mm\:ss") : "00:00:00";
         _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, text);
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для будильника: {id}");
     }
@@ -297,8 +206,8 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
     private void AddLongTimerTray(LongTimerEntryViewModel timer)
     {
-        string id = GetLongTimerId(timer);
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
+        var id = GetLongTimerId(timer);
+        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
         _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.TrayTooltip);
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для длинного таймера: {timer.Name} ({timer.TargetDateTime})");
     }
@@ -319,7 +228,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             RemoveLongTimerTray(timer);
-            LongTimersVM.LongTimers.Remove(timer);
+            LongTimersVm.LongTimers.Remove(timer);
             Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён после истечения: {timer.Name} ({timer.TargetDateTime})");
         });
     }
@@ -331,7 +240,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void SubscribeTimer(TimerEntryViewModel timer)
     {
-        timer.PropertyChanged += (s, e) =>
+        timer.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(timer.IsRunning) || e.PropertyName == nameof(timer.IsStartAvailable))
             {
@@ -346,15 +255,13 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 
     private void SubscribeAlarm(AlarmEntryViewModel alarm)
     {
-        alarm.PropertyChanged += (s, e) =>
+        alarm.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(alarm.IsEnabled) || e.PropertyName == nameof(alarm.IsStartAvailable))
-            {
-                if (alarm.IsEnabled)
-                    AddAlarmTray(alarm);
-                else
-                    RemoveAlarmTray(alarm);
-            }
+            if (e.PropertyName != nameof(alarm.IsEnabled) && e.PropertyName != nameof(alarm.IsStartAvailable)) return;
+            if (alarm.IsEnabled)
+                AddAlarmTray(alarm);
+            else
+                RemoveAlarmTray(alarm);
         };
         if (alarm.IsEnabled) AddAlarmTray(alarm);
     }
@@ -381,21 +288,21 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         if (id.StartsWith("timer_"))
         {
-            var timer = TimersVM.Timers.FirstOrDefault(t => GetTimerId(t) == id);
+            var timer = TimersVm.Timers.FirstOrDefault(t => GetTimerId(t) == id);
             timer?.Reset();
         }
         else if (id.StartsWith("alarm_"))
         {
-            var alarm = AlarmsVM.Alarms.FirstOrDefault(a => GetAlarmId(a) == id);
+            var alarm = AlarmsVm.Alarms.FirstOrDefault(a => GetAlarmId(a) == id);
             alarm?.Stop();
         }
         else if (id.StartsWith("longtimer_"))
         {
-            var longTimer = LongTimersVM.LongTimers.FirstOrDefault(t => GetLongTimerId(t) == id);
+            var longTimer = LongTimersVm.LongTimers.FirstOrDefault(t => GetLongTimerId(t) == id);
             if (longTimer != null)
             {
                 RemoveLongTimerTray(longTimer);
-                LongTimersVM.LongTimers.Remove(longTimer);
+                LongTimersVm.LongTimers.Remove(longTimer);
             }
         }
     }
@@ -435,11 +342,11 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private string GetLongTimersTooltip()
     {
-        int count = LongTimersVM.LongTimers.Count;
+        int count = LongTimersVm.LongTimers.Count;
         if (count == 0)
             return string.Empty;
         // Находим ближайший по времени длинный таймер
-        var nextTimer = LongTimersVM.LongTimers
+        var nextTimer = LongTimersVm.LongTimers
             .OrderBy(t => t.TargetDateTime)
             .FirstOrDefault();
         if (nextTimer == null)
@@ -448,7 +355,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         string tooltip = nextTimer.TrayTooltip;
         if (count > 1)
         {
-            string moreLabel = Helpers.LocalizationManager.GetString("LongTimers_Tooltip_More");
+            string moreLabel = LocalizationManager.GetString("LongTimers_Tooltip_More");
             tooltip += $"\n+ {count - 1} {moreLabel}";
         }
         return tooltip;
@@ -459,10 +366,10 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void UpdateLongTimersTrayIcon()
     {
-        string id = "longtimers";
-        string iconPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
-        string tooltip = GetLongTimersTooltip();
-        if (LongTimersVM.LongTimers.Count == 0)
+        const string id = "longtimers";
+        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
+        var tooltip = GetLongTimersTooltip();
+        if (LongTimersVm.LongTimers.Count == 0)
         {
             _trayIconManager.RemoveTrayIcon(id);
         }
@@ -477,15 +384,15 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     public void SyncCollections()
     {
-        TimersVM.Timers.Clear();
+        TimersVm.Timers.Clear();
         foreach (var t in _appDataService.Data.Timers)
-            TimersVM.Timers.Add(new TimerEntryViewModel(t.Duration));
-        AlarmsVM.Alarms.Clear();
+            TimersVm.Timers.Add(new TimerEntryViewModel(t.Duration));
+        AlarmsVm.Alarms.Clear();
         foreach (var a in _appDataService.Data.Alarms)
-            AlarmsVM.Alarms.Add(new AlarmEntryViewModel(a.AlarmTime, a.IsEnabled, a.NextTriggerDateTime));
-        LongTimersVM.LongTimers.Clear();
+            AlarmsVm.Alarms.Add(new AlarmEntryViewModel(a.AlarmTime, a.IsEnabled, a.NextTriggerDateTime));
+        LongTimersVm.LongTimers.Clear();
         foreach (var lt in _appDataService.Data.LongTimers)
-            LongTimersVM.LongTimers.Add(new LongTimerEntryViewModel(lt.TargetDateTime, _soundService, lt.Name));
+            LongTimersVm.LongTimers.Add(new LongTimerEntryViewModel(lt.TargetDateTime, _soundService, lt.Name));
     }
     #endregion
 }

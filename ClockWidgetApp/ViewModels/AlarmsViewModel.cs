@@ -2,8 +2,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using System.Linq;
-using System.Threading.Tasks;
 using ClockWidgetApp.Helpers;
 
 namespace ClockWidgetApp.ViewModels;
@@ -88,7 +86,7 @@ public class AlarmsViewModel : INotifyPropertyChanged
         CancelAlarmInputCommand = new RelayCommand(_ => CancelAlarmInput());
         EditAlarmCommand = new RelayCommand(a =>
         {
-            if (a is AlarmEntryViewModel alarm && alarm != null)
+            if (a is AlarmEntryViewModel alarm)
                 EditAlarm(alarm);
         });
         ApplyEditAlarmCommand = new RelayCommand(_ => ApplyEditAlarm(), _ => IsEditingAlarm && IsNewAlarmValid);
@@ -188,7 +186,7 @@ public class AlarmsViewModel : INotifyPropertyChanged
     private async void ShowDuplicateAlarmNotification(string? message = null)
     {
         DuplicateAlarmNotification = message ?? LocalizationManager.GetLocalizedStrings().Alarms_DuplicateNotification;
-        await Task.Delay(Helpers.Constants.DuplicateAlarmNotificationDurationMs);
+        await Task.Delay(Constants.DuplicateAlarmNotificationDurationMs);
         DuplicateAlarmNotification = string.Empty;
     }
 
@@ -196,6 +194,6 @@ public class AlarmsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Уведомляет об изменении свойства для биндинга.
     /// </summary>
-    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 } 

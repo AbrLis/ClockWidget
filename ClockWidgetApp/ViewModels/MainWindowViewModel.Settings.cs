@@ -103,11 +103,7 @@ public partial class MainWindowViewModel
         TextOpacity = validated.TextOpacity;
         FontSize = validated.FontSize;
         _showSeconds = validated.ShowSeconds;
-        _showDigitalClock = validated.ShowDigitalClock;
-        _showAnalogClock = validated.ShowAnalogClock;
         _analogClockSize = validated.AnalogClockSize;
-        _analogClockTopmost = validated.AnalogClockTopmost;
-        _digitalClockTopmost = validated.DigitalClockTopmost;
         LocalizationManager.SetLanguage(validated.Language);
         UpdateDigitalClockTopmost();
         UpdateAnalogClockTopmost();

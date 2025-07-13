@@ -1,8 +1,8 @@
-using System.Globalization;
-using System.Windows.Data;
-
 namespace ClockWidgetApp.Helpers
 {
+    using System.Globalization;
+    using System.Windows.Data;
+
     /// <summary>
     /// Конвертер bool -> Opacity (True=1.0, False=0.5)
     /// </summary>

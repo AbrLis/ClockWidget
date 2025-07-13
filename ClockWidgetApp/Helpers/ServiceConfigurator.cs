@@ -1,11 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using ClockWidgetApp.Services;
-using ClockWidgetApp.ViewModels;
-using Serilog;
-
 namespace ClockWidgetApp.Helpers
 {
+    using ClockWidgetApp.Services;
+    using ClockWidgetApp.ViewModels;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Serilog;
+
     /// <summary>
     /// Статический класс для конфигурации DI-контейнера приложения.
     /// </summary>

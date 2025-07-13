@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
-
 namespace ClockWidgetApp.Models
 {
+    using System.Collections.ObjectModel;
+
     /// <summary>
     /// Агрегирующая модель для хранения всех данных приложения: настроек виджета, таймеров, будильников и длинных таймеров.
     /// </summary>

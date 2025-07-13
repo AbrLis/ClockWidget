@@ -101,10 +101,12 @@ public class TimersViewModelTests
         var mainVM = new MainWindowViewModel(timeService, appDataService, soundService, windowService, mainLogger);
         var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
         var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
+        // Копируем таймеры в тестовый экземпляр
+        foreach (var t in timersVM.Timers)
+            timersAndAlarmsVM.TimersVm.Timers.Add(t);
         var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
         var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
-        settingsVM.TimersVM = timersVM;
-        settingsVM.DeleteTimerCommand.Execute(timer);
-        Assert.Empty(timersVM.Timers);
+        settingsVM.DeleteTimerCommand.Execute(timersAndAlarmsVM.TimersVm.Timers[0]);
+        Assert.Empty(timersAndAlarmsVM.TimersVm.Timers);
     }
 } 

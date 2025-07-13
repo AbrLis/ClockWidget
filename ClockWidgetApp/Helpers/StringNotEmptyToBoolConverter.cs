@@ -1,8 +1,8 @@
-using System.Globalization;
-using System.Windows.Data;
-
 namespace ClockWidgetApp.Helpers
 {
+    using System.Globalization;
+    using System.Windows.Data;
+
     /// <summary>
     /// Возвращает true, если строка не пуста.
     /// </summary>
