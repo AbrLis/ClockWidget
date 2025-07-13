@@ -141,17 +141,22 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
+        {
             foreach (AlarmEntryViewModel a in e.NewItems)
             {
                 SubscribeAlarm(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен будильник: {a.AlarmTime}");
             }
+        }
+
         if (e.OldItems != null)
+        {
             foreach (AlarmEntryViewModel a in e.OldItems)
             {
                 RemoveAlarmTray(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён будильник: {a.AlarmTime}");
             }
+        }
     }
 
     /// <summary>
@@ -161,17 +166,22 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
+        {
             foreach (LongTimerEntryViewModel t in e.NewItems)
             {
                 t.RequestExpire += OnLongTimerExpired;
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен длинный таймер: {t.Name} ({t.TargetDateTime})");
             }
+        }
+
         if (e.OldItems != null)
+        {
             foreach (LongTimerEntryViewModel t in e.OldItems)
             {
                 t.Dispose();
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён из коллекции: {t.Name} ({t.TargetDateTime})");
             }
+        }
         // После любого изменения коллекции обновляем иконку
         UpdateLongTimersTrayIcon();
     }
@@ -255,13 +265,20 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 
     private void SubscribeAlarm(AlarmEntryViewModel alarm)
     {
+        bool lastEnabled = alarm.IsEnabled;
         alarm.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName != nameof(alarm.IsEnabled) && e.PropertyName != nameof(alarm.IsStartAvailable)) return;
-            if (alarm.IsEnabled)
-                AddAlarmTray(alarm);
-            else
-                RemoveAlarmTray(alarm);
+            if (e.PropertyName == nameof(alarm.IsEnabled))
+            {
+                if (alarm.IsEnabled != lastEnabled)
+                {
+                    lastEnabled = alarm.IsEnabled;
+                    if (alarm.IsEnabled)
+                        AddAlarmTray(alarm);
+                    else
+                        RemoveAlarmTray(alarm);
+                }
+            }
         };
         if (alarm.IsEnabled) AddAlarmTray(alarm);
     }
@@ -318,8 +335,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             var app = System.Windows.Application.Current as App;
             if (app?.Services is not { } services)
                 return;
-            var soundService = services.GetService(typeof(ISoundService)) as ISoundService;
-            if (soundService == null)
+            if (services.GetService(typeof(ISoundService)) is not ISoundService soundService)
                 return;
             var baseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             if (string.IsNullOrEmpty(baseDir))
