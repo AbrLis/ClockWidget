@@ -5,6 +5,7 @@ using Moq;
 using ClockWidgetApp.Services;
 using ClockWidgetApp.Helpers;
 using System.IO;
+using ClockWidgetApp.Models;
 
 namespace CleanTest;
 
@@ -19,8 +20,10 @@ public class LongTimersViewModelTests
     [Fact]
     public void AddLongTimer_ShouldAppearInCollection()
     {
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
         var soundService = new Mock<ISoundService>().Object;
-        var vm = new LongTimersViewModel(soundService);
+        var vm = new LongTimersViewModel(appDataServiceMock.Object, soundService);
         var dt = DateTime.Now.AddHours(1);
         var timer = new LongTimerEntryViewModel(dt, soundService, "Test");
         vm.LongTimers.Add(timer);
@@ -34,8 +37,10 @@ public class LongTimersViewModelTests
     [Fact]
     public void RemoveLongTimer_ShouldDisappearFromCollection()
     {
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
         var soundService = new Mock<ISoundService>().Object;
-        var vm = new LongTimersViewModel(soundService);
+        var vm = new LongTimersViewModel(appDataServiceMock.Object, soundService);
         var dt = DateTime.Now.AddHours(1);
         var timer = new LongTimerEntryViewModel(dt, soundService, "Test");
         vm.LongTimers.Add(timer);
@@ -90,8 +95,10 @@ public class LongTimersViewModelTests
     [Fact]
     public void AddMultipleTimers_ShouldHandleEdgeCases()
     {
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
         var soundService = new Mock<ISoundService>().Object;
-        var vm = new LongTimersViewModel(soundService);
+        var vm = new LongTimersViewModel(appDataServiceMock.Object, soundService);
         for (int i = 0; i < 100; i++)
         {
             var timer = new LongTimerEntryViewModel(DateTime.Now.AddMinutes(i), soundService, $"T{i}");
@@ -106,6 +113,8 @@ public class LongTimersViewModelTests
     [Fact]
     public void AddTimer_WithEmptyName_ShouldUseNoNameLabel()
     {
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
         var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddHours(1);
         var timer = new LongTimerEntryViewModel(dt, soundService, "");
@@ -123,6 +132,8 @@ public class LongTimersViewModelTests
         var file = "timers_alarms.json";
         var settingsFile = "widget_settings.json";
         var service = new AppDataService(settingsFile, file, fs);
+        var appDataService = new Mock<IAppDataService>().Object;
+        var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddHours(2);
         var name = "PersistTest";
         service.Data.LongTimers.Add(new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name });

@@ -24,6 +24,8 @@ namespace ClockWidgetApp.Services
         private readonly string _timersFilePath;
         /// <summary>Сервис работы с файловой системой.</summary>
         private readonly IFileSystemService _fileSystemService;
+        /// <summary>Репозиторий для настроек виджета.</summary>
+        private readonly Data.SingleObjectJsonRepository<WidgetSettings> _settingsRepository;
         /// <summary>Репозиторий для таймеров и будильников.</summary>
         private readonly Data.SingleObjectJsonRepository<TimersAndAlarmsPersistModel> _timersRepository;
         private CancellationTokenSource? _settingsSaveDebounceCts;
@@ -51,6 +53,7 @@ namespace ClockWidgetApp.Services
             _settingsFilePath = settingsFilePath;
             _timersFilePath = timersFilePath;
             _fileSystemService = fileSystemService;
+            _settingsRepository = new Data.SingleObjectJsonRepository<WidgetSettings>(fileSystemService, settingsFilePath);
             _timersRepository = new Data.SingleObjectJsonRepository<TimersAndAlarmsPersistModel>(fileSystemService, timersFilePath);
             SubscribeToCollections();
             // Удаляю метод StartAutoSaveTimer
@@ -74,12 +77,12 @@ namespace ClockWidgetApp.Services
         public void Load()
         {
             Serilog.Log.Information("[AppDataService] Начата загрузка данных приложения");
-            var settings = LoadWithBackup<WidgetSettings>(_settingsFilePath);
+            var settings = _settingsRepository.LoadAsync().GetAwaiter().GetResult();
             if (settings != null)
             {
                 Data.WidgetSettings = settings;
                 SubscribeToWidgetSettings();
-                Serilog.Log.Information("[AppDataService] Настройки успешно загружены");
+                Serilog.Log.Information("[AppDataService] Настройки успешно загружены (репозиторий)");
             }
             else
             {
@@ -112,12 +115,12 @@ namespace ClockWidgetApp.Services
         public async Task LoadAsync()
         {
             Serilog.Log.Information("[AppDataService] Начата асинхронная загрузка данных приложения");
-            var settings = await LoadWithBackupAsync<WidgetSettings>(_settingsFilePath);
+            var settings = await _settingsRepository.LoadAsync();
             if (settings != null)
             {
                 Data.WidgetSettings = settings;
                 SubscribeToWidgetSettings();
-                Serilog.Log.Information("[AppDataService] Настройки успешно загружены");
+                Serilog.Log.Information("[AppDataService] Настройки успешно загружены (репозиторий)");
             }
             else
             {
@@ -252,130 +255,6 @@ namespace ClockWidgetApp.Services
         }
 
         /// <summary>
-        /// Сериализует объект в файл JSON с форматированием.
-        /// </summary>
-        private async Task SerializeToFileAsync<T>(string filePath, T obj)
-        {
-            Serilog.Log.Debug($"[AppDataService] Начало сериализации и записи файла: {filePath}");
-            var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
-            await _fileSystemService.WriteAllTextAsync(filePath, json);
-            Serilog.Log.Debug($"[AppDataService] Файл успешно сериализован и записан: {filePath}");
-        }
-
-        /// <summary>
-        /// Десериализует объект из файла JSON.
-        /// </summary>
-        private async Task<T?> DeserializeFromFileAsync<T>(string filePath) where T : class
-        {
-            var json = await _fileSystemService.ReadAllTextAsync(filePath);
-            return JsonSerializer.Deserialize<T>(json);
-        }
-
-        /// <summary>
-        /// Создаёт резервную копию файла, если он валиден (может быть десериализован).
-        /// </summary>
-        private async Task CreateBackupIfValidAsync<T>(string filePath, string backupPath) where T : class
-        {
-            Serilog.Log.Debug($"[AppDataService] Проверка валидности файла для бэкапа: {filePath}");
-            try
-            {
-                var obj = await DeserializeFromFileAsync<T>(filePath);
-                if (obj != null)
-                {
-                    Serilog.Log.Debug($"[AppDataService] Файл валиден, создаём бэкап: {backupPath}");
-                    await _fileSystemService.CreateBackupAsync(filePath, backupPath);
-                    Serilog.Log.Debug($"[AppDataService] Бэкап успешно создан: {backupPath}");
-                }
-                else
-                {
-                    Serilog.Log.Warning($"[AppDataService] Текущий файл повреждён, .bak не обновляется: {filePath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Serilog.Log.Warning(ex, $"[AppDataService] Ошибка при проверке валидности файла, .bak не обновляется: {filePath}");
-            }
-        }
-
-        /// <summary>
-        /// Загружает объект из файла, при ошибке пробует резервную копию.
-        /// </summary>
-        private T? LoadWithBackup<T>(string filePath) where T : class, new()
-        {
-            if (_fileSystemService.FileExists(filePath))
-            {
-                try
-                {
-                    var json = _fileSystemService.ReadAllTextAsync(filePath).GetAwaiter().GetResult();
-                    var obj = JsonSerializer.Deserialize<T>(json);
-                    if (obj != null)
-                        return obj;
-                }
-                catch (System.Exception ex)
-                {
-                    Serilog.Log.Error(ex, $"[AppDataService] Ошибка чтения файла {filePath}, попытка использовать резервную копию");
-                }
-            }
-            string backupPath = Path.ChangeExtension(filePath, ".bak");
-            if (_fileSystemService.FileExists(backupPath))
-            {
-                try
-                {
-                    var json = _fileSystemService.ReadAllTextAsync(backupPath).GetAwaiter().GetResult();
-                    var obj = JsonSerializer.Deserialize<T>(json);
-                    if (obj != null)
-                    {
-                        Serilog.Log.Warning($"[AppDataService] Использована резервная копия для файла {filePath}");
-                        return obj;
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Serilog.Log.Error(ex, $"[AppDataService] Ошибка чтения резервной копии {backupPath}");
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Асинхронно загружает объект из файла, при ошибке пробует резервную копию.
-        /// </summary>
-        private async Task<T?> LoadWithBackupAsync<T>(string filePath) where T : class, new()
-        {
-            if (_fileSystemService.FileExists(filePath))
-            {
-                try
-                {
-                    var obj = await DeserializeFromFileAsync<T>(filePath);
-                    if (obj != null)
-                        return obj;
-                }
-                catch (System.Exception ex)
-                {
-                    Serilog.Log.Error(ex, $"[AppDataService] Ошибка чтения файла {filePath}, попытка использовать резервную копию");
-                }
-            }
-            string backupPath = Path.ChangeExtension(filePath, ".bak");
-            if (_fileSystemService.FileExists(backupPath))
-            {
-                try
-                {
-                    var obj = await DeserializeFromFileAsync<T>(backupPath);
-                    if (obj != null)
-                    {
-                        Serilog.Log.Warning($"[AppDataService] Использована резервная копия для файла {filePath}");
-                        return obj;
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Serilog.Log.Error(ex, $"[AppDataService] Ошибка чтения резервной копии {backupPath}");
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Обновляет содержимое целевой коллекции, минимизируя количество изменений (удаляет, добавляет и обновляет только отличающиеся элементы).
         /// </summary>
         /// <typeparam name="T">Тип элемента коллекции</typeparam>
@@ -438,26 +317,10 @@ namespace ClockWidgetApp.Services
         /// </summary>
         private void SaveSettings()
         {
-            var settingsDir = Path.GetDirectoryName(_settingsFilePath);
-            if (!string.IsNullOrEmpty(settingsDir))
-                _fileSystemService.CreateDirectory(settingsDir);
-
-            string backupPath = Path.ChangeExtension(_settingsFilePath, ".bak");
-            if (_fileSystemService.FileExists(_settingsFilePath))
-            {
-                CreateBackupIfValidAsync<WidgetSettings>(_settingsFilePath, backupPath).GetAwaiter().GetResult();
-            }
-
             try
             {
-                SerializeToFileAsync(_settingsFilePath, Data.WidgetSettings).GetAwaiter().GetResult();
-                Serilog.Log.Information($"[AppDataService] Настройки успешно сохранены: {_settingsFilePath}");
-
-                bool backupAfterSave = _fileSystemService.FileExists(_settingsFilePath) && !_fileSystemService.FileExists(backupPath);
-                if (backupAfterSave)
-                {
-                    _fileSystemService.CreateBackupAsync(_settingsFilePath, backupPath).GetAwaiter().GetResult();
-                }
+                _settingsRepository.SaveAsync(Data.WidgetSettings).GetAwaiter().GetResult();
+                Serilog.Log.Information($"[AppDataService] Настройки успешно сохранены (репозиторий): {_settingsFilePath}");
             }
             catch (System.Exception ex)
             {
@@ -470,31 +333,10 @@ namespace ClockWidgetApp.Services
         /// </summary>
         private async Task SaveSettingsAsync()
         {
-            var settingsDir = Path.GetDirectoryName(_settingsFilePath);
-            if (!string.IsNullOrEmpty(settingsDir))
-                _fileSystemService.CreateDirectory(settingsDir);
-
-            string backupPath = Path.ChangeExtension(_settingsFilePath, ".bak");
-            if (_fileSystemService.FileExists(_settingsFilePath))
-            {
-                Serilog.Log.Debug($"[AppDataService] Перед созданием бэкапа настроек: {backupPath}");
-                await CreateBackupIfValidAsync<WidgetSettings>(_settingsFilePath, backupPath);
-                Serilog.Log.Debug($"[AppDataService] После создания бэкапа настроек: {backupPath}");
-            }
-
             try
             {
-                Serilog.Log.Debug($"[AppDataService] Перед сериализацией настроек: {_settingsFilePath}");
-                await SerializeToFileAsync(_settingsFilePath, Data.WidgetSettings);
-                Serilog.Log.Debug($"[AppDataService] После сериализации настроек: {_settingsFilePath}");
-
-                bool backupAfterSave = _fileSystemService.FileExists(_settingsFilePath) && !_fileSystemService.FileExists(backupPath);
-                if (backupAfterSave)
-                {
-                    Serilog.Log.Debug($"[AppDataService] Перед созданием бэкапа после сохранения: {backupPath}");
-                    await _fileSystemService.CreateBackupAsync(_settingsFilePath, backupPath);
-                    Serilog.Log.Debug($"[AppDataService] После создания бэкапа после сохранения: {backupPath}");
-                }
+                await _settingsRepository.SaveAsync(Data.WidgetSettings);
+                Serilog.Log.Debug($"[AppDataService] Настройки успешно сохранены (репозиторий): {_settingsFilePath}");
             }
             catch (System.Exception ex)
             {

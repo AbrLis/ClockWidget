@@ -20,8 +20,9 @@ public class AlarmsViewModelTests
     [Fact]
     public void AddAlarmCommand_ShouldAddAlarm_WhenInputIsValid()
     {
-        // Arrange
-        var vm = new AlarmsViewModel();
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var vm = new AlarmsViewModel(appDataServiceMock.Object);
         vm.NewAlarmHours = "7";
         vm.NewAlarmMinutes = "30";
 
@@ -39,7 +40,9 @@ public class AlarmsViewModelTests
     [Fact]
     public void AddAlarmCommand_ShouldNotAddAlarm_WhenInputIsInvalid()
     {
-        var vm = new AlarmsViewModel();
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var vm = new AlarmsViewModel(appDataServiceMock.Object);
         vm.NewAlarmHours = "-1";
         vm.NewAlarmMinutes = "0";
         vm.AddAlarmCommand.Execute(null);
@@ -61,7 +64,9 @@ public class AlarmsViewModelTests
     [Fact]
     public void EditAndApplyEditAlarm_ShouldUpdateAlarmTime()
     {
-        var vm = new AlarmsViewModel();
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var vm = new AlarmsViewModel(appDataServiceMock.Object);
         vm.NewAlarmHours = "8";
         vm.NewAlarmMinutes = "15";
         vm.AddAlarmCommand.Execute(null);
@@ -79,7 +84,9 @@ public class AlarmsViewModelTests
     [Fact]
     public void CorrectAlarmTime_ShouldClampValues()
     {
-        var vm = new AlarmsViewModel();
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var vm = new AlarmsViewModel(appDataServiceMock.Object);
         vm.NewAlarmHours = "25";
         vm.NewAlarmMinutes = "-5";
         vm.CorrectAlarmTime();
@@ -93,7 +100,9 @@ public class AlarmsViewModelTests
     [Fact]
     public void AddAlarmCommand_ShouldNotAddDuplicateAlarm_AndShowNotification()
     {
-        var vm = new AlarmsViewModel();
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var vm = new AlarmsViewModel(appDataServiceMock.Object);
         vm.NewAlarmHours = "7";
         vm.NewAlarmMinutes = "30";
         vm.AddAlarmCommand.Execute(null);
@@ -113,7 +122,9 @@ public class AlarmsViewModelTests
     [Fact]
     public void SettingsWindowViewModel_DeleteAlarmCommand_ShouldRemoveAlarm()
     {
-        var alarmsVM = new AlarmsViewModel();
+        var appDataServiceMock1 = new Mock<IAppDataService>();
+        appDataServiceMock1.SetupGet(s => s.Data).Returns(new AppDataModel());
+        var alarmsVM = new AlarmsViewModel(appDataServiceMock1.Object);
         alarmsVM.NewAlarmHours = "6";
         alarmsVM.NewAlarmMinutes = "0";
         alarmsVM.AddAlarmCommand.Execute(null);
