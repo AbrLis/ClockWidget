@@ -72,4 +72,4 @@ public partial class MainWindowViewModel
         ShowAnalogClock = true;
         UpdateWindowsVisibility();
     }
-} 
+}

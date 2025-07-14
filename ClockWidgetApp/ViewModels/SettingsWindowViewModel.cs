@@ -280,7 +280,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
                 TimersVm.Timers.Remove(persist);
         }
     });
-    
+
     /// <summary>
     /// Команда для удаления будильника без подтверждения.
     /// </summary>
@@ -368,6 +368,6 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
             System.Windows.Application.Current.Shutdown();
         }
     }
-    
+
     #endregion
-} 
+}

@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Input;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -179,4 +178,4 @@ public partial class SettingsWindow : Window
     }
 
     #endregion
-} 
+}

@@ -206,4 +206,4 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
         notification.Topmost = true;
         return notification;
     }
-} 
+}

@@ -1,6 +1,5 @@
 namespace ClockWidgetApp.Services
 {
-    using System.Windows;
     using ClockWidgetApp.ViewModels;
     using Microsoft.Extensions.Logging;
 

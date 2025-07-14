@@ -190,4 +190,4 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     }
 
     #endregion
-} 
+}

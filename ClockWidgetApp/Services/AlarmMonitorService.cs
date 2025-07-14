@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Serilog;
+using ClockWidgetApp.ViewModels;
 
 namespace ClockWidgetApp.Services;
 

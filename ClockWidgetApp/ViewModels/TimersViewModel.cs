@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ClockWidgetApp.Services;
 using ClockWidgetApp.Models;
-using System.Linq;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -233,4 +232,4 @@ public class TimersViewModel : INotifyPropertyChanged
     /// </summary>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-} 
+}

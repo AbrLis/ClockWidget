@@ -108,4 +108,4 @@ public partial class MainWindowViewModel
         UpdateDigitalClockTopmost();
         UpdateAnalogClockTopmost();
     }
-} 
+}

@@ -144,11 +144,11 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
             double tickLength = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HOUR_TICK_LENGTH : AnalogClockConstants.TickSizes.MINUTE_TICK_LENGTH;
             double tickThickness = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HOUR_TICK_THICKNESS : AnalogClockConstants.TickSizes.MINUTE_TICK_THICKNESS;
             double startRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS - tickLength;
-            double endRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS;
-            double startX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + startRadius * Math.Cos(angleInRadians);
-            double startY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + startRadius * Math.Sin(angleInRadians);
-            double endX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + endRadius * Math.Cos(angleInRadians);
-            double endY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + endRadius * Math.Sin(angleInRadians);
+            const double endRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS;
+            double startX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + (startRadius * Math.Cos(angleInRadians));
+            double startY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + (startRadius * Math.Sin(angleInRadians));
+            double endX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + (endRadius * Math.Cos(angleInRadians));
+            double endY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + (endRadius * Math.Sin(angleInRadians));
             ticks.Add(new ClockTick(startX, startY, endX, endY, tickThickness));
         }
         ClockTicks = ticks;
@@ -198,4 +198,4 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         }
     }
     #endregion
-} 
+}

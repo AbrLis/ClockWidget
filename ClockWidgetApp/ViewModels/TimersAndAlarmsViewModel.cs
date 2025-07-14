@@ -149,7 +149,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         if (e.NewItems != null)
         {
-            foreach (AlarmEntryViewModel a in e.NewItems)
+            foreach (ClockWidgetApp.ViewModels.AlarmEntryViewModel a in e.NewItems)
             {
                 SubscribeAlarm(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен будильник: {a.AlarmTime}");
@@ -158,7 +158,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 
         if (e.OldItems != null)
         {
-            foreach (AlarmEntryViewModel a in e.OldItems)
+            foreach (ClockWidgetApp.ViewModels.AlarmEntryViewModel a in e.OldItems)
             {
                 RemoveAlarmTray(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён будильник: {a.AlarmTime}");
@@ -206,7 +206,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _trayIconManager.RemoveTrayIcon(GetTimerId(timer));
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для таймера: {timer.Duration}");
     }
-    private void AddAlarmTray(AlarmEntryViewModel alarm)
+    private void AddAlarmTray(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
     {
         var id = GetAlarmId(alarm);
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
@@ -215,7 +215,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, text);
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для будильника: {id}");
     }
-    private void RemoveAlarmTray(AlarmEntryViewModel alarm)
+    private void RemoveAlarmTray(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
     {
         _trayIconManager.RemoveTrayIcon(GetAlarmId(alarm));
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для будильника: {alarm.AlarmTime}");
@@ -269,7 +269,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         if (timer.IsRunning) AddTimerTray(timer);
     }
 
-    private void SubscribeAlarm(AlarmEntryViewModel alarm)
+    private void SubscribeAlarm(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
     {
         bool lastEnabled = alarm.IsEnabled;
         alarm.PropertyChanged += (_, e) =>
@@ -297,7 +297,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Генерирует уникальный идентификатор для будильника.
     /// </summary>
-    private string GetAlarmId(AlarmEntryViewModel alarm) => $"alarm_{alarm.GetHashCode()}";
+    private string GetAlarmId(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm) => $"alarm_{alarm.GetHashCode()}";
 
     /// <summary>
     /// Генерирует уникальный идентификатор для длинного таймера.
@@ -333,7 +333,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Обрабатывает срабатывание будильника: проигрывает звук, показывает уведомление, сбрасывает состояние.
     /// </summary>
-    private void OnAlarmTriggered(AlarmEntryViewModel alarm)
+    private void OnAlarmTriggered(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
     {
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Сработал будильник: {alarm.AlarmTime}");
         System.Windows.Application.Current.Dispatcher.Invoke(() =>

@@ -116,4 +116,4 @@ public partial class AnalogClockWindow : Window
     }
 
     #endregion
-} 
+}

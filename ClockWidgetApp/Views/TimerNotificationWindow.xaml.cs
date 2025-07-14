@@ -20,7 +20,6 @@ namespace ClockWidgetApp.Views
             // Подписка на событие закрытия окна
             this.Closing += TimerNotificationWindow_Closing;
             // Подписка на клик по кнопке Stop
-            this.StopButton.Click += StopButton_Click;
         }
 
         /// <summary>
@@ -63,4 +62,4 @@ namespace ClockWidgetApp.Views
             return window;
         }
     }
-} 
+}
