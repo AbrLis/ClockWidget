@@ -42,16 +42,14 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         _appDataService = appDataService;
         _soundService = soundService;
-        TimersVm = new TimersViewModel();
-        AlarmsVm = new AlarmsViewModel();
-        LongTimersVm = new LongTimersViewModel(soundService);
-        // Синхронизируем коллекции с данными из AppDataService
-        SyncCollections();
+        TimersVm = new TimersViewModel(appDataService);
+        AlarmsVm = new AlarmsViewModel(appDataService);
+        LongTimersVm = new LongTimersViewModel(appDataService, soundService);
         _alarmMonitorService = new AlarmMonitorService(AlarmsVm.Alarms);
         _alarmMonitorService.AlarmTriggered += OnAlarmTriggered;
         _trayIconManager = trayIconManager;
         _trayIconManager.StopRequested += OnTrayIconStopRequested;
-        TimersVm.Timers.CollectionChanged += Timers_CollectionChanged;
+        TimersVm.TimerEntries.CollectionChanged += Timers_CollectionChanged;
         AlarmsVm.Alarms.CollectionChanged += Alarms_CollectionChanged;
         foreach (var longTimer in LongTimersVm.LongTimers)
         {
@@ -72,13 +70,24 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 
     #region Public methods
     /// <summary>
-    /// Сохраняет таймеры, длинные таймеры и будильники.
+    /// Сохраняет таймеры, длинные таймеры и будильники (асинхронно).
     /// </summary>
-    public void SaveTimersAndAlarms()
+    public async Task SaveTimersAndAlarmsAsync()
     {
         Serilog.Log.Information("[TimersAndAlarmsViewModel] Сохранение timers/alarms...");
-        _appDataService.Save();
+        await _appDataService.SaveAsync();
         Serilog.Log.Information("[TimersAndAlarmsViewModel] Сохранение timers/alarms завершено.");
+    }
+
+    /// <summary>
+    /// Отменяет все отложенные автосохранения и немедленно сохраняет все данные приложения.
+    /// </summary>
+    public async Task FlushPendingSavesAsync()
+    {
+        if (_appDataService is AppDataService concreteService)
+            await concreteService.FlushPendingSavesAsync();
+        else
+            await _appDataService.SaveAsync();
     }
 
     #endregion
@@ -95,7 +104,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void UpdateTrayTooltips()
     {
-        foreach (var timer in TimersVm.Timers)
+        foreach (var timer in TimersVm.TimerEntries)
         {
             if (timer.IsRunning)
                 _trayIconManager.UpdateTooltip(GetTimerId(timer), timer.DisplayTime);
@@ -119,7 +128,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void Timers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
             foreach (TimerEntryViewModel t in e.NewItems)
             {
@@ -139,7 +147,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void Alarms_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
         {
             foreach (AlarmEntryViewModel a in e.NewItems)
@@ -164,7 +171,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void LongTimers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        App.MarkTimersAlarmsDirty();
         if (e.NewItems != null)
         {
             foreach (LongTimerEntryViewModel t in e.NewItems)
@@ -305,7 +311,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         if (id.StartsWith("timer_"))
         {
-            var timer = TimersVm.Timers.FirstOrDefault(t => GetTimerId(t) == id);
+            var timer = TimersVm.TimerEntries.FirstOrDefault(t => GetTimerId(t) == id);
             timer?.Reset();
         }
         else if (id.StartsWith("alarm_"))
@@ -395,20 +401,5 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         }
     }
 
-    /// <summary>
-    /// Синхронизирует коллекции ViewModel с данными из AppDataService.Data
-    /// </summary>
-    public void SyncCollections()
-    {
-        TimersVm.Timers.Clear();
-        foreach (var t in _appDataService.Data.Timers)
-            TimersVm.Timers.Add(new TimerEntryViewModel(t.Duration));
-        AlarmsVm.Alarms.Clear();
-        foreach (var a in _appDataService.Data.Alarms)
-            AlarmsVm.Alarms.Add(new AlarmEntryViewModel(a.AlarmTime, a.IsEnabled, a.NextTriggerDateTime));
-        LongTimersVm.LongTimers.Clear();
-        foreach (var lt in _appDataService.Data.LongTimers)
-            LongTimersVm.LongTimers.Add(new LongTimerEntryViewModel(lt.TargetDateTime, _soundService, lt.Name));
-    }
     #endregion
 }

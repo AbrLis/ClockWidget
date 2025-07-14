@@ -2,6 +2,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using ClockWidgetApp.Services;
+using ClockWidgetApp.Models;
+using System.Linq;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -10,10 +13,17 @@ namespace ClockWidgetApp.ViewModels;
 /// </summary>
 public class TimersViewModel : INotifyPropertyChanged
 {
+    private readonly IAppDataService _appDataService;
+
     /// <summary>
-    /// Коллекция таймеров.
+    /// Коллекция ViewModel для UI-таймеров.
     /// </summary>
-    public ObservableCollection<TimerEntryViewModel> Timers { get; } = new();
+    public ObservableCollection<TimerEntryViewModel> TimerEntries { get; } = new();
+
+    /// <summary>
+    /// Коллекция таймеров из модели данных приложения.
+    /// </summary>
+    public ObservableCollection<TimerPersistModel> Timers => _appDataService.Data.Timers;
 
     /// <summary>
     /// Показывать ли поле ввода для нового таймера.
@@ -65,8 +75,9 @@ public class TimersViewModel : INotifyPropertyChanged
 
     private TimerEntryViewModel? _editingTimer;
 
-    public TimersViewModel()
+    public TimersViewModel(IAppDataService appDataService)
     {
+        _appDataService = appDataService;
         NewTimerHours = "";
         NewTimerMinutes = "";
         NewTimerSeconds = "";
@@ -74,6 +85,46 @@ public class TimersViewModel : INotifyPropertyChanged
         AddTimerCommand = new RelayCommand(_ => AddTimer(), _ => IsNewTimerValid);
         CancelTimerInputCommand = new RelayCommand(_ => CancelTimerInput());
         ApplyEditTimerCommand = new RelayCommand(_ => ApplyEditTimer(), _ => IsEditingTimer && IsNewTimerValid);
+        // Синхронизируем TimerEntries с Timers
+        TimerEntries.Clear();
+        foreach (var model in Timers)
+        {
+            var vm = CreateViewModel(model);
+            TimerEntries.Add(vm);
+        }
+        Timers.CollectionChanged += Timers_CollectionChanged;
+    }
+
+    private TimerEntryViewModel CreateViewModel(TimerPersistModel model)
+    {
+        var vm = new TimerEntryViewModel(model.Duration);
+        vm.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(vm.Duration))
+                model.Duration = vm.Duration;
+        };
+        return vm;
+    }
+
+    private void Timers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (TimerPersistModel model in e.NewItems)
+            {
+                var vm = CreateViewModel(model);
+                TimerEntries.Insert(Timers.IndexOf(model), vm);
+            }
+        }
+        if (e.OldItems != null)
+        {
+            foreach (TimerPersistModel model in e.OldItems)
+            {
+                var vm = TimerEntries.FirstOrDefault(x => x.Duration == model.Duration);
+                if (vm != null)
+                    TimerEntries.Remove(vm);
+            }
+        }
     }
 
     /// <summary>
@@ -82,14 +133,12 @@ public class TimersViewModel : INotifyPropertyChanged
     private void AddTimer()
     {
         if (!IsNewTimerValid) return;
-        // Значения гарантированно валидны после проверки IsNewTimerValid
         _ = TryParseOrZero(NewTimerHours, out int h);
         _ = TryParseOrZero(NewTimerMinutes, out int m);
         _ = TryParseOrZero(NewTimerSeconds, out int s);
         var ts = new TimeSpan(h, m, s);
-        var timer = new TimerEntryViewModel(ts);
-        timer.RequestDeactivate += t => t.IsActive = false;
-        Timers.Insert(0, timer);
+        var model = new TimerPersistModel { Duration = ts };
+        Timers.Insert(0, model); // вызовет добавление в TimerEntries через CollectionChanged
         IsTimerInputVisible = false;
         NewTimerHours = "";
         NewTimerMinutes = "";
@@ -102,16 +151,11 @@ public class TimersViewModel : INotifyPropertyChanged
     private void ApplyEditTimer()
     {
         if (_editingTimer == null || !IsNewTimerValid) return;
-        // Значения гарантированно валидны после проверки IsNewTimerValid
         _ = TryParseOrZero(NewTimerHours, out int h);
         _ = TryParseOrZero(NewTimerMinutes, out int m);
         _ = TryParseOrZero(NewTimerSeconds, out int s);
         var ts = new TimeSpan(h, m, s);
         _editingTimer.Duration = ts;
-        _editingTimer.Remaining = ts;
-        _editingTimer.OnPropertyChanged(nameof(_editingTimer.Duration));
-        _editingTimer.OnPropertyChanged(nameof(_editingTimer.Remaining));
-        _editingTimer.OnPropertyChanged(nameof(_editingTimer.DisplayTime));
         _editingTimer = null;
         IsTimerInputVisible = false;
         NewTimerHours = "";
@@ -145,13 +189,26 @@ public class TimersViewModel : INotifyPropertyChanged
     /// <summary>
     /// Переводит ViewModel в режим редактирования выбранного таймера.
     /// </summary>
-    public void EditTimer(TimerEntryViewModel? timer)
+    public void EditTimer(TimerPersistModel? model)
     {
-        if (timer == null) return;
-        _editingTimer = timer;
-        NewTimerHours = timer.Duration.Hours.ToString("D2");
-        NewTimerMinutes = timer.Duration.Minutes.ToString("D2");
-        NewTimerSeconds = timer.Duration.Seconds.ToString("D2");
+        if (model == null) return;
+        var vm = TimerEntries.FirstOrDefault(x => x.Duration == model.Duration);
+        if (vm == null) return;
+        _editingTimer = vm;
+        NewTimerHours = vm.Duration.Hours.ToString("D2");
+        NewTimerMinutes = vm.Duration.Minutes.ToString("D2");
+        NewTimerSeconds = vm.Duration.Seconds.ToString("D2");
+        IsTimerInputVisible = true;
+        OnPropertyChanged(nameof(IsEditingTimer));
+    }
+
+    public void EditTimer(TimerEntryViewModel? vm)
+    {
+        if (vm == null) return;
+        _editingTimer = vm;
+        NewTimerHours = vm.Duration.Hours.ToString("D2");
+        NewTimerMinutes = vm.Duration.Minutes.ToString("D2");
+        NewTimerSeconds = vm.Duration.Seconds.ToString("D2");
         IsTimerInputVisible = true;
         OnPropertyChanged(nameof(IsEditingTimer));
     }

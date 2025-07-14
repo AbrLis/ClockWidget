@@ -25,7 +25,7 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     public DateTime TargetDateTime
     {
         get => _targetDateTime;
-        set { _targetDateTime = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+        set { _targetDateTime = value; OnPropertyChanged(); }
     }
     private DateTime _targetDateTime;
 
@@ -33,6 +33,22 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     /// Оставшееся время до срабатывания таймера.
     /// </summary>
     public TimeSpan Remaining => TargetDateTime - DateTime.Now;
+
+    /// <summary>
+    /// Длительность длинного таймера.
+    /// </summary>
+    public TimeSpan Duration
+    {
+        get => TargetDateTime - DateTime.Now > TimeSpan.Zero ? TargetDateTime - DateTime.Now : TimeSpan.Zero;
+        set
+        {
+            TargetDateTime = DateTime.Now + value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TargetDateTime));
+            OnPropertyChanged(nameof(Remaining));
+            OnPropertyChanged(nameof(DisplayTime));
+        }
+    }
 
     /// <summary>
     /// Строка для отображения оставшегося времени в формате Xл:Yм:Zд:hh:mm:ss.
@@ -52,7 +68,7 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
             string name = string.IsNullOrWhiteSpace(Name) ? nameLabel : Name;
             // Обрезаем имя до максимальной длины, если оно длиннее
             if (name.Length > Helpers.Constants.LongTimerTooltipNameMaxLength)
-                name = name.Substring(0, Helpers.Constants.LongTimerTooltipNameMaxLength) + "...";
+                name = $"{name.AsSpan(0, Helpers.Constants.LongTimerTooltipNameMaxLength)}...";
             return $"{name}\n{targetLabel} {TargetDateTime:dd.MM.yyyy HH:mm:ss}\n{remainingLabel} {DisplayTime}";
         }
     }
@@ -79,7 +95,7 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     public string Name
     {
         get => _name;
-        set { _name = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+        set { _name = value; OnPropertyChanged(); }
     }
     private string _name = string.Empty;
 
@@ -116,7 +132,6 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
         OnPropertyChanged(nameof(TargetDateTime));
         OnPropertyChanged(nameof(Remaining));
         OnPropertyChanged(nameof(DisplayTime));
-        App.MarkTimersAlarmsDirty();
     }
 
     /// <summary>

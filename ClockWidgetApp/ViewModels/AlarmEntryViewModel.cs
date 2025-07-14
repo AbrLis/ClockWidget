@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using ClockWidgetApp;
 
 /// <summary>
 /// ViewModel для отдельного будильника (только два состояния: включен/выключен).
@@ -30,7 +29,6 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsStartAvailable));
                 OnPropertyChanged(nameof(IsStopAvailable));
                 OnPropertyChanged(nameof(NextTriggerDateTime));
-                App.MarkTimersAlarmsDirty();
             }
         }
     }
@@ -78,7 +76,6 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsStartAvailable));
         OnPropertyChanged(nameof(IsStopAvailable));
         OnPropertyChanged(nameof(NextTriggerDateTime));
-        App.MarkTimersAlarmsDirty();
     }
 
     public void UpdateNextTrigger()
@@ -87,14 +84,12 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
         {
             NextTriggerDateTime = null;
             OnPropertyChanged(nameof(NextTriggerDateTime));
-            App.MarkTimersAlarmsDirty();
             return;
         }
         var now = DateTime.Now;
         var todayTrigger = new DateTime(now.Year, now.Month, now.Day, AlarmTime.Hours, AlarmTime.Minutes, 0);
         NextTriggerDateTime = todayTrigger > now ? todayTrigger : todayTrigger.AddDays(1);
         OnPropertyChanged(nameof(NextTriggerDateTime));
-        App.MarkTimersAlarmsDirty();
     }
 
     public void Start()
@@ -106,7 +101,6 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsEnabled));
             OnPropertyChanged(nameof(IsStartAvailable));
             OnPropertyChanged(nameof(IsStopAvailable));
-            App.MarkTimersAlarmsDirty();
         }
     }
 
@@ -118,7 +112,6 @@ public class AlarmEntryViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsEnabled));
             OnPropertyChanged(nameof(IsStartAvailable));
             OnPropertyChanged(nameof(IsStopAvailable));
-            App.MarkTimersAlarmsDirty();
         }
     }
 

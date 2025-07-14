@@ -34,55 +34,26 @@ namespace ClockWidgetApp.Services
         /// </summary>
         public void RegisterLifecycleHandlers(System.Windows.Application app)
         {
-            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-            {
-                _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
-            };
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) => _logger?.LogError(args.ExceptionObject as Exception, "[App] Unhandled exception (AppDomain)");
             app.DispatcherUnhandledException += (sender, args) =>
             {
                 _logger?.LogError(args.Exception, "[App] Unhandled exception (Dispatcher)");
                 args.Handled = true;
             };
-            app.SessionEnding += App_SessionEnding;
         }
 
         /// <summary>
-        /// Сохраняет настройки приложения и таймеры/будильники.
-        /// </summary>
-        public void SaveOnShutdown()
-        {
-            try
-            {
-                _timersAndAlarmsViewModel.SaveTimersAndAlarms();
-                _logger?.LogInformation("[App] Settings and timers/alarms saved on shutdown/session ending");
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "[App] Error saving settings/timers/alarms on shutdown/session ending");
-            }
-        }
-
-        /// <summary>
-        /// Выполняет graceful shutdown: останавливает сервисы, сохраняет состояние.
+        /// Выполняет graceful shutdown: останавливает сервисы (без сохранения данных).
         /// </summary>
         public void GracefulShutdown()
         {
-            SaveOnShutdown();
             if (_timeService != null)
             {
                 _timeService.Stop();
                 _timeService.Dispose();
                 _logger?.LogInformation("[App] Time service disposed");
             }
-        }
-
-        /// <summary>
-        /// Обработчик завершения сессии пользователя.
-        /// </summary>
-        private void App_SessionEnding(object? sender, SessionEndingCancelEventArgs e)
-        {
-            _logger?.LogInformation("[App] Session ending: {Reason}", e.ReasonSessionEnding);
-            SaveOnShutdown();
+            _logger?.LogInformation("[App] GracefulShutdownAsync завершён: все сервисы остановлены");
         }
     }
 } 

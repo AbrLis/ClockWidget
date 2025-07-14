@@ -119,11 +119,10 @@ public class LongTimersViewModelTests
     [Fact]
     public void LongTimer_ShouldBeSavedAndLoadedCorrectly()
     {
-        var tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());
-        System.IO.Directory.CreateDirectory(tempDir);
-        var file = System.IO.Path.Combine(tempDir, "timers_alarms.json");
-        var settingsFile = Path.Combine(Path.GetDirectoryName(file)!, "widget_settings.json");
-        var service = new AppDataService(settingsFile, file);
+        var fs = new InMemoryFileSystemService();
+        var file = "timers_alarms.json";
+        var settingsFile = "widget_settings.json";
+        var service = new AppDataService(settingsFile, file, fs);
         var dt = DateTime.Now.AddHours(2);
         var name = "PersistTest";
         service.Data.LongTimers.Add(new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name });
@@ -133,6 +132,5 @@ public class LongTimersViewModelTests
         Assert.Single(service.Data.LongTimers);
         Assert.Equal(name, service.Data.LongTimers[0].Name);
         Assert.Equal(dt, service.Data.LongTimers[0].TargetDateTime, TimeSpan.FromSeconds(1));
-        System.IO.Directory.Delete(tempDir, true);
     }
 } 

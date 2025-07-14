@@ -37,6 +37,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         _logger = logger;
         TimersVm = _timersAndAlarmsViewModel.TimersVm;
         AlarmsVm = _timersAndAlarmsViewModel.AlarmsVm;
+        LongTimersVm = _timersAndAlarmsViewModel.LongTimersVm;
         _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
         Localized = LocalizationManager.GetLocalizedStrings();
         LocalizationManager.LanguageChanged += (_, _) =>
@@ -77,7 +78,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Показывать секунды. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Показывать секунды. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool ShowSeconds
     {
@@ -93,7 +94,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Показывать цифровые часы. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Показывать цифровые часы. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool ShowDigitalClock
     {
@@ -109,7 +110,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Показывать аналоговые часы. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Показывать аналоговые часы. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool ShowAnalogClock
     {
@@ -125,7 +126,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Размер аналоговых часов. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Размер аналоговых часов. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public double AnalogClockSize
     {
@@ -139,7 +140,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Аналоговые часы поверх всех окон. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Аналоговые часы поверх всех окон. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool AnalogClockTopmost
     {
@@ -155,7 +156,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Цифровые часы поверх всех окон. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Цифровые часы поверх всех окон. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool DigitalClockTopmost
     {
@@ -171,7 +172,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Воспроизводить звук кукушки каждый час. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Воспроизводить звук кукушки каждый час. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool CuckooEveryHour
     {
@@ -187,7 +188,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Воспроизводить сигнал каждые полчаса. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Воспроизводить сигнал каждые полчаса. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public bool HalfHourChimeEnabled
     {
@@ -203,7 +204,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         }
     }
     /// <summary>
-    /// Размер шрифта. Dirty-флаг выставляется в MainWindowViewModel.
+    /// Размер шрифта. Связывает значение из MainWindowViewModel с UI окна настроек.
     /// </summary>
     public double FontSize
     {
@@ -243,7 +244,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
     public RelayCommand CloseAppCommand => new RelayCommand(_ => CloseApp());
     public TimersViewModel TimersVm { get; }
     public AlarmsViewModel AlarmsVm { get; }
-    public LongTimersViewModel LongTimersVm => _timersAndAlarmsViewModel.LongTimersVm;
+    public LongTimersViewModel LongTimersVm { get; private set; }
 
     /// <summary>
     /// Команда для удаления длинного таймера с подтверждением.
@@ -272,7 +273,11 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
     {
         if (obj is TimerEntryViewModel timer)
         {
-            TimersVm.Timers.Remove(timer);
+            TimersVm.TimerEntries.Remove(timer);
+            // Также удаляем из PersistModel
+            var persist = TimersVm.Timers.FirstOrDefault(m => m.Duration == timer.Duration);
+            if (persist != null)
+                TimersVm.Timers.Remove(persist);
         }
     });
     

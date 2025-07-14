@@ -14,6 +14,14 @@ namespace CleanTest;
 /// </summary>
 public class TimersViewModelTests
 {
+    private static TimersViewModel CreateTimersViewModelWithMockData()
+    {
+        var appData = new AppDataModel();
+        var appDataServiceMock = new Mock<IAppDataService>();
+        appDataServiceMock.SetupGet(s => s.Data).Returns(appData);
+        return new TimersViewModel(appDataServiceMock.Object);
+    }
+
     /// <summary>
     /// Проверяет, что при валидном вводе таймер добавляется в коллекцию.
     /// </summary>
@@ -21,7 +29,7 @@ public class TimersViewModelTests
     public void AddTimerCommand_ShouldAddTimer_WhenInputIsValid()
     {
         // Arrange
-        var vm = new TimersViewModel();
+        var vm = CreateTimersViewModelWithMockData();
         vm.NewTimerHours = "0";
         vm.NewTimerMinutes = "1";
         vm.NewTimerSeconds = "5";
@@ -40,7 +48,7 @@ public class TimersViewModelTests
     [Fact]
     public void AddTimerCommand_ShouldNotAddTimer_WhenInputIsInvalid()
     {
-        var vm = new TimersViewModel();
+        var vm = CreateTimersViewModelWithMockData();
         vm.NewTimerHours = "-1";
         vm.NewTimerMinutes = "0";
         vm.NewTimerSeconds = "0";
@@ -69,7 +77,7 @@ public class TimersViewModelTests
     [Fact]
     public void CorrectTimerTime_ShouldClampValues()
     {
-        var vm = new TimersViewModel();
+        var vm = CreateTimersViewModelWithMockData();
         vm.NewTimerHours = "25";
         vm.NewTimerMinutes = "70";
         vm.NewTimerSeconds = "-5";
@@ -85,20 +93,19 @@ public class TimersViewModelTests
     [Fact]
     public void SettingsWindowViewModel_DeleteTimerCommand_ShouldRemoveTimer()
     {
-        var timersVM = new TimersViewModel();
+        var timersVM = CreateTimersViewModelWithMockData();
         timersVM.NewTimerHours = "0";
         timersVM.NewTimerMinutes = "0";
         timersVM.NewTimerSeconds = "10";
         timersVM.AddTimerCommand.Execute(null);
         var timer = timersVM.Timers[0];
-        var timeService = new Mock<ITimeService>().Object;
         var appDataServiceMock = new Mock<IAppDataService>();
         appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
         var appDataService = appDataServiceMock.Object;
         var soundService = new Mock<ISoundService>().Object;
         var windowService = new Mock<IWindowService>().Object;
         var mainLogger = new Mock<ILogger<MainWindowViewModel>>().Object;
-        var mainVM = new MainWindowViewModel(timeService, appDataService, soundService, windowService, mainLogger);
+        var mainVM = new MainWindowViewModel(new Mock<ITimeService>().Object, appDataService, soundService, windowService, mainLogger);
         var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
         var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
         // Копируем таймеры в тестовый экземпляр
@@ -106,7 +113,7 @@ public class TimersViewModelTests
             timersAndAlarmsVM.TimersVm.Timers.Add(t);
         var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
         var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
-        settingsVM.DeleteTimerCommand.Execute(timersAndAlarmsVM.TimersVm.Timers[0]);
+        settingsVM.DeleteTimerCommand.Execute(timersAndAlarmsVM.TimersVm.TimerEntries[0]);
         Assert.Empty(timersAndAlarmsVM.TimersVm.Timers);
     }
 } 

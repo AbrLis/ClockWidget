@@ -25,15 +25,6 @@ public partial class App : System.Windows.Application
     /// <summary>Временный логгер для single instance событий (до инициализации DI/основного логгера).</summary>
     private static Serilog.ILogger? _earlyLogger;
     private ApplicationLifecycleService? _lifecycleService;
-    /// <summary>
-    /// Потокобезопасный флаг наличия несохранённых изменений настроек виджетов.
-    /// </summary>
-    internal static int _widgetSettingsDirty = 0;
-    /// <summary>
-    /// Потокобезопасный флаг наличия несохранённых изменений таймеров и будильников.
-    /// </summary>
-    internal static int _timersAlarmsDirty = 0;
-
     #endregion
 
     #region Public Properties
@@ -72,24 +63,15 @@ public partial class App : System.Windows.Application
         windowService.OpenAnalogClockWindow();
     }
 
-    /// <summary>
-    /// Устанавливает флаг наличия несохранённых изменений настроек виджетов.
-    /// </summary>
-    public static void MarkWidgetSettingsDirty() => Interlocked.Exchange(ref _widgetSettingsDirty, 1);
-    /// <summary>
-    /// Устанавливает флаг наличия несохранённых изменений таймеров и будильников.
-    /// </summary>
-    public static void MarkTimersAlarmsDirty() => Interlocked.Exchange(ref _timersAlarmsDirty, 1);
-
     #endregion
 
     #region Application Lifecycle
 
     /// <summary>
-    /// Обработчик запуска приложения.
+    /// Обработчик запуска приложения (асинхронный).
     /// </summary>
     /// <param name="e">Аргументы запуска.</param>
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         System.Console.WriteLine("=== App OnStartup: begin ===");
         // Временный логгер для single instance событий
@@ -97,8 +79,8 @@ public partial class App : System.Windows.Application
             .WriteTo.File(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "ClockWidget", "logs", "clock-widget-singleinstance.log"),
-                rollingInterval: RollingInterval.Day,
-                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+                rollingInterval: RollingInterval.Day)
             .CreateLogger();
         System.Console.WriteLine("[OnStartup] Early logger created");
 
@@ -155,11 +137,20 @@ public partial class App : System.Windows.Application
         _lifecycleService.RegisterLifecycleHandlers(this);
         System.Console.WriteLine("[OnStartup] Lifecycle handlers registered");
 
-        // Загрузка всех данных приложения через единый сервис
+        // Загрузка всех данных приложения через единый сервис (асинхронно)
         var appDataService = _serviceProvider.GetRequiredService<IAppDataService>();
         System.Console.WriteLine("[OnStartup] AppDataService resolved");
-        appDataService.Load();
-        System.Console.WriteLine("[OnStartup] AppDataService loaded");
+        try
+        {
+            await appDataService.LoadAsync();
+            System.Console.WriteLine("[OnStartup] AppDataService loaded (async)");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"[OnStartup] AppDataService load error: {ex}");
+            _logger?.LogError(ex, "[App] Error loading AppDataService on startup");
+            throw;
+        }
 
         // Запуск сервиса времени для обновления виджетов
         var timeService = _serviceProvider.GetRequiredService<ITimeService>();
@@ -187,8 +178,6 @@ public partial class App : System.Windows.Application
         var logger = _serviceProvider.GetRequiredService<ILogger<SettingsWindow>>();
         System.Console.WriteLine("[OnStartup] SettingsWindow logger resolved");
         var timersAndAlarmsVm = _serviceProvider.GetRequiredService<TimersAndAlarmsViewModel>();
-        timersAndAlarmsVm.SyncCollections();
-        System.Console.WriteLine("[OnStartup] TimersAndAlarmsViewModel collections synced from data");
         var prewarmedSettingsWindow = new SettingsWindow(settingsVm, timersAndAlarmsVm, logger);
         prewarmedSettingsWindow.Hide();
         System.Console.WriteLine("[OnStartup] Prewarmed SettingsWindow created and hidden");
@@ -218,9 +207,8 @@ public partial class App : System.Windows.Application
     }
 
     /// <summary>
-    /// Обработчик завершения приложения.
+    /// Обработчик завершения приложения (синхронный, блокирующий).
     /// </summary>
-    /// <param name="e">Аргументы завершения.</param>
     protected override void OnExit(ExitEventArgs e)
     {
         SingleInstance.Stop();
@@ -241,4 +229,3 @@ public partial class App : System.Windows.Application
 
     #endregion
 }
-

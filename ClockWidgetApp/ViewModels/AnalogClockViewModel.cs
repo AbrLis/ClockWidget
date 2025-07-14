@@ -104,12 +104,11 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     public (double Left, double Top) GetWindowPosition() => WindowPositionHelper.GetWindowPosition(_appDataService, true);
 
     /// <summary>
-    /// Сохраняет позицию окна аналоговых часов и помечает настройки как изменённые (dirty-флаг).
+    /// Сохраняет позицию окна аналоговых часов
     /// </summary>
     public void SaveWindowPosition(double left, double top)
     {
         WindowPositionHelper.SaveWindowPosition(_appDataService, left, top, true);
-        App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
     }
 
     /// <summary>Вызывает событие изменения свойства.</summary>
@@ -165,11 +164,9 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Обработчик события обновления времени. Обновляет углы поворота стрелок.</summary>
     private void OnTimeUpdated(object? sender, DateTime time)
     {
-        if (System.Windows.Application.Current != null)
-        {
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current?.Dispatcher.Invoke(() =>
             {
-                double hourAngle = (time.Hour % 12 + time.Minute / 60.0) * 30;
+                double hourAngle = ((time.Hour % 12) + (time.Minute / 60.0)) * 30;
                 double minuteAngle = time.Minute * 6;
                 double secondAngle = time.Second * 6;
                 if (_hourHandTransform.Children.Count > 0 && _hourHandTransform.Children[0] is RotateTransform hourRotate)
@@ -185,7 +182,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
                 else
                     SecondHandTransform = new TransformGroup { Children = { new RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
             });
-        }
     }
 
     #endregion

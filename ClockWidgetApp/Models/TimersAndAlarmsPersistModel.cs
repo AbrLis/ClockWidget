@@ -1,6 +1,5 @@
 namespace ClockWidgetApp.Models
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>

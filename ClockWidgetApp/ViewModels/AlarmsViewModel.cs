@@ -1,8 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ClockWidgetApp.Helpers;
+using ClockWidgetApp.Models;
+using ClockWidgetApp.Services;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -15,6 +19,8 @@ public class AlarmsViewModel : INotifyPropertyChanged
     /// Коллекция будильников.
     /// </summary>
     public ObservableCollection<AlarmEntryViewModel> Alarms { get; } = new();
+    public ObservableCollection<AlarmPersistModel> AlarmModels => _appDataService.Data.Alarms;
+    private readonly IAppDataService _appDataService;
 
     /// <summary>
     /// Показывать ли поле ввода для нового будильника.
@@ -77,8 +83,13 @@ public class AlarmsViewModel : INotifyPropertyChanged
 
     private AlarmEntryViewModel? _editingAlarm;
 
-    public AlarmsViewModel()
+    public AlarmsViewModel(IAppDataService appDataService)
     {
+        _appDataService = appDataService;
+        Alarms.Clear();
+        foreach (var model in AlarmModels)
+            Alarms.Add(CreateViewModel(model));
+        AlarmModels.CollectionChanged += AlarmModels_CollectionChanged;
         NewAlarmHours = "";
         NewAlarmMinutes = "";
         ShowAlarmInputCommand = new RelayCommand(_ => IsAlarmInputVisible = true);
@@ -90,6 +101,40 @@ public class AlarmsViewModel : INotifyPropertyChanged
                 EditAlarm(alarm);
         });
         ApplyEditAlarmCommand = new RelayCommand(_ => ApplyEditAlarm(), _ => IsEditingAlarm && IsNewAlarmValid);
+    }
+
+    private AlarmEntryViewModel CreateViewModel(AlarmPersistModel model)
+    {
+        var vm = new AlarmEntryViewModel(model.AlarmTime, model.IsEnabled);
+        vm.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(vm.AlarmTime))
+                model.AlarmTime = vm.AlarmTime;
+            if (e.PropertyName == nameof(vm.IsEnabled))
+                model.IsEnabled = vm.IsEnabled;
+        };
+        return vm;
+    }
+
+    private void AlarmModels_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (AlarmPersistModel model in e.NewItems)
+            {
+                var vm = CreateViewModel(model);
+                Alarms.Insert(AlarmModels.IndexOf(model), vm);
+            }
+        }
+        if (e.OldItems != null)
+        {
+            foreach (AlarmPersistModel model in e.OldItems)
+            {
+                var vm = Alarms.FirstOrDefault(x => x.AlarmTime == model.AlarmTime && x.IsEnabled == model.IsEnabled);
+                if (vm != null)
+                    Alarms.Remove(vm);
+            }
+        }
     }
 
     /// <summary>

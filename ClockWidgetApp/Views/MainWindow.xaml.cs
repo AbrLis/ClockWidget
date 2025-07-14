@@ -89,6 +89,7 @@ public partial class MainWindow : Window
     {
         _isDragging = false;
         ReleaseMouseCapture();
+        _viewModel.SaveWindowPosition(Left, Top); // Сохраняем позицию окна при завершении перемещения
         e.Handled = true;
     }
 

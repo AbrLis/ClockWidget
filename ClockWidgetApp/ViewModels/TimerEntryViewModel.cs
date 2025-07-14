@@ -29,11 +29,11 @@ namespace ClockWidgetApp.ViewModels
         /// </summary>
         private bool _isWidgetVisible = true;
         /// <summary>
-        /// Длительность таймера. При изменении выставляет dirty-флаг.
+        /// Длительность таймера.
         /// </summary>
         private TimeSpan _duration;
         /// <summary>
-        /// Активен ли таймер. При изменении выставляет dirty-флаг.
+        /// Активен ли таймер.
         /// </summary>
         private bool _isActive = true;
         #endregion
@@ -54,12 +54,12 @@ namespace ClockWidgetApp.ViewModels
 
         #region Public properties
         /// <summary>
-        /// Длительность таймера. При изменении выставляет dirty-флаг.
+        /// Длительность таймера.
         /// </summary>
         public TimeSpan Duration
         {
             get => _duration;
-            set { _duration = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+            set { _duration = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -68,16 +68,16 @@ namespace ClockWidgetApp.ViewModels
         public TimeSpan Remaining
         {
             get => _remaining;
-            set { _remaining = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayTime)); App.MarkTimersAlarmsDirty(); }
+            set { _remaining = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayTime)); }
         }
 
         /// <summary>
-        /// Активен ли таймер. При изменении выставляет dirty-флаг.
+        /// Активен ли таймер.
         /// </summary>
         public bool IsActive
         {
             get => _isActive;
-            set { _isActive = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+            set { _isActive = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace ClockWidgetApp.ViewModels
         public bool IsRunning
         {
             get => _isRunning;
-            set { _isRunning = value; OnPropertyChanged(); App.MarkTimersAlarmsDirty(); }
+            set { _isRunning = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace ClockWidgetApp.ViewModels
         public bool IsWidgetVisible
         {
             get => _isWidgetVisible;
-            set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); App.MarkTimersAlarmsDirty(); }
+            set { _isWidgetVisible = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHideAvailable)); }
         }
 
         /// <summary>
@@ -150,7 +150,6 @@ namespace ClockWidgetApp.ViewModels
                 _timer.AutoReset = true;
             }
             _timer.Start();
-            App.MarkTimersAlarmsDirty();
         }
 
         /// <summary>
@@ -163,7 +162,6 @@ namespace ClockWidgetApp.ViewModels
             OnPropertyChanged(nameof(IsStartAvailable));
             OnPropertyChanged(nameof(IsStopAvailable));
             _timer?.Stop();
-            App.MarkTimersAlarmsDirty();
         }
 
         /// <summary>
@@ -177,7 +175,6 @@ namespace ClockWidgetApp.ViewModels
             OnPropertyChanged(nameof(IsStopAvailable));
             OnPropertyChanged(nameof(IsHideAvailable));
             RequestDeactivate?.Invoke(this);
-            App.MarkTimersAlarmsDirty();
         }
 
         /// <summary>
@@ -189,7 +186,6 @@ namespace ClockWidgetApp.ViewModels
             Remaining = Duration;
             OnPropertyChanged(nameof(Remaining));
             OnPropertyChanged(nameof(DisplayTime));
-            App.MarkTimersAlarmsDirty();
         }
 
         /// <summary>

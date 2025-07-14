@@ -72,7 +72,7 @@ public partial class MainWindowViewModel
     }
 
     /// <summary>
-    /// Размер шрифта. При изменении выставляется dirty-флаг.
+    /// Размер шрифта.
     /// </summary>
     public double FontSize
     {
@@ -84,12 +84,11 @@ public partial class MainWindowViewModel
             _logger.LogInformation($"[FontSize] Changed: {validatedValue}");
             _appDataService.Data.WidgetSettings.FontSize = validatedValue;
             OnPropertyChanged();
-            App.MarkWidgetSettingsDirty();
         }
     }
 
     /// <summary>
-    /// Показывать секунды. При изменении выставляется dirty-флаг.
+    /// Показывать секунды.
     /// </summary>
     public bool ShowSeconds
     {
@@ -100,12 +99,11 @@ public partial class MainWindowViewModel
             _showSeconds = value;
             _logger.LogInformation($"[ShowSeconds] Changed: {value}");
             OnPropertyChanged();
-            App.MarkWidgetSettingsDirty();
         }
     }
 
     /// <summary>
-    /// Показывать цифровые часы. При изменении выставляется dirty-флаг.
+    /// Показывать цифровые часы.
     /// </summary>
     public bool ShowDigitalClock
     {
@@ -118,13 +116,12 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.ShowDigitalClock = value;
                 OnPropertyChanged();
                 UpdateWindowsVisibility();
-                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Показывать аналоговые часы. При изменении выставляется dirty-флаг.
+    /// Показывать аналоговые часы.
     /// </summary>
     public bool ShowAnalogClock
     {
@@ -137,13 +134,12 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.ShowAnalogClock = value;
                 OnPropertyChanged();
                 UpdateWindowsVisibility();
-                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Размер аналоговых часов. При изменении выставляется dirty-флаг.
+    /// Размер аналоговых часов.
     /// </summary>
     public double AnalogClockSize
     {
@@ -157,12 +153,11 @@ public partial class MainWindowViewModel
             _analogClockSize = validatedValue;
             OnPropertyChanged();
             UpdateAnalogClockSize();
-            App.MarkWidgetSettingsDirty();
         }
     }
 
     /// <summary>
-    /// Аналоговые часы поверх всех окон. При изменении выставляется dirty-флаг.
+    /// Аналоговые часы поверх всех окон.
     /// </summary>
     public bool AnalogClockTopmost
     {
@@ -175,14 +170,12 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.AnalogClockTopmost = value;
                 OnPropertyChanged();
                 UpdateAnalogClockTopmost();
-                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Цифровые часы поверх всех окон. При изменении выставляется dirty-флаг.
-    /// </summary>
+    /// Цифровые часы поверх всех окон.
     public bool DigitalClockTopmost
     {
         get => _appDataService.Data.WidgetSettings.DigitalClockTopmost;
@@ -194,13 +187,12 @@ public partial class MainWindowViewModel
                 _appDataService.Data.WidgetSettings.DigitalClockTopmost = value;
                 OnPropertyChanged();
                 UpdateDigitalClockTopmost();
-                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Воспроизводить звук кукушки каждый час. При изменении выставляется dirty-флаг.
+    /// Воспроизводить звук кукушки каждый час.
     /// </summary>
     public bool CuckooEveryHour
     {
@@ -212,13 +204,12 @@ public partial class MainWindowViewModel
             {
                 _appDataService.Data.WidgetSettings.CuckooEveryHour = value;
                 OnPropertyChanged();
-                App.MarkWidgetSettingsDirty();
             }
         }
     }
 
     /// <summary>
-    /// Воспроизводить сигнал каждые полчаса. При изменении выставляется dirty-флаг.
+    /// Воспроизводить сигнал каждые полчаса.
     /// </summary>
     public bool HalfHourChimeEnabled
     {
@@ -230,7 +221,6 @@ public partial class MainWindowViewModel
             {
                 _appDataService.Data.WidgetSettings.HalfHourChimeEnabled = value;
                 OnPropertyChanged();
-                App.MarkWidgetSettingsDirty();
             }
         }
     }

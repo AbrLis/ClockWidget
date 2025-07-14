@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 using ClockWidgetApp.Helpers;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace ClockWidgetApp.Models;
 
@@ -7,116 +9,200 @@ namespace ClockWidgetApp.Models;
 /// Класс, представляющий настройки виджета часов.
 /// Содержит все настраиваемые параметры виджета и их значения по умолчанию.
 /// </summary>
-public class WidgetSettings
+public class WidgetSettings : INotifyPropertyChanged
 {
+    private double _backgroundOpacity = Constants.WindowSettings.DEFAULT_WINDOW_OPACITY;
     /// <summary>
     /// Получает или устанавливает прозрачность фона виджета.
     /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_OPACITY"/>.
     /// </summary>
     [JsonPropertyName("backgroundOpacity")]
-    public double BackgroundOpacity { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_OPACITY;
+    public double BackgroundOpacity
+    {
+        get => _backgroundOpacity;
+        set { if (_backgroundOpacity != value) { _backgroundOpacity = value; OnPropertyChanged(); } }
+    }
 
+    private double _textOpacity = Constants.TextSettings.DEFAULT_TEXT_OPACITY;
     /// <summary>
     /// Получает или устанавливает прозрачность текста виджета.
     /// Значение по умолчанию: <see cref="Constants.TextSettings.DEFAULT_TEXT_OPACITY"/>.
     /// </summary>
     [JsonPropertyName("textOpacity")]
-    public double TextOpacity { get; set; } = Constants.TextSettings.DEFAULT_TEXT_OPACITY;
+    public double TextOpacity
+    {
+        get => _textOpacity;
+        set { if (_textOpacity != value) { _textOpacity = value; OnPropertyChanged(); } }
+    }
 
+    private double _fontSize = Constants.TextSettings.DEFAULT_FONT_SIZE;
     /// <summary>
     /// Получает или устанавливает размер шрифта текста.
     /// Значение по умолчанию: <see cref="Constants.TextSettings.DEFAULT_FONT_SIZE"/>.
     /// </summary>
     [JsonPropertyName("fontSize")]
-    public double FontSize { get; set; } = Constants.TextSettings.DEFAULT_FONT_SIZE;
+    public double FontSize
+    {
+        get => _fontSize;
+        set { if (_fontSize != value) { _fontSize = value; OnPropertyChanged(); } }
+    }
 
+    private bool _showSeconds = Constants.DisplaySettings.DEFAULT_SHOW_SECONDS;
     /// <summary>
     /// Получает или устанавливает флаг отображения секунд.
     /// Значение по умолчанию: <see cref="Constants.DisplaySettings.DEFAULT_SHOW_SECONDS"/>.
     /// </summary>
     [JsonPropertyName("showSeconds")]
-    public bool ShowSeconds { get; set; } = Constants.DisplaySettings.DEFAULT_SHOW_SECONDS;
+    public bool ShowSeconds
+    {
+        get => _showSeconds;
+        set { if (_showSeconds != value) { _showSeconds = value; OnPropertyChanged(); } }
+    }
 
+    private double? _windowLeft = Constants.WindowSettings.DEFAULT_WINDOW_LEFT;
     /// <summary>
     /// Получает или устанавливает позицию окна по горизонтали.
     /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_LEFT"/>.
     /// </summary>
     [JsonPropertyName("windowLeft")]
-    public double? WindowLeft { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_LEFT;
+    public double? WindowLeft
+    {
+        get => _windowLeft;
+        set { if (_windowLeft != value) { _windowLeft = value; OnPropertyChanged(); } }
+    }
 
+    private double? _windowTop = Constants.WindowSettings.DEFAULT_WINDOW_TOP;
     /// <summary>
     /// Получает или устанавливает позицию окна по вертикали.
     /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_TOP"/>.
     /// </summary>
     [JsonPropertyName("windowTop")]
-    public double? WindowTop { get; set; } = Constants.WindowSettings.DEFAULT_WINDOW_TOP;
+    public double? WindowTop
+    {
+        get => _windowTop;
+        set { if (_windowTop != value) { _windowTop = value; OnPropertyChanged(); } }
+    }
 
+    private double? _analogClockLeft = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
     /// <summary>
     /// Получает или устанавливает позицию окна аналоговых часов по горизонтали.
     /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT"/>.
     /// </summary>
     [JsonPropertyName("analogClockLeft")]
-    public double? AnalogClockLeft { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
+    public double? AnalogClockLeft
+    {
+        get => _analogClockLeft;
+        set { if (_analogClockLeft != value) { _analogClockLeft = value; OnPropertyChanged(); } }
+    }
 
+    private double? _analogClockTop = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
     /// <summary>
     /// Получает или устанавливает позицию окна аналоговых часов по вертикали.
     /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP"/>.
     /// </summary>
     [JsonPropertyName("analogClockTop")]
-    public double? AnalogClockTop { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
+    public double? AnalogClockTop
+    {
+        get => _analogClockTop;
+        set { if (_analogClockTop != value) { _analogClockTop = value; OnPropertyChanged(); } }
+    }
 
+    private double _analogClockSize = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
     /// <summary>
     /// Получает или устанавливает размер окна аналоговых часов.
     /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE"/>.
     /// </summary>
     [JsonPropertyName("analogClockSize")]
-    public double AnalogClockSize { get; set; } = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
+    public double AnalogClockSize
+    {
+        get => _analogClockSize;
+        set { if (_analogClockSize != value) { _analogClockSize = value; OnPropertyChanged(); } }
+    }
 
+    private bool _showDigitalClock = true;
     /// <summary>
     /// Получает или устанавливает флаг отображения цифровых часов.
     /// Значение по умолчанию: true.
     /// </summary>
     [JsonPropertyName("showDigitalClock")]
-    public bool ShowDigitalClock { get; set; } = true;
+    public bool ShowDigitalClock
+    {
+        get => _showDigitalClock;
+        set { if (_showDigitalClock != value) { _showDigitalClock = value; OnPropertyChanged(); } }
+    }
 
+    private bool _showAnalogClock = true;
     /// <summary>
     /// Получает или устанавливает флаг отображения аналоговых часов.
     /// Значение по умолчанию: true.
     /// </summary>
     [JsonPropertyName("showAnalogClock")]
-    public bool ShowAnalogClock { get; set; } = true;
+    public bool ShowAnalogClock
+    {
+        get => _showAnalogClock;
+        set { if (_showAnalogClock != value) { _showAnalogClock = value; OnPropertyChanged(); } }
+    }
 
+    private bool _analogClockTopmost = true;
     /// <summary>
     /// Флаг "поверх всех окон" для аналоговых часов. По умолчанию: true.
     /// </summary>
     [JsonPropertyName("analogClockTopmost")]
-    public bool AnalogClockTopmost { get; set; } = true;
+    public bool AnalogClockTopmost
+    {
+        get => _analogClockTopmost;
+        set { if (_analogClockTopmost != value) { _analogClockTopmost = value; OnPropertyChanged(); } }
+    }
 
+    private bool _digitalClockTopmost = true;
     /// <summary>
     /// Флаг "поверх всех окон" для цифровых часов. По умолчанию: true.
     /// </summary>
     [JsonPropertyName("digitalClockTopmost")]
-    public bool DigitalClockTopmost { get; set; } = true;
+    public bool DigitalClockTopmost
+    {
+        get => _digitalClockTopmost;
+        set { if (_digitalClockTopmost != value) { _digitalClockTopmost = value; OnPropertyChanged(); } }
+    }
 
+    private bool _cuckooEveryHour = Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
     /// <summary>
     /// Воспроизводить звук кукушки каждый час.
     /// Значение по умолчанию: <see cref="Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR"/>.
     /// </summary>
     [JsonPropertyName("cuckooEveryHour")]
-    public bool CuckooEveryHour { get; set; } = Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
+    public bool CuckooEveryHour
+    {
+        get => _cuckooEveryHour;
+        set { if (_cuckooEveryHour != value) { _cuckooEveryHour = value; OnPropertyChanged(); } }
+    }
 
+    private bool _halfHourChimeEnabled = false;
     /// <summary>
     /// Воспроизводить сигнал каждые полчаса (например, в 12:30, 1:30 и т.д.).
     /// Значение по умолчанию: false.
     /// </summary>
     [JsonPropertyName("halfHourChimeEnabled")]
-    public bool HalfHourChimeEnabled { get; set; } = false;
+    public bool HalfHourChimeEnabled
+    {
+        get => _halfHourChimeEnabled;
+        set { if (_halfHourChimeEnabled != value) { _halfHourChimeEnabled = value; OnPropertyChanged(); } }
+    }
 
+    private string _language = "en";
     /// <summary>
     /// Язык интерфейса ("ru" или "en"). По умолчанию: "en".
     /// </summary>
     [JsonPropertyName("language")]
-    public string Language { get; set; } = "en";
+    public string Language
+    {
+        get => _language;
+        set { if (_language != value) { _language = value; OnPropertyChanged(); } }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
     /// Проверяет и корректирует значения всех настроек.
@@ -212,31 +298,4 @@ public class WidgetSettings
     {
         return value == "en" ? "en" : "ru";
     }
-}
-
-/// <summary>
-/// Модель для сериализации таймера.
-/// </summary>
-public class TimerPersistModel
-{
-    public TimeSpan Duration { get; set; }
-}
-
-/// <summary>
-/// Модель для сериализации будильника.
-/// </summary>
-public class AlarmPersistModel
-{
-    /// <summary>
-    /// Время срабатывания будильника.
-    /// </summary>
-    public TimeSpan AlarmTime { get; set; }
-    /// <summary>
-    /// Включён ли будильник (true = включён, false = выключен).
-    /// </summary>
-    public bool IsEnabled { get; set; }
-    /// <summary>
-    /// Дата и время следующего срабатывания будильника (если включён).
-    /// </summary>
-    public DateTime? NextTriggerDateTime { get; set; }
 } 

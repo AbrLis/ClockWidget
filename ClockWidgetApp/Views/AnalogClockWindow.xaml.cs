@@ -71,6 +71,7 @@ public partial class AnalogClockWindow : Window
     {
         _viewModel.StopDrag();
         ReleaseMouseCapture();
+        _viewModel.SaveWindowPosition(Left, Top); // Сохраняем позицию окна при завершении перемещения
         e.Handled = true;
     }
 

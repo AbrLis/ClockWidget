@@ -86,12 +86,12 @@ public partial class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>
-    /// Сохраняет позицию окна и помечает настройки как изменённые.
+    /// Сохраняет позицию окна и уведомляет об изменении настроек.
     /// </summary>
-    private void SaveWindowPosition(double left, double top)
+    public void SaveWindowPosition(double left, double top)
     {
         WindowPositionHelper.SaveWindowPosition(_appDataService.Data.WidgetSettings, left, top, false);
-        App.MarkWidgetSettingsDirty(); // Устанавливаем dirty-флаг
+        _appDataService.NotifySettingsChanged();
     }
 
     /// <summary>

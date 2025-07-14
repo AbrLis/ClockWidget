@@ -18,6 +18,7 @@ namespace ClockWidgetApp.Helpers
         {
             var services = new ServiceCollection();
             // Регистрируем сервисы приложения
+            services.AddSingleton<IFileSystemService, FileSystemService>();
             services.AddSingleton<ITimeService, TimeService>();
             services.AddSingleton<ISoundService, SoundService>();
             services.AddSingleton<IWindowService, WindowService>();
@@ -29,7 +30,8 @@ namespace ClockWidgetApp.Helpers
                     "ClockWidget");
                 var settingsPath = System.IO.Path.Combine(appDataPath, "widget_settings.json");
                 var timersPath = System.IO.Path.Combine(appDataPath, "timers_alarms.json");
-                return new AppDataService(settingsPath, timersPath);
+                var fileSystemService = sp.GetRequiredService<IFileSystemService>();
+                return new AppDataService(settingsPath, timersPath, fileSystemService);
             });
             services.AddSingleton<MainWindowViewModel>(sp =>
                 new MainWindowViewModel(
