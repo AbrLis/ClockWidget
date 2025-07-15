@@ -14,7 +14,7 @@ public class AlarmMonitorService : IDisposable
     /// <summary>Коллекция отслеживаемых будильников.</summary>
     private readonly ObservableCollection<AlarmEntryViewModel> _alarms;
     /// <summary>Объект блокировки для потокобезопасности.</summary>
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     /// <summary>Таймер для отслеживания времени срабатывания.</summary>
     private System.Threading.Timer? _timer;
     /// <summary>Кэш ближайшего будильника.</summary>

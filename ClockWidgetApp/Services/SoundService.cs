@@ -37,7 +37,7 @@ public class SoundService : ISoundService
     #region Private fields
     private readonly ILogger<SoundService> _logger;
     private MediaPlayer? _player;
-    private bool _isLooping = false;
+
     #endregion
 
     #region Constructors
@@ -56,7 +56,7 @@ public class SoundService : ISoundService
         var player = new MediaPlayer();
         player.Open(new Uri(soundPath));
         player.Volume = 1.0;
-        player.MediaEnded += (s, e) =>
+        player.MediaEnded += (_, _) =>
         {
             if (loop)
             {
@@ -69,7 +69,7 @@ public class SoundService : ISoundService
                 onEnded?.Invoke(player);
             }
         };
-        player.MediaFailed += (s, e) =>
+        player.MediaFailed += (_, e) =>
         {
             _logger.LogError($"[SoundService] MediaPlayer failed: {e.ErrorException}");
         };
@@ -95,13 +95,12 @@ public class SoundService : ISoundService
             }
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                _player = CreateAndPlayMediaPlayer(soundPath, loop, p => { _player = null; _logger.LogDebug($"[SoundService] MediaPlayer closed after playback: {soundPath}"); });
-                _isLooping = loop;
+                _player = CreateAndPlayMediaPlayer(soundPath, loop, _ => { _player = null; _logger.LogDebug($"[SoundService] MediaPlayer closed after playback: {soundPath}"); });
             });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SoundService] Error playing sound. Path: {Path}, Loop: {Loop}, ThreadId: {ThreadId}", soundPath, loop, System.Threading.Thread.CurrentThread.ManagedThreadId);
+            _logger.LogError(ex, "[SoundService] Error playing sound. Path: {Path}, Loop: {Loop}, ThreadId: {ThreadId}", soundPath, loop, Thread.CurrentThread.ManagedThreadId);
         }
     }
 
@@ -115,7 +114,6 @@ public class SoundService : ISoundService
                 _player.Stop();
                 _player.Close();
                 _player = null;
-                _isLooping = false;
                 _logger.LogDebug("[SoundService] Sound stopped.");
             }
         });
@@ -162,7 +160,7 @@ public class SoundService : ISoundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[SoundService] Error playing sound instance. Path: {Path}, Loop: {Loop}, ThreadId: {ThreadId}", soundPath, loop, System.Threading.Thread.CurrentThread.ManagedThreadId);
+            _logger.LogError(ex, "[SoundService] Error playing sound instance. Path: {Path}, Loop: {Loop}, ThreadId: {ThreadId}", soundPath, loop, Thread.CurrentThread.ManagedThreadId);
             return new SoundHandle(new MediaPlayer());
         }
     }

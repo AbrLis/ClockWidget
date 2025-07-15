@@ -49,4 +49,4 @@ namespace ClockWidgetApp.Models
         /// </summary>
         public DateTime? NextTriggerDateTime { get; set; }
     }
-} 
+}

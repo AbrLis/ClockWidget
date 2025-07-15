@@ -105,12 +105,17 @@ public class AlarmsViewModel : INotifyPropertyChanged
     private AlarmEntryViewModel CreateViewModel(AlarmPersistModel model)
     {
         var vm = new AlarmEntryViewModel(model);
-        vm.PropertyChanged += (s, e) =>
+        vm.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(vm.AlarmTime))
-                model.AlarmTime = vm.AlarmTime;
-            if (e.PropertyName == nameof(vm.IsEnabled))
-                model.IsEnabled = vm.IsEnabled;
+            switch (e.PropertyName)
+            {
+                case nameof(vm.AlarmTime):
+                    model.AlarmTime = vm.AlarmTime;
+                    break;
+                case nameof(vm.IsEnabled):
+                    model.IsEnabled = vm.IsEnabled;
+                    break;
+            }
         };
         return vm;
     }
@@ -180,21 +185,19 @@ public class AlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void ApplyEditAlarm()
     {
-        if (_editingAlarm != null && IsNewAlarmValid)
-        {
-            TryParseOrZero(NewAlarmHours, out int h);
-            TryParseOrZero(NewAlarmMinutes, out int m);
-            var ts = new TimeSpan(h, m, 0);
-            _editingAlarm.AlarmTime = ts;
-            if (_editingAlarm.IsEnabled)
-                _editingAlarm.UpdateNextTrigger();
-            _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.AlarmTime));
-            _editingAlarm = null;
-            IsAlarmInputVisible = false;
-            NewAlarmHours = "";
-            NewAlarmMinutes = "";
-            OnPropertyChanged(nameof(IsEditingAlarm));
-        }
+        if (_editingAlarm == null || !IsNewAlarmValid) return;
+        TryParseOrZero(NewAlarmHours, out int h);
+        TryParseOrZero(NewAlarmMinutes, out int m);
+        var ts = new TimeSpan(h, m, 0);
+        _editingAlarm.AlarmTime = ts;
+        if (_editingAlarm.IsEnabled)
+            _editingAlarm.UpdateNextTrigger();
+        _editingAlarm.OnPropertyChanged(nameof(_editingAlarm.AlarmTime));
+        _editingAlarm = null;
+        IsAlarmInputVisible = false;
+        NewAlarmHours = "";
+        NewAlarmMinutes = "";
+        OnPropertyChanged(nameof(IsEditingAlarm));
     }
 
     /// <summary>
@@ -240,4 +243,4 @@ public class AlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-} 
+}

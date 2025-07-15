@@ -120,7 +120,7 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
         _initialTargetDateTime = model.TargetDateTime;
         Name = model.Name;
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _uiTimer.Tick += (s, _) =>
+        _uiTimer.Tick += (_, _) =>
         {
             OnPropertyChanged(nameof(Remaining));
             OnPropertyChanged(nameof(DisplayTime));

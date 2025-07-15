@@ -1,7 +1,7 @@
 namespace ClockWidgetApp.Services
 {
     using System.IO;
-    using ClockWidgetApp.ViewModels;
+    using ViewModels;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
@@ -38,14 +38,11 @@ namespace ClockWidgetApp.Services
             /// NotifyIcon, отображаемый в трее.
             /// </summary>
             public NotifyIcon? Icon { get; set; }
-            /// <summary>
-            /// Уникальный идентификатор таймера или будильника.
-            /// </summary>
-            public string? Id { get; set; }
+
             /// <summary>
             /// Ссылка на пункт меню 'Стоп' для динамического обновления текста.
             /// </summary>
-            public ToolStripMenuItem? StopMenuItem { get; set; }
+            public ToolStripMenuItem? StopMenuItem { get; init; }
         }
         #endregion
 
@@ -74,17 +71,17 @@ namespace ClockWidgetApp.Services
             _exitItem = new ToolStripMenuItem(Helpers.LocalizationManager.GetString("Tray_Exit", lang));
             var separator = new ToolStripSeparator();
             var separator2 = new ToolStripSeparator();
-            _showDigitalItem.Click += (s, e) =>
+            _showDigitalItem.Click += (_, _) =>
             {
                 if (_mainViewModel != null)
                     _mainViewModel.ShowDigitalClock = !_mainViewModel.ShowDigitalClock;
             };
-            _showAnalogItem.Click += (s, e) =>
+            _showAnalogItem.Click += (_, _) =>
             {
                 if (_mainViewModel != null)
                     _mainViewModel.ShowAnalogClock = !_mainViewModel.ShowAnalogClock;
             };
-            _settingsItem.Click += (s, e) =>
+            _settingsItem.Click += (_, _) =>
             {
                 if (_serviceProvider != null)
                 {
@@ -95,18 +92,16 @@ namespace ClockWidgetApp.Services
                         ws?.OpenSettingsWindow();
                 }
             };
-            _timerAlarmSettingsItem.Click += (s, e) =>
+            _timerAlarmSettingsItem.Click += (_, _) =>
             {
-                if (_serviceProvider != null)
-                {
-                    var ws = _serviceProvider.GetService(typeof(IWindowService)) as IWindowService;
-                    if (ws is WindowService windowService)
-                        windowService.OpenSettingsWindow(true);
-                    else
-                        ws?.OpenSettingsWindow();
-                }
+                if (_serviceProvider == null) return;
+                var ws = _serviceProvider.GetService(typeof(IWindowService)) as IWindowService;
+                if (ws is WindowService windowService)
+                    windowService.OpenSettingsWindow(true);
+                else
+                    ws?.OpenSettingsWindow();
             };
-            _exitItem.Click += (s, e) => System.Windows.Application.Current.Shutdown();
+            _exitItem.Click += (_, _) => System.Windows.Application.Current.Shutdown();
             _mainTrayMenu.Items.Add(_showDigitalItem);
             _mainTrayMenu.Items.Add(_showAnalogItem);
             _mainTrayMenu.Items.Add(separator2);
@@ -121,12 +116,12 @@ namespace ClockWidgetApp.Services
                 return;
             }
             _mainNotifyIcon = new NotifyIcon();
-            _mainNotifyIcon.Icon = new System.Drawing.Icon(iconPath);
+            _mainNotifyIcon.Icon = new Icon(iconPath);
             _mainNotifyIcon.Visible = true;
             _mainNotifyIcon.Text = TrimTooltip(Helpers.LocalizationManager.GetString("Tray_IconText", lang));
             _mainNotifyIcon.ContextMenuStrip = _mainTrayMenu;
             _mainNotifyIcon.MouseUp += NotifyIcon_MouseUp;
-            Helpers.LocalizationManager.LanguageChanged += (s, e) => UpdateMainTrayMenuItems();
+            Helpers.LocalizationManager.LanguageChanged += (_, _) => UpdateMainTrayMenuItems();
         }
 
         /// <summary>
@@ -209,10 +204,10 @@ namespace ClockWidgetApp.Services
         /// <param name="tooltip">Начальный текст тултипа (оставшееся время).</param>
         public void AddOrUpdateTrayIcon(string id, string iconPath, string tooltip)
         {
-            if (_trayIcons.ContainsKey(id))
+            if (_trayIcons.TryGetValue(id, out var trayIcon))
             {
                 // Обновляем тултип
-                var icon = _trayIcons[id].Icon;
+                var icon = trayIcon.Icon;
                 if (icon != null)
                     icon.Text = TrimTooltip(tooltip);
                 return;
@@ -227,7 +222,7 @@ namespace ClockWidgetApp.Services
                     ? Helpers.LocalizationManager.GetString("Tray_Stop")
                     : Helpers.LocalizationManager.GetString("Tray_StopTimer");
                 var stopItem = new ToolStripMenuItem(stopText);
-                stopItem.Click += (s, e) => {
+                stopItem.Click += (_, _) => {
                     if (id.StartsWith("longtimer_")) {
                         if (Helpers.DialogHelper.ConfirmLongTimerDelete())
                             StopRequested?.Invoke(id);
@@ -240,7 +235,7 @@ namespace ClockWidgetApp.Services
 
             var notifyIcon = new NotifyIcon
             {
-                Icon = new System.Drawing.Icon(iconPath),
+                Icon = new Icon(iconPath),
                 Text = TrimTooltip(tooltip),
                 Visible = true,
                 ContextMenuStrip = contextMenu
@@ -249,7 +244,7 @@ namespace ClockWidgetApp.Services
             // Для иконки длинных таймеров подписываемся на MouseUp
             if (id == "longtimers")
             {
-                notifyIcon.MouseUp += (s, e) =>
+                notifyIcon.MouseUp += (_, e) =>
                 {
                     if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
                     {
@@ -266,7 +261,7 @@ namespace ClockWidgetApp.Services
                 };
             }
 
-            _trayIcons[id] = new TrayIconInfo { Id = id, Icon = notifyIcon, StopMenuItem = null };
+            _trayIcons[id] = new TrayIconInfo { Icon = notifyIcon, StopMenuItem = null };
         }
 
         /// <summary>
@@ -326,7 +321,7 @@ namespace ClockWidgetApp.Services
         #region Constructor
         public TrayIconManager()
         {
-            Helpers.LocalizationManager.LanguageChanged += (s, e) => UpdateMenuLanguage();
+            Helpers.LocalizationManager.LanguageChanged += (_, _) => UpdateMenuLanguage();
         }
         #endregion
 

@@ -15,7 +15,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     private readonly AlarmMonitorService _alarmMonitorService;
     private readonly TrayIconManager _trayIconManager;
     private readonly System.Windows.Threading.DispatcherTimer _trayUpdateTimer;
-    private readonly ISoundService _soundService;
+
     #endregion
 
     #region Public properties
@@ -41,7 +41,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     public TimersAndAlarmsViewModel(IAppDataService appDataService, ISoundService soundService, TrayIconManager trayIconManager)
     {
         _appDataService = appDataService;
-        _soundService = soundService;
         TimersVm = new TimersViewModel(appDataService);
         TimersVm.OnTimerTrayStateChanged = (timer, isRunning) =>
         {
@@ -155,7 +154,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         if (e.NewItems != null)
         {
-            foreach (ClockWidgetApp.ViewModels.AlarmEntryViewModel a in e.NewItems)
+            foreach (AlarmEntryViewModel a in e.NewItems)
             {
                 SubscribeAlarm(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен будильник: {a.AlarmTime}");
@@ -164,7 +163,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 
         if (e.OldItems != null)
         {
-            foreach (ClockWidgetApp.ViewModels.AlarmEntryViewModel a in e.OldItems)
+            foreach (AlarmEntryViewModel a in e.OldItems)
             {
                 RemoveAlarmTray(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён будильник: {a.AlarmTime}");
@@ -212,7 +211,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _trayIconManager.RemoveTrayIcon(GetTimerId(timer));
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для таймера: {timer.Duration}");
     }
-    private void AddAlarmTray(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
+    private void AddAlarmTray(AlarmEntryViewModel alarm)
     {
         var id = GetAlarmId(alarm);
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
@@ -221,7 +220,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, text);
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для будильника: {id}");
     }
-    private void RemoveAlarmTray(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
+    private void RemoveAlarmTray(AlarmEntryViewModel alarm)
     {
         _trayIconManager.RemoveTrayIcon(GetAlarmId(alarm));
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для будильника: {alarm.AlarmTime}");
@@ -265,29 +264,24 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         if (persist != null)
             LongTimersVm.LongTimerModels.Remove(persist);
         // Сохраняем изменения
-        if (_appDataService != null)
-            await _appDataService.SaveAsync();
+        await _appDataService.SaveAsync();
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён после истечения: {timer.Name} ({timer.TargetDateTime})");
     }
 
     #endregion
 
-    private void SubscribeAlarm(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
+    private void SubscribeAlarm(AlarmEntryViewModel alarm)
     {
         bool lastEnabled = alarm.IsEnabled;
         alarm.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(alarm.IsEnabled))
-            {
-                if (alarm.IsEnabled != lastEnabled)
-                {
-                    lastEnabled = alarm.IsEnabled;
-                    if (alarm.IsEnabled)
-                        AddAlarmTray(alarm);
-                    else
-                        RemoveAlarmTray(alarm);
-                }
-            }
+            if (e.PropertyName != nameof(alarm.IsEnabled)) return;
+            if (alarm.IsEnabled == lastEnabled) return;
+            lastEnabled = alarm.IsEnabled;
+            if (alarm.IsEnabled)
+                AddAlarmTray(alarm);
+            else
+                RemoveAlarmTray(alarm);
         };
         if (alarm.IsEnabled) AddAlarmTray(alarm);
     }
@@ -300,7 +294,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Генерирует уникальный идентификатор для будильника.
     /// </summary>
-    private string GetAlarmId(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm) => $"alarm_{alarm.GetHashCode()}";
+    private string GetAlarmId(AlarmEntryViewModel alarm) => $"alarm_{alarm.GetHashCode()}";
 
     /// <summary>
     /// Генерирует уникальный идентификатор для длинного таймера.
@@ -336,7 +330,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Обрабатывает срабатывание будильника: проигрывает звук, показывает уведомление, сбрасывает состояние.
     /// </summary>
-    private void OnAlarmTriggered(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
+    private void OnAlarmTriggered(AlarmEntryViewModel alarm)
     {
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Сработал будильник: {alarm.AlarmTime}");
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -378,11 +372,9 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             return string.Empty;
         // Формируем тултип: ближайший таймер + сводка
         string tooltip = nextTimer.TrayTooltip;
-        if (count > 1)
-        {
-            string moreLabel = LocalizationManager.GetString("LongTimers_Tooltip_More");
-            tooltip += $"\n+ {count - 1} {moreLabel}";
-        }
+        if (count <= 1) return tooltip;
+        string moreLabel = LocalizationManager.GetString("LongTimers_Tooltip_More");
+        tooltip += $"\n+ {count - 1} {moreLabel}";
         return tooltip;
     }
 

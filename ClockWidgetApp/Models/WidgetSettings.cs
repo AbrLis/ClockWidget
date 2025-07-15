@@ -20,7 +20,11 @@ public class WidgetSettings : INotifyPropertyChanged
     public double BackgroundOpacity
     {
         get => _backgroundOpacity;
-        set { if (_backgroundOpacity != value) { _backgroundOpacity = value; OnPropertyChanged(); } }
+        set
+        {
+            if (DoubleEquals(_backgroundOpacity, value)) return;
+            _backgroundOpacity = value; OnPropertyChanged();
+        }
     }
 
     private double _textOpacity = Constants.TextSettings.DEFAULT_TEXT_OPACITY;
@@ -32,7 +36,7 @@ public class WidgetSettings : INotifyPropertyChanged
     public double TextOpacity
     {
         get => _textOpacity;
-        set { if (_textOpacity != value) { _textOpacity = value; OnPropertyChanged(); } }
+        set { if (!DoubleEquals(_textOpacity, value)) { _textOpacity = value; OnPropertyChanged(); } }
     }
 
     private double _fontSize = Constants.TextSettings.DEFAULT_FONT_SIZE;
@@ -44,7 +48,11 @@ public class WidgetSettings : INotifyPropertyChanged
     public double FontSize
     {
         get => _fontSize;
-        set { if (_fontSize != value) { _fontSize = value; OnPropertyChanged(); } }
+        set
+        {
+            if (DoubleEquals(_fontSize, value)) return;
+            _fontSize = value; OnPropertyChanged();
+        }
     }
 
     private bool _showSeconds = Constants.DisplaySettings.DEFAULT_SHOW_SECONDS;
@@ -68,7 +76,12 @@ public class WidgetSettings : INotifyPropertyChanged
     public double? WindowLeft
     {
         get => _windowLeft;
-        set { if (_windowLeft != value) { _windowLeft = value; OnPropertyChanged(); } }
+        set
+        {
+            // Упрощённое сравнение nullable double с учётом точности
+            if (DoubleEquals(_windowLeft ?? double.NaN, value ?? double.NaN)) return;
+            _windowLeft = value; OnPropertyChanged();
+        }
     }
 
     private double? _windowTop = Constants.WindowSettings.DEFAULT_WINDOW_TOP;
@@ -80,7 +93,11 @@ public class WidgetSettings : INotifyPropertyChanged
     public double? WindowTop
     {
         get => _windowTop;
-        set { if (_windowTop != value) { _windowTop = value; OnPropertyChanged(); } }
+        set
+        {
+            if (DoubleEquals(_windowTop ?? double.NaN, value ?? double.NaN)) return;
+            _windowTop = value; OnPropertyChanged();
+        }
     }
 
     private double? _analogClockLeft = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
@@ -92,7 +109,11 @@ public class WidgetSettings : INotifyPropertyChanged
     public double? AnalogClockLeft
     {
         get => _analogClockLeft;
-        set { if (_analogClockLeft != value) { _analogClockLeft = value; OnPropertyChanged(); } }
+        set
+        {
+            if (DoubleEquals(_analogClockLeft ?? double.NaN, value ?? double.NaN)) return;
+            _analogClockLeft = value; OnPropertyChanged();
+        }
     }
 
     private double? _analogClockTop = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
@@ -104,7 +125,11 @@ public class WidgetSettings : INotifyPropertyChanged
     public double? AnalogClockTop
     {
         get => _analogClockTop;
-        set { if (_analogClockTop != value) { _analogClockTop = value; OnPropertyChanged(); } }
+        set
+        {
+            if (DoubleEquals(_analogClockTop ?? double.NaN, value ?? double.NaN)) return;
+            _analogClockTop = value; OnPropertyChanged();
+        }
     }
 
     private double _analogClockSize = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
@@ -116,7 +141,11 @@ public class WidgetSettings : INotifyPropertyChanged
     public double AnalogClockSize
     {
         get => _analogClockSize;
-        set { if (_analogClockSize != value) { _analogClockSize = value; OnPropertyChanged(); } }
+        set
+        {
+            if (DoubleEquals(_analogClockSize, value)) return;
+            _analogClockSize = value; OnPropertyChanged();
+        }
     }
 
     private bool _showDigitalClock = true;
@@ -177,7 +206,7 @@ public class WidgetSettings : INotifyPropertyChanged
         set { if (_cuckooEveryHour != value) { _cuckooEveryHour = value; OnPropertyChanged(); } }
     }
 
-    private bool _halfHourChimeEnabled = false;
+    private bool _halfHourChimeEnabled;
     /// <summary>
     /// Воспроизводить сигнал каждые полчаса (например, в 12:30, 1:30 и т.д.).
     /// Значение по умолчанию: false.
@@ -211,11 +240,6 @@ public class WidgetSettings : INotifyPropertyChanged
     /// <returns>Скорректированный объект настроек.</returns>
     public static WidgetSettings ValidateSettings(WidgetSettings settings)
     {
-        if (settings == null)
-        {
-            return new WidgetSettings();
-        }
-
         // Валидация прозрачности фона
         settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity, 
             Constants.WindowSettings.MIN_WINDOW_OPACITY, 
@@ -298,4 +322,14 @@ public class WidgetSettings : INotifyPropertyChanged
     {
         return value == "en" ? "en" : "ru";
     }
+
+    /// <summary>
+    /// Сравнивает два значения double с учетом заданной точности.
+    /// </summary>
+    /// <param name="a">Первое значение.</param>
+    /// <param name="b">Второе значение.</param>
+    /// <param name="epsilon">Точность сравнения (по умолчанию 1e-6).</param>
+    /// <returns>True, если значения равны с учетом точности, иначе false.</returns>
+    private static bool DoubleEquals(double a, double b, double epsilon = 1e-6)
+        => Math.Abs(a - b) < epsilon;
 } 

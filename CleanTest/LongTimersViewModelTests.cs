@@ -26,7 +26,7 @@ public class LongTimersViewModelTests
         var soundService = new Mock<ISoundService>().Object;
         var vm = new LongTimersViewModel(appDataServiceMock.Object, soundService);
         var dt = DateTime.Now.AddHours(1);
-        var timer = new LongTimerEntryViewModel(dt, soundService, "Test");
+        var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = dt, Name = "Test" }, soundService);
         vm.LongTimers.Add(timer);
         Assert.Single(vm.LongTimers);
         Assert.Equal("Test", vm.LongTimers[0].Name);
@@ -43,7 +43,7 @@ public class LongTimersViewModelTests
         var soundService = new Mock<ISoundService>().Object;
         var vm = new LongTimersViewModel(appDataServiceMock.Object, soundService);
         var dt = DateTime.Now.AddHours(1);
-        var timer = new LongTimerEntryViewModel(dt, soundService, "Test");
+        var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = dt, Name = "Test" }, soundService);
         vm.LongTimers.Add(timer);
         vm.LongTimers.Remove(timer);
         Assert.Empty(vm.LongTimers);
@@ -57,7 +57,7 @@ public class LongTimersViewModelTests
     {
         var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddHours(1);
-        var timer = new LongTimerEntryViewModel(dt, soundService, "Test");
+        var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = dt, Name = "Test" }, soundService);
         timer.TargetDateTime = dt.AddMinutes(10);
         timer.Reset();
         Assert.Equal(dt, timer.TargetDateTime, TimeSpan.FromSeconds(1));
@@ -71,7 +71,7 @@ public class LongTimersViewModelTests
     {
         var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddSeconds(-10); // Уже истёк
-        var timer = new LongTimerEntryViewModel(dt, soundService, "Test");
+        var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = dt, Name = "Test" }, soundService);
         Assert.Equal("00:00:00", timer.DisplayTime);
     }
 
@@ -83,7 +83,7 @@ public class LongTimersViewModelTests
     {
         var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddHours(1);
-        var timer = new LongTimerEntryViewModel(dt, soundService, "VeryLongTimerName12356");
+        var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = dt, Name = "VeryLongTimerName12356" }, soundService);
         string tooltip = timer.TrayTooltip;
         // Имя обрезано до максимальной длины + ...
         string expectedStart = "VeryLongTimerName12356".Substring(0, Constants.LongTimerTooltipNameMaxLength) + "...";
@@ -102,7 +102,7 @@ public class LongTimersViewModelTests
         var vm = new LongTimersViewModel(appDataServiceMock.Object, soundService);
         for (int i = 0; i < 100; i++)
         {
-            var timer = new LongTimerEntryViewModel(DateTime.Now.AddMinutes(i), soundService, $"T{i}");
+            var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = DateTime.Now.AddMinutes(i), Name = $"T{i}" }, soundService);
             vm.LongTimers.Add(timer);
         }
         Assert.Equal(100, vm.LongTimers.Count);
@@ -118,7 +118,7 @@ public class LongTimersViewModelTests
         appDataServiceMock.SetupGet(s => s.Data).Returns(new AppDataModel());
         var soundService = new Mock<ISoundService>().Object;
         var dt = DateTime.Now.AddHours(1);
-        var timer = new LongTimerEntryViewModel(dt, soundService, "");
+        var timer = new LongTimerEntryViewModel(new LongTimerPersistModel { TargetDateTime = dt, Name = "" }, soundService);
         // Проверяем, что TrayTooltip не пустой и содержит локализованное значение (зависит от локализации)
         Assert.False(string.IsNullOrWhiteSpace(timer.TrayTooltip));
     }

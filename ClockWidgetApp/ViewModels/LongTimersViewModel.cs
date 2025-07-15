@@ -13,14 +13,14 @@ namespace ClockWidgetApp.ViewModels;
 /// </summary>
 public class LongTimersViewModel : INotifyPropertyChanged
 {
-    /// <summary>
-    /// Коллекция длинных таймеров.
-    /// </summary>
-    public ObservableCollection<LongTimerEntryViewModel> LongTimers { get; } = new();
-    public ObservableCollection<LongTimerPersistModel> LongTimerModels => _appDataService.Data.LongTimers;
+    #region Private Fields
     private readonly IAppDataService _appDataService;
     private readonly ISoundService _soundService;
+    public ObservableCollection<LongTimerEntryViewModel> LongTimers { get; } = new();
+    public ObservableCollection<LongTimerPersistModel> LongTimerModels => _appDataService.Data.LongTimers;
+    #endregion
 
+    #region Constructors
     /// <summary>
     /// Конструктор ViewModel длинных таймеров.
     /// </summary>
@@ -39,7 +39,9 @@ public class LongTimersViewModel : INotifyPropertyChanged
         }
         LongTimerModels.CollectionChanged += LongTimerModels_CollectionChanged;
     }
+    #endregion
 
+    #region Public Methods
     private LongTimerEntryViewModel CreateViewModel(LongTimerPersistModel model)
     {
         var vm = new LongTimerEntryViewModel(model, _soundService);
@@ -126,7 +128,7 @@ public class LongTimersViewModel : INotifyPropertyChanged
         if (screenPosition.HasValue)
         {
             // Позиционируем окно после загрузки, чтобы корректно вычислить размеры
-            inputWindow.Loaded += (s, e) =>
+            inputWindow.Loaded += (_, _) =>
             {
                 inputWindow.Left = screenPosition.Value.X - inputWindow.ActualWidth / 2;
                 inputWindow.Top = screenPosition.Value.Y - inputWindow.ActualHeight / 2;
@@ -169,8 +171,11 @@ public class LongTimersViewModel : INotifyPropertyChanged
             Log.Information($"[LongTimersViewModel] Завершено редактирование таймера '{timer.Name}', сохранение будет выполнено через debounce PropertyChanged");
         }
     }
+    #endregion
 
+    #region Event Handlers
     public event PropertyChangedEventHandler? PropertyChanged;
     public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    #endregion
 }

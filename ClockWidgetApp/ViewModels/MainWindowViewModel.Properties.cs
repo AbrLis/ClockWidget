@@ -176,6 +176,7 @@ public partial class MainWindowViewModel
 
     /// <summary>
     /// Цифровые часы поверх всех окон.
+    /// </summary>
     public bool DigitalClockTopmost
     {
         get => _appDataService.Data.WidgetSettings.DigitalClockTopmost;

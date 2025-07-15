@@ -19,8 +19,6 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
     private readonly IAppDataService _appDataService;
     /// <summary>Логгер для событий ViewModel.</summary>
     private readonly ILogger<SettingsWindowViewModel> _logger;
-    /// <summary>ViewModel для таймеров и будильников.</summary>
-    private readonly TimersAndAlarmsViewModel _timersAndAlarmsViewModel;
     /// <summary>Индекс выбранной вкладки.</summary>
     private int _selectedTabIndex;
     #endregion
@@ -33,11 +31,10 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
     {
         _mainViewModel = mainViewModel;
         _appDataService = appDataService;
-        _timersAndAlarmsViewModel = timersAndAlarmsViewModel;
         _logger = logger;
-        TimersVm = _timersAndAlarmsViewModel.TimersVm;
-        AlarmsVm = _timersAndAlarmsViewModel.AlarmsVm;
-        LongTimersVm = _timersAndAlarmsViewModel.LongTimersVm;
+        TimersVm = timersAndAlarmsViewModel.TimersVm;
+        AlarmsVm = timersAndAlarmsViewModel.AlarmsVm;
+        LongTimersVm = timersAndAlarmsViewModel.LongTimersVm;
         _logger.LogInformation("[SettingsWindowViewModel] Settings window view model initialized");
         Localized = LocalizationManager.GetLocalizedStrings();
         LocalizationManager.LanguageChanged += (_, _) =>

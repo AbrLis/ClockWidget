@@ -42,7 +42,7 @@ namespace ClockWidgetApp.ViewModels
                     _isEnabled = value;
                     if (!_isEnabled)
                         NextTriggerDateTime = null;
-                    OnPropertyChanged(nameof(IsEnabled));
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(IsStartAvailable));
                     OnPropertyChanged(nameof(IsStopAvailable));
                     OnPropertyChanged(nameof(NextTriggerDateTime));

@@ -5,7 +5,6 @@ using System.Windows.Media;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
 using ClockWidgetApp.Services;
-using Microsoft.Extensions.Logging;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -21,8 +20,6 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     private readonly IAppDataService _appDataService;
     /// <summary>Главный ViewModel приложения.</summary>
     private readonly MainWindowViewModel _mainViewModel;
-    /// <summary>Логгер.</summary>
-    private readonly ILogger<AnalogClockViewModel> _logger;
     /// <summary>Трансформация часовой стрелки.</summary>
     private TransformGroup _hourHandTransform;
     /// <summary>Трансформация минутной стрелки.</summary>
@@ -35,10 +32,9 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     private bool _disposed;
     /// <summary>Флаг активного перемещения окна.</summary>
     private bool _isDragging;
-    /// <summary>Точка начала drag&drop.</summary>
+    /// <summary>Точка начала drag and drop.</summary>
     private System.Windows.Point _dragStartPoint;
-    /// <summary>Сервис управления окнами.</summary>
-    private readonly IWindowService? _windowService;
+
     #endregion
 
     /// <summary>Команда открытия окна настроек.</summary>
@@ -83,13 +79,12 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="AnalogClockViewModel"/>.
     /// </summary>
-    public AnalogClockViewModel(ITimeService timeService, IAppDataService appDataService, MainWindowViewModel mainViewModel, ILogger<AnalogClockViewModel> logger, IWindowService? windowService = null)
+    public AnalogClockViewModel(ITimeService timeService, IAppDataService appDataService, MainWindowViewModel mainViewModel, IWindowService? windowService = null)
     {
-        _logger = logger;
         _timeService = timeService;
         _appDataService = appDataService;
         _mainViewModel = mainViewModel;
-        _windowService = windowService;
+        var windowService1 = windowService;
         _hourHandTransform = new TransformGroup();
         _minuteHandTransform = new TransformGroup();
         _secondHandTransform = new TransformGroup();
@@ -97,7 +92,7 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         _timeService.TimeUpdated += OnTimeUpdated;
         OnTimeUpdated(this, DateTime.Now);
         _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-        OpenSettingsCommand = new RelayCommand(_ => _windowService?.OpenSettingsWindow());
+        OpenSettingsCommand = new RelayCommand(_ => windowService1?.OpenSettingsWindow());
     }
 
     /// <summary>Получает сохраненную позицию окна.</summary>

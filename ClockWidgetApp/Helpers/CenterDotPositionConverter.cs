@@ -27,22 +27,21 @@ public class CenterDotPositionConverter : IValueConverter
     /// <param name="parameter">Параметр конвертации.</param>
     /// <param name="culture">Культура.</param>
     /// <returns>Преобразованное значение.</returns>
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is double centerCoordinate)
         {
             // Вычитаем половину размера центральной точки для правильного позиционирования
             return centerCoordinate - AnalogClockConstants.ClockDimensions.CENTER_DOT_SIZE / 2;
         }
-        
         return value;
     }
 
     /// <summary>
     /// Обратная конвертация (не используется).
     /// </summary>
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException("ConvertBack is not implemented for CenterDotPositionConverter");
     }
-} 
+}

@@ -1,7 +1,6 @@
 namespace ClockWidgetApp.Services
 {
-    using System.Collections.Specialized;
-    using ClockWidgetApp.Models;
+    using Models;
     using System.Linq;
     using System;
     using System.Collections.Generic;
@@ -20,8 +19,6 @@ namespace ClockWidgetApp.Services
         private readonly string _settingsFilePath;
         /// <summary>Путь к файлу таймеров и будильников.</summary>
         private readonly string _timersFilePath;
-        /// <summary>Сервис работы с файловой системой.</summary>
-        private readonly IFileSystemService _fileSystemService;
         /// <summary>Репозиторий для настроек виджета.</summary>
         private readonly Data.SingleObjectJsonRepository<WidgetSettings> _settingsRepository;
         /// <summary>Репозиторий для таймеров и будильников.</summary>
@@ -50,7 +47,6 @@ namespace ClockWidgetApp.Services
         {
             _settingsFilePath = settingsFilePath;
             _timersFilePath = timersFilePath;
-            _fileSystemService = fileSystemService;
             _settingsRepository = new Data.SingleObjectJsonRepository<WidgetSettings>(fileSystemService, settingsFilePath);
             _timersRepository = new Data.SingleObjectJsonRepository<TimersAndAlarmsPersistModel>(fileSystemService, timersFilePath);
             SubscribeToCollections();
@@ -60,7 +56,7 @@ namespace ClockWidgetApp.Services
 
         #region Public Properties
         /// <inheritdoc/>
-        public AppDataModel Data { get; private set; } = new AppDataModel();
+        public AppDataModel Data { get; } = new();
         #endregion
 
         #region Public Methods
@@ -169,8 +165,8 @@ namespace ClockWidgetApp.Services
         /// </summary>
         public async Task FlushPendingSavesAsync()
         {
-            _settingsSaveDebounceCts?.Cancel();
-            _timersSaveDebounceCts?.Cancel();
+            await _settingsSaveDebounceCts?.CancelAsync()!;
+            await _timersSaveDebounceCts?.CancelAsync()!;
             await SaveAsync();
         }
         #endregion
@@ -219,19 +215,17 @@ namespace ClockWidgetApp.Services
         /// </summary>
         private void SubscribeToCollections()
         {
-            Data.Timers.CollectionChanged += (s, e) => { OnCollectionChanged(s, e); ScheduleTimersAndAlarmsSave(); };
-            Data.Alarms.CollectionChanged += (s, e) => { OnCollectionChanged(s, e); ScheduleTimersAndAlarmsSave(); };
-            Data.LongTimers.CollectionChanged += (s, e) => { OnCollectionChanged(s, e); ScheduleTimersAndAlarmsSave(); };
+            Data.Timers.CollectionChanged += (s, _) => { OnCollectionChanged(s); ScheduleTimersAndAlarmsSave(); };
+            Data.Alarms.CollectionChanged += (s, _) => { OnCollectionChanged(s); ScheduleTimersAndAlarmsSave(); };
+            Data.LongTimers.CollectionChanged += (s, _) => { OnCollectionChanged(s); ScheduleTimersAndAlarmsSave(); };
             SubscribeToWidgetSettings();
         }
 
         private void SubscribeToWidgetSettings()
         {
-            if (Data.WidgetSettings is INotifyPropertyChanged npc)
-            {
-                npc.PropertyChanged -= WidgetSettings_PropertyChanged;
-                npc.PropertyChanged += WidgetSettings_PropertyChanged;
-            }
+            if (Data.WidgetSettings is not INotifyPropertyChanged npc) return;
+            npc.PropertyChanged -= WidgetSettings_PropertyChanged;
+            npc.PropertyChanged += WidgetSettings_PropertyChanged;
         }
 
         private void WidgetSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -242,7 +236,7 @@ namespace ClockWidgetApp.Services
         /// <summary>
         /// Обработчик изменения коллекций таймеров/будильников/длинных таймеров.
         /// </summary>
-        private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void OnCollectionChanged(object? sender)
         {
             if (sender == Data.Timers)
                 TimersChanged?.Invoke(this, EventArgs.Empty);
@@ -269,7 +263,7 @@ namespace ClockWidgetApp.Services
                     target.RemoveAt(i);
             }
             // Добавляем и обновляем
-            for (int i = 0; i < source.Count; i++)
+            for (var i = 0; i < source.Count; i++)
             {
                 var src = source[i];
                 var existing = target.FirstOrDefault(t => equals(t, src));
@@ -283,7 +277,7 @@ namespace ClockWidgetApp.Services
                 }
                 else
                 {
-                    int oldIndex = target.IndexOf(existing);
+                    var oldIndex = target.IndexOf(existing);
                     // Перемещаем только если оба индекса валидны и отличаются
                     if (oldIndex != i && oldIndex >= 0 && i >= 0 && i < target.Count)
                     {
@@ -300,9 +294,9 @@ namespace ClockWidgetApp.Services
         {
             try
             {
-                int oldTimers = Data.Timers.Count;
-                int oldAlarms = Data.Alarms.Count;
-                int oldLongTimers = Data.LongTimers.Count;
+                var oldTimers = Data.Timers.Count;
+                var oldAlarms = Data.Alarms.Count;
+                var oldLongTimers = Data.LongTimers.Count;
 
                 // Сравнение теперь по уникальному идентификатору Id
                 UpdateCollection(Data.Timers, model.Timers, (a, b) => a.Id == b.Id);
@@ -327,7 +321,7 @@ namespace ClockWidgetApp.Services
                 _settingsRepository.SaveAsync(Data.WidgetSettings).GetAwaiter().GetResult();
                 Serilog.Log.Information($"[AppDataService] Настройки успешно сохранены (репозиторий): {_settingsFilePath}");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Serilog.Log.Error(ex, $"[AppDataService] Ошибка сохранения настроек: {_settingsFilePath}");
             }
@@ -343,7 +337,7 @@ namespace ClockWidgetApp.Services
                 await _settingsRepository.SaveAsync(Data.WidgetSettings);
                 Serilog.Log.Debug($"[AppDataService] Настройки успешно сохранены (репозиторий): {_settingsFilePath}");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Serilog.Log.Error(ex, $"[AppDataService] Ошибка сохранения настроек: {_settingsFilePath}");
             }
@@ -358,38 +352,38 @@ namespace ClockWidgetApp.Services
             {
                 var timersModel = new TimersAndAlarmsPersistModel
                 {
-                    Timers = new System.Collections.Generic.List<TimerPersistModel>(Data.Timers),
-                    Alarms = new System.Collections.Generic.List<AlarmPersistModel>(Data.Alarms),
-                    LongTimers = new System.Collections.Generic.List<LongTimerPersistModel>(Data.LongTimers)
+                    Timers = [..Data.Timers],
+                    Alarms = [..Data.Alarms],
+                    LongTimers = new List<LongTimerPersistModel>(Data.LongTimers)
                 };
                 _timersRepository.SaveAsync(timersModel).GetAwaiter().GetResult();
-                Serilog.Log.Information($"[AppDataService] Таймеры и будильники успешно сохранены (репозиторий): {_timersFilePath}");
+                Serilog.Log.Information("[AppDataService] Таймеры и будильники успешно сохранены (репозиторий): {TimersFilePath}", _timersFilePath);
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex, $"[AppDataService] Ошибка сохранения timers/alarms в репозиторий: {_timersFilePath}");
+                Serilog.Log.Error(ex, "[AppDataService] Ошибка сохранения timers/alarms в репозиторий: {TimersFilePath}", _timersFilePath);
             }
         }
 
         /// <summary>
         /// Асинхронно сохраняет таймеры и будильники с резервным копированием и логированием.
         /// </summary>
-        public async Task SaveTimersAndAlarmsAsync()
+        private async Task SaveTimersAndAlarmsAsync()
         {
             try
             {
                 var timersModel = new TimersAndAlarmsPersistModel
                 {
-                    Timers = new System.Collections.Generic.List<TimerPersistModel>(Data.Timers),
-                    Alarms = new System.Collections.Generic.List<AlarmPersistModel>(Data.Alarms),
-                    LongTimers = new System.Collections.Generic.List<LongTimerPersistModel>(Data.LongTimers)
+                    Timers = [..Data.Timers],
+                    Alarms = [..Data.Alarms],
+                    LongTimers = new List<LongTimerPersistModel>(Data.LongTimers)
                 };
                 await _timersRepository.SaveAsync(timersModel);
-                Serilog.Log.Information($"[AppDataService] Асинхронное сохранение timers/alarms в репозиторий: {_timersFilePath}");
+                Serilog.Log.Information("[AppDataService] Асинхронное сохранение timers/alarms в репозиторий: {TimersFilePath}", _timersFilePath);
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex, $"[AppDataService] Ошибка сохранения timers/alarms в репозиторий: {_timersFilePath}");
+                Serilog.Log.Error(ex, "[AppDataService] Ошибка сохранения timers/alarms в репозиторий: {TimersFilePath}", _timersFilePath);
             }
         }
         #endregion

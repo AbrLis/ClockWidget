@@ -50,12 +50,8 @@ namespace ClockWidgetApp.Helpers
                 )
             );
             services.AddSingleton<ApplicationLifecycleService>(sp =>
-                new ApplicationLifecycleService(
-                    sp,
-                    sp.GetRequiredService<ILogger<ApplicationLifecycleService>>(),
-                    sp.GetRequiredService<IAppDataService>(),
-                    sp.GetRequiredService<ITimeService>(),
-                    sp.GetRequiredService<TimersAndAlarmsViewModel>()
+                new ApplicationLifecycleService(sp.GetRequiredService<ILogger<ApplicationLifecycleService>>(),
+                    sp.GetRequiredService<ITimeService>()
                 )
             );
             services.AddTransient<SettingsWindowViewModel>(sp =>
@@ -71,7 +67,6 @@ namespace ClockWidgetApp.Helpers
                     sp.GetRequiredService<ITimeService>(),
                     sp.GetRequiredService<IAppDataService>(),
                     sp.GetRequiredService<MainWindowViewModel>(),
-                    sp.GetRequiredService<ILogger<AnalogClockViewModel>>(),
                     sp.GetRequiredService<IWindowService>()
                 )
             );

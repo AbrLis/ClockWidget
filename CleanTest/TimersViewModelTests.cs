@@ -62,7 +62,7 @@ public class TimersViewModelTests
     [Fact]
     public void TimerEntryViewModel_StartStop_ShouldChangeIsRunning()
     {
-        var timer = new TimerEntryViewModel(TimeSpan.FromSeconds(5));
+        var timer = new TimerEntryViewModel(new TimerPersistModel { Duration = TimeSpan.FromSeconds(5) });
         Assert.False(timer.IsRunning);
         timer.StartCommand.Execute(null);
         Assert.True(timer.IsRunning);

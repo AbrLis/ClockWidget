@@ -5,47 +5,19 @@ namespace ClockWidgetApp.Helpers;
 /// </summary>
 public static class Constants
 {
-    /// <summary>
-    /// Интервал автосохранения (в минутах) для AppDataService.
-    /// </summary>
-    public const int DEFAULT_AUTO_SAVE_INTERVAL_MINUTES = 3;
-
     // Свойства для доступа из XAML
     public static double MIN_WINDOW_OPACITY => WindowSettings.MIN_WINDOW_OPACITY;
     public static double MAX_WINDOW_OPACITY => WindowSettings.MAX_WINDOW_OPACITY;
     public static double OPACITY_STEP => WindowSettings.OPACITY_STEP;
-    public static double DEFAULT_WINDOW_LEFT => WindowSettings.DEFAULT_WINDOW_LEFT;
-    public static double DEFAULT_WINDOW_TOP => WindowSettings.DEFAULT_WINDOW_TOP;
-    public static double DEFAULT_ANALOG_CLOCK_LEFT => WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
-    public static double DEFAULT_ANALOG_CLOCK_TOP => WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
-    public static double DEFAULT_ANALOG_CLOCK_SIZE => WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
     public static double MIN_ANALOG_CLOCK_SIZE => WindowSettings.MIN_ANALOG_CLOCK_SIZE;
     public static double MAX_ANALOG_CLOCK_SIZE => WindowSettings.MAX_ANALOG_CLOCK_SIZE;
     public static double ANALOG_CLOCK_SIZE_STEP => WindowSettings.ANALOG_CLOCK_SIZE_STEP;
 
     public static double MIN_TEXT_OPACITY => TextSettings.MIN_TEXT_OPACITY;
     public static double MAX_TEXT_OPACITY => TextSettings.MAX_TEXT_OPACITY;
-    public static double DEFAULT_TEXT_OPACITY => TextSettings.DEFAULT_TEXT_OPACITY;
     public static double MIN_FONT_SIZE => TextSettings.MIN_FONT_SIZE;
     public static double MAX_FONT_SIZE => TextSettings.MAX_FONT_SIZE;
     public static double FONT_SIZE_STEP => TextSettings.FONT_SIZE_STEP;
-
-    public static bool DEFAULT_SHOW_SECONDS => DisplaySettings.DEFAULT_SHOW_SECONDS;
-    public static string TIME_FORMAT_WITH_SECONDS => DisplaySettings.TIME_FORMAT_WITH_SECONDS;
-    public static string TIME_FORMAT_WITHOUT_SECONDS => DisplaySettings.TIME_FORMAT_WITHOUT_SECONDS;
-
-    public static string SETTINGS_FILENAME => FileSettings.SETTINGS_FILENAME;
-
-    public static bool DEFAULT_CUCKOO_EVERY_HOUR => CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
-
-    /// <summary>
-    /// Минимально допустимый год для длинного таймера (текущий год).
-    /// </summary>
-    public static int LongTimerMinYear => DateTime.Now.Year;
-    /// <summary>
-    /// Максимально допустимый год для длинного таймера.
-    /// </summary>
-    public const int LongTimerMaxYear = 2090;
 
     /// <summary>
     /// Максимальная длина названия длинного таймера.
@@ -203,18 +175,6 @@ public static class Constants
         /// </summary>
         public const string TIME_FORMAT_WITHOUT_SECONDS = "HH:mm";
     }
-
-    /// <summary>
-    /// Настройки файлов.
-    /// </summary>
-    public static class FileSettings
-    {
-        /// <summary>
-        /// Имя файла настроек.
-        /// </summary>
-        public const string SETTINGS_FILENAME = "widget_settings.json";
-    }
-
     /// <summary>
     /// Настройки кукушки.
     /// </summary>

@@ -1,8 +1,12 @@
+using System.Windows;
+using ClockWidgetApp.Helpers;
+using ClockWidgetApp.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Application = System.Windows.Application;
+
 namespace ClockWidgetApp.Services
 {
-    using ClockWidgetApp.Helpers;
-    using Microsoft.Extensions.DependencyInjection;
-
     /// <summary>
     /// Сервис для централизованного управления всеми окнами приложения (открытие, скрытие, активация, получение экземпляров).
     /// Гарантирует единственность экземпляров окон, скрытие вместо закрытия, и централизованный доступ.
@@ -12,11 +16,11 @@ namespace ClockWidgetApp.Services
     {
         #region Private Fields
         /// <summary>Экземпляр главного окна.</summary>
-        private MainWindow? _mainWindow = null;
+        private MainWindow? _mainWindow;
         /// <summary>Экземпляр окна аналоговых часов.</summary>
-        private AnalogClockWindow? _analogClockWindow = null;
+        private AnalogClockWindow? _analogClockWindow;
         /// <summary>Экземпляр окна настроек.</summary>
-        private SettingsWindow? _settingsWindow = null;
+        private SettingsWindow? _settingsWindow;
         #endregion
 
         #region Открытие и скрытие окон
@@ -26,13 +30,13 @@ namespace ClockWidgetApp.Services
             if (_mainWindow == null)
             {
                 // Получаем зависимости через DI
-                var services = ((App)System.Windows.Application.Current).Services;
-                var viewModel = services.GetRequiredService<ClockWidgetApp.ViewModels.MainWindowViewModel>();
-                var logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger<MainWindow>>();
+                var services = ((App)Application.Current).Services;
+                var viewModel = services.GetRequiredService<MainWindowViewModel>();
+                var logger = services.GetRequiredService<ILogger<MainWindow>>();
                 _mainWindow = new MainWindow(viewModel, logger);
                 // При попытке закрытия окна — скрываем его, не уничтожая
-                _mainWindow.Closing += (s, e) => { e.Cancel = true; _mainWindow.Hide(); };
-                _mainWindow.Closed += (s, e) => _mainWindow = null;
+                _mainWindow.Closing += (_, e) => { e.Cancel = true; _mainWindow.Hide(); };
+                _mainWindow.Closed += (_, _) => _mainWindow = null;
                 _mainWindow.Show();
             }
             else
@@ -56,17 +60,17 @@ namespace ClockWidgetApp.Services
             if (_analogClockWindow == null)
             {
                 // Получаем зависимости через DI
-                var services = ((App)System.Windows.Application.Current).Services;
-                var analogVm = services.GetRequiredService<ClockWidgetApp.ViewModels.AnalogClockViewModel>();
-                var mainVm = services.GetRequiredService<ClockWidgetApp.ViewModels.MainWindowViewModel>();
-                var logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AnalogClockWindow>>();
+                var services = ((App)Application.Current).Services;
+                var analogVm = services.GetRequiredService<AnalogClockViewModel>();
+                var mainVm = services.GetRequiredService<MainWindowViewModel>();
+                var logger = services.GetRequiredService<ILogger<AnalogClockWindow>>();
                 _analogClockWindow = new AnalogClockWindow(analogVm, mainVm, logger);
                 _analogClockWindow.Width = mainVm.AnalogClockSize;
                 _analogClockWindow.Height = mainVm.AnalogClockSize;
                 _analogClockWindow.Topmost = mainVm.AnalogClockTopmost;
                 // При попытке закрытия окна — скрываем его, не уничтожая
-                _analogClockWindow.Closing += (s, e) => { e.Cancel = true; _analogClockWindow.Hide(); };
-                _analogClockWindow.Closed += (s, e) => _analogClockWindow = null;
+                _analogClockWindow.Closing += (_, e) => { e.Cancel = true; _analogClockWindow.Hide(); };
+                _analogClockWindow.Closed += (_, _) => _analogClockWindow = null;
                 _analogClockWindow.Show();
             }
             else
@@ -90,25 +94,21 @@ namespace ClockWidgetApp.Services
             // Если окно ещё не создано (или не внедрено) — создаём его
             if (_settingsWindow == null)
             {
-                var services = ((App)System.Windows.Application.Current).Services;
-                var settingsVm = services.GetRequiredService<ClockWidgetApp.ViewModels.SettingsWindowViewModel>();
-                var timersAndAlarmsVm = services.GetRequiredService<ClockWidgetApp.ViewModels.TimersAndAlarmsViewModel>();
-                var logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SettingsWindow>>();
+                var services = ((App)Application.Current).Services;
+                var settingsVm = services.GetRequiredService<SettingsWindowViewModel>();
+                var timersAndAlarmsVm = services.GetRequiredService<TimersAndAlarmsViewModel>();
+                var logger = services.GetRequiredService<ILogger<SettingsWindow>>();
                 _settingsWindow = new SettingsWindow(settingsVm, timersAndAlarmsVm, logger);
                 // При попытке закрытия окна — скрываем его, не уничтожая
-                _settingsWindow.Closing += (s, e) => { e.Cancel = true; _settingsWindow.Hide(); };
-                _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+                _settingsWindow.Closing += (_, e) => { e.Cancel = true; _settingsWindow.Hide(); };
+                _settingsWindow.Closed += (_, _) => _settingsWindow = null;
             }
             _settingsWindow.Show();
             _settingsWindow.Activate();
             // Устанавливаем флаг в MainWindow
-            if (_settingsWindow != null && System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            if (_settingsWindow != null && Application.Current.MainWindow is MainWindow mainWindow)
             {
-                /// <summary>
-                /// Устанавливает флаг открытия окна настроек во ViewModel главного окна.
-                /// </summary>
-                if (mainWindow.ViewModel != null)
-                    mainWindow.ViewModel.IsSettingsWindowOpen = true;
+                mainWindow.ViewModel.IsSettingsWindowOpen = true;
             }
         }
 
@@ -136,7 +136,7 @@ namespace ClockWidgetApp.Services
         /// <summary>Активирует все окна приложения (выводит на передний план).</summary>
         public void BringAllToFront()
         {
-            void BringToFront(System.Windows.Window? window)
+            void BringToFront(Window? window)
             {
                 if (window == null || !window.IsVisible)
                     return;
@@ -158,8 +158,7 @@ namespace ClockWidgetApp.Services
             if (_settingsWindow != null)
             {
                 var vm = _settingsWindow.ViewModel;
-                if (vm != null)
-                    vm.SelectedTabIndex = selectTimersTab ? Constants.SETTINGS_TAB_INDEX_TIMERS : Constants.SETTINGS_TAB_INDEX_GENERAL;
+                vm.SelectedTabIndex = selectTimersTab ? Constants.SETTINGS_TAB_INDEX_TIMERS : Constants.SETTINGS_TAB_INDEX_GENERAL;
             }
         }
 
