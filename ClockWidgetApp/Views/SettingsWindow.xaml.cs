@@ -184,7 +184,9 @@ public partial class SettingsWindow : Window
     {
         if (sender is System.Windows.Controls.Border border && border.DataContext is LongTimerEntryViewModel timer)
         {
-            _timersAndAlarmsViewModel.LongTimersVm.EditLongTimer(timer);
+            // Получаем позицию мыши в экранных координатах
+            var point = border.PointToScreen(e.GetPosition(border));
+            _timersAndAlarmsViewModel.LongTimersVm.EditLongTimer(timer, point);
         }
     }
 
