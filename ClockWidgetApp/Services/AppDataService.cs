@@ -198,7 +198,7 @@ namespace ClockWidgetApp.Services
         /// <summary>
         /// Планирует автосохранение только timers/alarms с debounce.
         /// </summary>
-        private void ScheduleTimersAndAlarmsSave()
+        public void ScheduleTimersAndAlarmsSave()
         {
             _timersSaveDebounceCts?.Cancel();
             _timersSaveDebounceCts = new CancellationTokenSource();
@@ -367,7 +367,7 @@ namespace ClockWidgetApp.Services
         /// <summary>
         /// Асинхронно сохраняет таймеры и будильники с резервным копированием и логированием.
         /// </summary>
-        private async Task SaveTimersAndAlarmsAsync()
+        public async Task SaveTimersAndAlarmsAsync()
         {
             try
             {
@@ -377,9 +377,8 @@ namespace ClockWidgetApp.Services
                     Alarms = new System.Collections.Generic.List<AlarmPersistModel>(Data.Alarms),
                     LongTimers = new System.Collections.Generic.List<LongTimerPersistModel>(Data.LongTimers)
                 };
-                Serilog.Log.Debug($"[AppDataService] Перед сохранением timers/alarms: {_timersFilePath}");
                 await _timersRepository.SaveAsync(timersModel);
-                Serilog.Log.Debug($"[AppDataService] После сохранения timers/alarms: {_timersFilePath}");
+                Serilog.Log.Information($"[AppDataService] Асинхронное сохранение timers/alarms в репозиторий: {_timersFilePath}");
             }
             catch (Exception ex)
             {

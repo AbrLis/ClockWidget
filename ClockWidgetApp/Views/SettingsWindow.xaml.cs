@@ -177,5 +177,16 @@ public partial class SettingsWindow : Window
         }
     }
 
+    /// <summary>
+    /// Клик по длинному таймеру для редактирования.
+    /// </summary>
+    private void LongTimerItem_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Border border && border.DataContext is LongTimerEntryViewModel timer)
+        {
+            _timersAndAlarmsViewModel.LongTimersVm.EditLongTimer(timer);
+        }
+    }
+
     #endregion
 }

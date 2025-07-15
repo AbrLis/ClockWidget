@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using ClockWidgetApp.Services;
 using ClockWidgetApp.Views;
+using ClockWidgetApp.Models;
 
 namespace ClockWidgetApp.ViewModels;
 
@@ -20,12 +21,17 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     private bool _disposed;
 
     /// <summary>
+    /// Persist-модель, связанная с этим ViewModel.
+    /// </summary>
+    private readonly LongTimerPersistModel _persistModel;
+
+    /// <summary>
     /// Дата и время срабатывания таймера.
     /// </summary>
     public DateTime TargetDateTime
     {
         get => _targetDateTime;
-        set { _targetDateTime = value; OnPropertyChanged(); }
+        set { _targetDateTime = value; _persistModel.TargetDateTime = value; OnPropertyChanged(); }
     }
     private DateTime _targetDateTime;
 
@@ -95,25 +101,28 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     public string Name
     {
         get => _name;
-        set { _name = value; OnPropertyChanged(); }
+        set { _name = value; _persistModel.Name = value; OnPropertyChanged(); }
     }
     private string _name = string.Empty;
 
-    public LongTimerEntryViewModel(DateTime targetDateTime, ISoundService soundService, string name = "")
+    /// <summary>
+    /// Конструктор ViewModel для длинного таймера. Принимает persist-модель и сохраняет на неё ссылку.
+    /// </summary>
+    public LongTimerEntryViewModel(LongTimerPersistModel model, ISoundService soundService)
     {
-        TargetDateTime = targetDateTime;
-        _initialTargetDateTime = targetDateTime;
-        var soundService1 = soundService;
-        Name = name;
+        _persistModel = model;
+        TargetDateTime = model.TargetDateTime;
+        _initialTargetDateTime = model.TargetDateTime;
+        Name = model.Name;
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _uiTimer.Tick += (s, _) =>
         {
             OnPropertyChanged(nameof(Remaining));
             OnPropertyChanged(nameof(DisplayTime));
-            OnPropertyChanged(nameof(TrayTooltip)); // Обновляем тултип для трея
+            OnPropertyChanged(nameof(TrayTooltip));
             if (_notified || Remaining > TimeSpan.Zero) return;
             _notified = true;
-            _notificationWindow ??= ShowLongTimerNotification(soundService1, Name, TargetDateTime, () =>
+            _notificationWindow ??= ShowLongTimerNotification(soundService, Name, TargetDateTime, () =>
             {
                 _notificationWindow = null;
                 RequestExpire?.Invoke(this);
@@ -155,7 +164,10 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    /// <summary>
+    /// Уведомляет об изменении свойства для биндинга.
+    /// </summary>
+    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>

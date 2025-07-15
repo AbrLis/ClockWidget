@@ -462,7 +462,7 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
-                                            <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,4" ToolTip="{Binding SettingsTooltip}">
+                                            <Border CornerRadius="6" BorderThickness="2" BorderBrush="#A5D6A7" Margin="0,0,0,4" ToolTip="{Binding SettingsTooltip}" MouseLeftButtonDown="LongTimerItem_MouseLeftButtonDown">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Setter Property="Background" Value="#F1F8E9"/>
