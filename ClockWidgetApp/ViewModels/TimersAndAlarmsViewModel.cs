@@ -71,6 +71,11 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             Localized = LocalizationManager.GetLocalizedStrings();
             OnPropertyChanged(nameof(Localized));
         };
+        // После инициализации _trayIconManager подписываем все будильники и добавляем иконки для активных
+        foreach (var alarm in AlarmsVm.Alarms)
+        {
+            SubscribeAlarm(alarm);
+        }
     }
     #endregion
 
@@ -165,6 +170,7 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         {
             foreach (AlarmEntryViewModel a in e.OldItems)
             {
+                a.OnTrayStateChanged = null;
                 RemoveAlarmTray(a);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалён будильник: {a.AlarmTime}");
             }
@@ -213,10 +219,26 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
     private void AddAlarmTray(AlarmEntryViewModel alarm)
     {
+        if (alarm == null)
+        {
+            Serilog.Log.Error("[TimersAndAlarmsViewModel] AddAlarmTray: alarm is null");
+            return;
+        }
+        if (_trayIconManager == null)
+        {
+            Serilog.Log.Error("[TimersAndAlarmsViewModel] AddAlarmTray: _trayIconManager is null");
+            return;
+        }
         var id = GetAlarmId(alarm);
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "alarm.ico");
+        if (string.IsNullOrEmpty(iconPath) || !System.IO.File.Exists(iconPath))
+        {
+            Serilog.Log.Error($"[TimersAndAlarmsViewModel] AddAlarmTray: iconPath is invalid or file does not exist: {iconPath}");
+            return;
+        }
         var left = alarm.NextTriggerDateTime.HasValue ? alarm.NextTriggerDateTime.Value - DateTime.Now : TimeSpan.Zero;
-        var text = left > TimeSpan.Zero ? left.ToString(@"hh\:mm\:ss") : "00:00:00";
+        string text = left > TimeSpan.Zero ? left.ToString(@"hh\:mm\:ss") : "00:00:00";
+        Serilog.Log.Debug($"[TimersAndAlarmsViewModel] AddAlarmTray: id={id}, iconPath={iconPath}, text={text}");
         _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, text);
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для будильника: {id}");
     }
@@ -258,18 +280,16 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
 
     private void SubscribeAlarm(AlarmEntryViewModel alarm)
     {
-        bool lastEnabled = alarm.IsEnabled;
-        alarm.PropertyChanged += (_, e) =>
+        alarm.OnTrayStateChanged = (a, enabled) =>
         {
-            if (e.PropertyName != nameof(alarm.IsEnabled)) return;
-            if (alarm.IsEnabled == lastEnabled) return;
-            lastEnabled = alarm.IsEnabled;
-            if (alarm.IsEnabled)
-                AddAlarmTray(alarm);
+            if (enabled)
+                AddAlarmTray(a);
             else
-                RemoveAlarmTray(alarm);
+                RemoveAlarmTray(a);
         };
-        if (alarm.IsEnabled) AddAlarmTray(alarm);
+        // Если будильник включён при инициализации — отобразить иконку
+        if (alarm.IsEnabled)
+            alarm.OnTrayStateChanged.Invoke(alarm, true);
     }
 
     /// <summary>

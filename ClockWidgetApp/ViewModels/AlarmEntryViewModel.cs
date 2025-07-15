@@ -40,12 +40,14 @@ namespace ClockWidgetApp.ViewModels
                 if (_isEnabled != value)
                 {
                     _isEnabled = value;
+                    OnTrayStateChanged?.Invoke(this, _isEnabled);
                     if (!_isEnabled)
                         NextTriggerDateTime = null;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(IsStartAvailable));
                     OnPropertyChanged(nameof(IsStopAvailable));
                     OnPropertyChanged(nameof(NextTriggerDateTime));
+                    OnStateChanged?.Invoke(); // Автосохранение состояния
                 }
             }
         }
@@ -53,6 +55,15 @@ namespace ClockWidgetApp.ViewModels
         /// Дата и время следующего срабатывания будильника (если включён).
         /// </summary>
         public DateTime? NextTriggerDateTime { get; private set; }
+
+        /// <summary>
+        /// Делегат, вызываемый при изменении состояния активности будильника (для автосохранения).
+        /// </summary>
+        public Action? OnStateChanged { get; set; }
+        /// <summary>
+        /// Делегат, вызываемый при изменении состояния активности будильника для управления иконкой трея.
+        /// </summary>
+        public Action<AlarmEntryViewModel, bool>? OnTrayStateChanged { get; set; }
 
         /// <summary>
         /// Команда для включения будильника.
