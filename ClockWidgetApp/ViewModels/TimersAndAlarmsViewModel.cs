@@ -59,9 +59,9 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         AlarmsVm.Alarms.CollectionChanged += Alarms_CollectionChanged;
         foreach (var longTimer in LongTimersVm.LongTimers)
         {
-            AddLongTimerTray(longTimer);
             longTimer.RequestExpire += OnLongTimerExpired;
         }
+        UpdateLongTimersTrayIcon();
         LongTimersVm.LongTimers.CollectionChanged += LongTimers_CollectionChanged;
         _trayUpdateTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _trayUpdateTimer.Tick += (_, _) => UpdateTrayTooltips();
@@ -225,19 +225,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _trayIconManager.RemoveTrayIcon(GetAlarmId(alarm));
         Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для будильника: {alarm.AlarmTime}");
     }
-    private void AddLongTimerTray(LongTimerEntryViewModel timer)
-    {
-        var id = GetLongTimerId(timer);
-        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icons", "long.ico");
-        _trayIconManager.AddOrUpdateTrayIcon(id, iconPath, timer.TrayTooltip);
-        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлена иконка трея для длинного таймера: {timer.Name} ({timer.TargetDateTime})");
-    }
-    private void RemoveLongTimerTray(LongTimerEntryViewModel timer)
-    {
-        _trayIconManager.RemoveTrayIcon(GetLongTimerId(timer));
-        timer.Dispose(); // Освобождаем ресурсы
-        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Удалена иконка трея для длинного таймера: {timer.Name} ({timer.TargetDateTime})");
-    }
     #endregion
 
     #region Long timer event handlers
@@ -257,7 +244,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private async Task RemoveAndPersistLongTimerAsync(LongTimerEntryViewModel timer)
     {
-        RemoveLongTimerTray(timer);
         LongTimersVm.LongTimers.Remove(timer);
         // Удаляем из persist-модели
         var persist = LongTimersVm.LongTimerModels.FirstOrDefault(m => m.TargetDateTime == timer.TargetDateTime && m.Name == timer.Name);
@@ -321,7 +307,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
             var longTimer = LongTimersVm.LongTimers.FirstOrDefault(t => GetLongTimerId(t) == id);
             if (longTimer != null)
             {
-                RemoveLongTimerTray(longTimer);
                 LongTimersVm.LongTimers.Remove(longTimer);
             }
         }
