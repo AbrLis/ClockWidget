@@ -257,7 +257,7 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
             {
                 _logger.LogInformation($"[SettingsWindowViewModel] Пользователь подтвердил удаление длинного таймера: {timer.Name} ({timer.TargetDateTime})");
                 timer.Dispose();
-                var persist = LongTimersVm.LongTimerModels.FirstOrDefault(m => m.TargetDateTime == timer.TargetDateTime && m.Name == timer.Name);
+                var persist = LongTimersVm.LongTimerModels.FirstOrDefault(m => m.Id == timer.Model.Id);
                 if (persist != null)
                     LongTimersVm.LongTimerModels.Remove(persist);
             }
@@ -276,8 +276,8 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         if (obj is TimerEntryViewModel timer)
         {
             TimersVm.TimerEntries.Remove(timer);
-            // Также удаляем из PersistModel
-            var persist = TimersVm.Timers.FirstOrDefault(m => m.Duration == timer.Duration);
+            // Теперь удаляем по Id
+            var persist = TimersVm.Timers.FirstOrDefault(m => m.Id == timer.Model.Id);
             if (persist != null)
                 TimersVm.Timers.Remove(persist);
         }
@@ -291,10 +291,8 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
         if (obj is AlarmEntryViewModel alarm)
         {
             AlarmsVm.Alarms.Remove(alarm);
-            var persist = AlarmsVm.AlarmModels.FirstOrDefault(m =>
-                m.AlarmTime == alarm.AlarmTime &&
-                m.IsEnabled == alarm.IsEnabled &&
-                m.NextTriggerDateTime == alarm.NextTriggerDateTime);
+            // Теперь удаляем по Id
+            var persist = AlarmsVm.AlarmModels.FirstOrDefault(m => m.Id == alarm.Model.Id);
             if (persist != null)
                 AlarmsVm.AlarmModels.Remove(persist);
         }

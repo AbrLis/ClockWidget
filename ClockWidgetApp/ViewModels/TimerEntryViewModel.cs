@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Timers;
 using ClockWidgetApp.Services;
+using ClockWidgetApp.Models;
 
 namespace ClockWidgetApp.ViewModels
 {
@@ -29,10 +30,6 @@ namespace ClockWidgetApp.ViewModels
         /// </summary>
         private bool _isWidgetVisible = true;
         /// <summary>
-        /// Длительность таймера.
-        /// </summary>
-        private TimeSpan _duration;
-        /// <summary>
         /// Активен ли таймер.
         /// </summary>
         private bool _isActive = true;
@@ -40,13 +37,23 @@ namespace ClockWidgetApp.ViewModels
 
         #region Constructors
         /// <summary>
+        /// Persist-модель, связанная с этим ViewModel.
+        /// </summary>
+        public TimerPersistModel Model { get; }
+
+        /// <summary>
+        /// Уникальный идентификатор таймера.
+        /// </summary>
+        public Guid Id => Model.Id;
+
+        /// <summary>
         /// Конструктор TimerEntryViewModel.
         /// </summary>
-        /// <param name="duration">Длительность таймера.</param>
-        public TimerEntryViewModel(TimeSpan duration)
+        public TimerEntryViewModel(TimerPersistModel model)
         {
-            Duration = duration;
-            Remaining = duration;
+            Model = model;
+            Duration = model.Duration;
+            Remaining = model.Duration;
             StartCommand = new RelayCommand(_ => { if (IsStartAvailable) Start(); });
             StopCommand = new RelayCommand(_ => { if (IsStopAvailable) Stop(); });
         }
@@ -58,8 +65,8 @@ namespace ClockWidgetApp.ViewModels
         /// </summary>
         public TimeSpan Duration
         {
-            get => _duration;
-            set { _duration = value; OnPropertyChanged(); }
+            get => Model.Duration;
+            set { Model.Duration = value; OnPropertyChanged(); }
         }
 
         /// <summary>

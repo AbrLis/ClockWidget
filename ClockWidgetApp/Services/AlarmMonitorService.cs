@@ -90,11 +90,9 @@ public class AlarmMonitorService : IDisposable
                 dueTime = _nextScheduledTime.Value - now;
                 if (dueTime < TimeSpan.Zero)
                     dueTime = TimeSpan.Zero;
-                Log.Information("[AlarmMonitorService] Next alarm: {Time}", _nextScheduledTime);
             }
             else
             {
-                // No active alarms — check every minute
                 dueTime = TimeSpan.FromMinutes(1);
             }
 

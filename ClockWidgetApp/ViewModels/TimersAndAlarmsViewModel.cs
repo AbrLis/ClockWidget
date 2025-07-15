@@ -43,6 +43,13 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         _appDataService = appDataService;
         _soundService = soundService;
         TimersVm = new TimersViewModel(appDataService);
+        TimersVm.OnTimerTrayStateChanged = (timer, isRunning) =>
+        {
+            if (isRunning)
+                AddTimerTray(timer);
+            else
+                RemoveTimerTray(timer);
+        };
         AlarmsVm = new AlarmsViewModel(appDataService);
         LongTimersVm = new LongTimersViewModel(appDataService, soundService);
         _alarmMonitorService = new AlarmMonitorService(AlarmsVm.Alarms);
@@ -131,7 +138,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
         if (e.NewItems != null)
             foreach (TimerEntryViewModel t in e.NewItems)
             {
-                SubscribeTimer(t);
                 Serilog.Log.Information($"[TimersAndAlarmsViewModel] Добавлен таймер: {t.Duration}");
             }
         if (e.OldItems != null)
@@ -265,24 +271,6 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     }
 
     #endregion
-
-    /// <summary>
-    /// Подписывает таймер на события для отображения/удаления иконки в трее.
-    /// </summary>
-    private void SubscribeTimer(TimerEntryViewModel timer)
-    {
-        timer.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(timer.IsRunning) || e.PropertyName == nameof(timer.IsStartAvailable))
-            {
-                if (timer.IsRunning)
-                    AddTimerTray(timer);
-                else
-                    RemoveTimerTray(timer);
-            }
-        };
-        if (timer.IsRunning) AddTimerTray(timer);
-    }
 
     private void SubscribeAlarm(ClockWidgetApp.ViewModels.AlarmEntryViewModel alarm)
     {

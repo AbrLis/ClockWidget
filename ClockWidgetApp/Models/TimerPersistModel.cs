@@ -8,6 +8,10 @@ namespace ClockWidgetApp.Models
     /// </summary>
     public class TimerPersistModel : INotifyPropertyChanged
     {
+        /// <summary>
+        /// Уникальный идентификатор таймера.
+        /// </summary>
+        public Guid Id { get; set; } = Guid.NewGuid();
         private TimeSpan _duration;
         /// <summary>
         /// Длительность таймера.
@@ -28,6 +32,10 @@ namespace ClockWidgetApp.Models
     /// </summary>
     public class AlarmPersistModel
     {
+        /// <summary>
+        /// Уникальный идентификатор будильника.
+        /// </summary>
+        public Guid Id { get; set; } = Guid.NewGuid();
         /// <summary>
         /// Время срабатывания будильника.
         /// </summary>

@@ -68,15 +68,11 @@ public class LongTimersViewModel : INotifyPropertyChanged
     /// </summary>
     private void Timer_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // Сохраняем только при изменении ключевых свойств через debounce
         if (e.PropertyName == nameof(LongTimerEntryViewModel.TargetDateTime) ||
             e.PropertyName == nameof(LongTimerEntryViewModel.Name))
         {
-            Log.Information($"[LongTimersViewModel] PropertyChanged: {e.PropertyName} у таймера '{(sender as LongTimerEntryViewModel)?.Name}' — вызов debounce-сохранения");
-            // Используем ScheduleTimersAndAlarmsSave для предотвращения блокировки UI
             if (_appDataService is AppDataService concreteService)
                 concreteService.ScheduleTimersAndAlarmsSave();
-            // Если интерфейс, можно добавить метод в IAppDataService
         }
     }
 

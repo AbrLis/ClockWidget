@@ -74,6 +74,11 @@ public class TimersViewModel : INotifyPropertyChanged
 
     private TimerEntryViewModel? _editingTimer;
 
+    /// <summary>
+    /// Callback для управления иконкой трея (устанавливается извне).
+    /// </summary>
+    public Action<TimerEntryViewModel, bool>? OnTimerTrayStateChanged { get; set; }
+
     public TimersViewModel(IAppDataService appDataService)
     {
         _appDataService = appDataService;
@@ -96,11 +101,15 @@ public class TimersViewModel : INotifyPropertyChanged
 
     private TimerEntryViewModel CreateViewModel(TimerPersistModel model)
     {
-        var vm = new TimerEntryViewModel(model.Duration);
+        var vm = new TimerEntryViewModel(model);
         vm.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(vm.Duration))
                 model.Duration = vm.Duration;
+            if (e.PropertyName == nameof(vm.IsRunning))
+            {
+                OnTimerTrayStateChanged?.Invoke(vm, vm.IsRunning);
+            }
         };
         return vm;
     }
@@ -119,7 +128,7 @@ public class TimersViewModel : INotifyPropertyChanged
         {
             foreach (TimerPersistModel model in e.OldItems)
             {
-                var vm = TimerEntries.FirstOrDefault(x => x.Duration == model.Duration);
+                var vm = TimerEntries.FirstOrDefault(x => x.Model == model);
                 if (vm != null)
                     TimerEntries.Remove(vm);
             }

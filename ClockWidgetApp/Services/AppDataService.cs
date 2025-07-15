@@ -254,6 +254,7 @@ namespace ClockWidgetApp.Services
 
         /// <summary>
         /// Обновляет содержимое целевой коллекции, минимизируя количество изменений (удаляет, добавляет и обновляет только отличающиеся элементы).
+        /// Гарантирует, что индексы не выходят за границы коллекции.
         /// </summary>
         /// <typeparam name="T">Тип элемента коллекции</typeparam>
         /// <param name="target">Целевая коллекция (ObservableCollection)</param>
@@ -274,15 +275,20 @@ namespace ClockWidgetApp.Services
                 var existing = target.FirstOrDefault(t => equals(t, src));
                 if (existing == null)
                 {
-                    target.Insert(i, src);
+                    // Если индекс больше размера коллекции — добавляем в конец
+                    if (i >= target.Count)
+                        target.Add(src);
+                    else
+                        target.Insert(i, src);
                 }
                 else
                 {
-                    // Если элемент на другой позиции — переместить
                     int oldIndex = target.IndexOf(existing);
-                    if (oldIndex != i)
+                    // Перемещаем только если оба индекса валидны и отличаются
+                    if (oldIndex != i && oldIndex >= 0 && i >= 0 && i < target.Count)
+                    {
                         target.Move(oldIndex, i);
-                    // Если требуется глубокое обновление — реализовать здесь
+                    }
                 }
             }
         }
@@ -298,9 +304,10 @@ namespace ClockWidgetApp.Services
                 int oldAlarms = Data.Alarms.Count;
                 int oldLongTimers = Data.LongTimers.Count;
 
-                UpdateCollection(Data.Timers, model.Timers, (a, b) => a.Duration == b.Duration);
-                UpdateCollection(Data.Alarms, model.Alarms, (a, b) => a.AlarmTime == b.AlarmTime && a.IsEnabled == b.IsEnabled && a.NextTriggerDateTime == b.NextTriggerDateTime);
-                UpdateCollection(Data.LongTimers, model.LongTimers, (a, b) => a.Name == b.Name && a.TargetDateTime == b.TargetDateTime);
+                // Сравнение теперь по уникальному идентификатору Id
+                UpdateCollection(Data.Timers, model.Timers, (a, b) => a.Id == b.Id);
+                UpdateCollection(Data.Alarms, model.Alarms, (a, b) => a.Id == b.Id);
+                UpdateCollection(Data.LongTimers, model.LongTimers, (a, b) => a.Id == b.Id);
 
                 Serilog.Log.Information($"[AppDataService] Коллекции обновлены: Timers {oldTimers}->{Data.Timers.Count}, Alarms {oldAlarms}->{Data.Alarms.Count}, LongTimers {oldLongTimers}->{Data.LongTimers.Count}");
             }

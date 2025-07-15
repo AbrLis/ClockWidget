@@ -104,7 +104,7 @@ public class AlarmsViewModel : INotifyPropertyChanged
 
     private AlarmEntryViewModel CreateViewModel(AlarmPersistModel model)
     {
-        var vm = new AlarmEntryViewModel(model.AlarmTime, model.IsEnabled);
+        var vm = new AlarmEntryViewModel(model);
         vm.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(vm.AlarmTime))
@@ -129,7 +129,7 @@ public class AlarmsViewModel : INotifyPropertyChanged
         {
             foreach (AlarmPersistModel model in e.OldItems)
             {
-                var vm = Alarms.FirstOrDefault(x => x.AlarmTime == model.AlarmTime && x.IsEnabled == model.IsEnabled);
+                var vm = Alarms.FirstOrDefault(x => x.Model == model);
                 if (vm != null)
                     Alarms.Remove(vm);
             }

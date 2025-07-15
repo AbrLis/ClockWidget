@@ -26,6 +26,11 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
     private readonly LongTimerPersistModel _persistModel;
 
     /// <summary>
+    /// Persist-модель, связанная с этим ViewModel.
+    /// </summary>
+    public LongTimerPersistModel Model => _persistModel;
+
+    /// <summary>
     /// Дата и время срабатывания таймера.
     /// </summary>
     public DateTime TargetDateTime

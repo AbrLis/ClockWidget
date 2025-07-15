@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using ClockWidgetApp.Models;
 
 namespace ClockWidgetApp.ViewModels
 {
@@ -10,9 +11,23 @@ namespace ClockWidgetApp.ViewModels
     public class AlarmEntryViewModel : INotifyPropertyChanged
     {
         /// <summary>
+        /// Persist-модель, связанная с этим ViewModel.
+        /// </summary>
+        public AlarmPersistModel Model { get; }
+
+        /// <summary>
+        /// Уникальный идентификатор будильника.
+        /// </summary>
+        public Guid Id => Model.Id;
+
+        /// <summary>
         /// Время срабатывания будильника.
         /// </summary>
-        public TimeSpan AlarmTime { get; set; }
+        public TimeSpan AlarmTime
+        {
+            get => Model.AlarmTime;
+            set { Model.AlarmTime = value; OnPropertyChanged(); }
+        }
         private bool _isEnabled;
         /// <summary>
         /// Включён ли будильник.
@@ -56,11 +71,12 @@ namespace ClockWidgetApp.ViewModels
         /// </summary>
         public bool IsStopAvailable => IsEnabled;
 
-        public AlarmEntryViewModel(TimeSpan alarmTime, bool isEnabled = false, DateTime? nextTriggerDateTime = null)
+        public AlarmEntryViewModel(AlarmPersistModel model)
         {
-            AlarmTime = alarmTime;
-            _isEnabled = isEnabled;
-            NextTriggerDateTime = nextTriggerDateTime;
+            Model = model;
+            AlarmTime = model.AlarmTime;
+            IsEnabled = model.IsEnabled;
+            NextTriggerDateTime = model.NextTriggerDateTime;
             StartCommand = new RelayCommand(_ => Start(), _ => !IsEnabled);
             StopCommand = new RelayCommand(_ => Stop(), _ => IsEnabled);
             if (IsEnabled && NextTriggerDateTime == null)
