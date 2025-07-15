@@ -40,8 +40,6 @@ public class LongTimersViewModel : INotifyPropertyChanged
         var vm = new LongTimerEntryViewModel(model.TargetDateTime, _soundService, model.Name);
         vm.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(vm.Duration))
-                model.Duration = vm.Duration;
             if (e.PropertyName == nameof(vm.Name))
                 model.Name = vm.Name;
         };
@@ -62,7 +60,7 @@ public class LongTimersViewModel : INotifyPropertyChanged
         {
             foreach (LongTimerPersistModel model in e.OldItems)
             {
-                var vm = LongTimers.FirstOrDefault(x => x.Duration == model.Duration && x.Name == model.Name);
+                var vm = LongTimers.FirstOrDefault(x => x.TargetDateTime == model.TargetDateTime && x.Name == model.Name);
                 if (vm != null)
                     LongTimers.Remove(vm);
             }
@@ -80,15 +78,15 @@ public class LongTimersViewModel : INotifyPropertyChanged
         };
         // Окно появляется строго над кнопкой: центрируем по X, нижний край окна совпадает с верхом кнопки
         inputWindow.Left = screenPosition.X - inputWindow.Width / 2;
-        inputWindow.Top = screenPosition.Y - inputWindow.Height;
+        inputWindow.Top = screenPosition.Y - inputWindow.Height / 2;
         inputWindow.ShowInTaskbar = false;
         inputWindow.Topmost = true;
         if (inputWindow.ShowDialog() == true)
         {
             var selectedDateTime = inputWindow.SelectedDateTime;
             var timerName = inputWindow.TimerName;
-            var timer = new LongTimerEntryViewModel(selectedDateTime, _soundService, timerName);
-            LongTimers.Add(timer);
+            var persistModel = new LongTimerPersistModel { TargetDateTime = selectedDateTime, Name = timerName };
+            LongTimerModels.Add(persistModel);
         }
     }
 

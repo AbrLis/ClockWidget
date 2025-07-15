@@ -3,6 +3,7 @@ namespace ClockWidgetApp.Views
     using System.Windows;
     using ClockWidgetApp.Services;
     using ClockWidgetApp.ViewModels;
+    using System;
 
     /// <summary>
     /// Окно оповещения о сработавшем таймере или будильнике.
@@ -10,13 +11,20 @@ namespace ClockWidgetApp.Views
     public partial class TimerNotificationWindow : Window
     {
         /// <summary>
-        /// Конструктор окна, принимающий ViewModel.
+        /// Callback, вызываемый при закрытии окна (например, для удаления таймера).
+        /// </summary>
+        private readonly Action? _onClosed;
+
+        /// <summary>
+        /// Конструктор окна, принимающий ViewModel и callback.
         /// </summary>
         /// <param name="viewModel">ViewModel для окна уведомления.</param>
-        public TimerNotificationWindow(TimerNotificationViewModel viewModel)
+        /// <param name="onClosed">Callback, вызываемый при закрытии окна.</param>
+        public TimerNotificationWindow(TimerNotificationViewModel viewModel, Action? onClosed = null)
         {
             InitializeComponent();
             this.DataContext = viewModel;
+            this._onClosed = onClosed;
             // Подписка на событие закрытия окна
             this.Closing += TimerNotificationWindow_Closing;
             // Подписка на клик по кнопке Stop
@@ -32,6 +40,7 @@ namespace ClockWidgetApp.Views
                 if (vm.StopCommand.CanExecute(null))
                     vm.StopCommand.Execute(null);
             }
+            _onClosed?.Invoke();
         }
 
         /// <summary>
@@ -45,6 +54,7 @@ namespace ClockWidgetApp.Views
                     vm.StopCommand.Execute(null);
             }
             this.Close();
+            // _onClosed будет вызван в обработчике Closing
         }
 
         /// <summary>
@@ -53,12 +63,12 @@ namespace ClockWidgetApp.Views
         /// <param name="soundHandle">Handle для управления звуком.</param>
         /// <param name="description">Описание или имя таймера/будильника.</param>
         /// <param name="notificationType">Тип: "timer" или "alarm".</param>
+        /// <param name="onClosed">Callback, вызываемый при закрытии окна.</param>
         /// <returns>Экземпляр окна уведомления.</returns>
-        public static TimerNotificationWindow CreateWithCloseCallback(ISoundHandle soundHandle, string description, string notificationType = "timer")
+        public static TimerNotificationWindow CreateWithCloseCallback(ISoundHandle soundHandle, string description, string notificationType = "timer", Action? onClosed = null)
         {
-            TimerNotificationWindow? window = null;
             var viewModel = new TimerNotificationViewModel(soundHandle, description, notificationType);
-            window = new TimerNotificationWindow(viewModel);
+            var window = new TimerNotificationWindow(viewModel, onClosed);
             return window;
         }
     }

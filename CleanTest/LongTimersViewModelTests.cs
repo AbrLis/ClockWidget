@@ -6,6 +6,7 @@ using ClockWidgetApp.Services;
 using ClockWidgetApp.Helpers;
 using System.IO;
 using ClockWidgetApp.Models;
+using System.Linq;
 
 namespace CleanTest;
 
@@ -143,5 +144,91 @@ public class LongTimersViewModelTests
         Assert.Single(service.Data.LongTimers);
         Assert.Equal(name, service.Data.LongTimers[0].Name);
         Assert.Equal(dt, service.Data.LongTimers[0].TargetDateTime, TimeSpan.FromSeconds(1));
+    }
+
+    /// <summary>
+    /// Проверяет, что при удалении длинного таймера из persist-модели он не появляется после перезапуска.
+    /// </summary>
+    [Fact]
+    public void DeleteLongTimer_FromPersist_ShouldNotAppearAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        // Добавляем длинный таймер
+        var dt = DateTime.Now.AddHours(1);
+        var name = "TestLongTimerPersist";
+        var longTimerModel = new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name };
+        appDataService.Data.LongTimers.Add(longTimerModel);
+        appDataService.Save();
+        // Удаляем напрямую из persist
+        var toRemove = appDataService.Data.LongTimers.FirstOrDefault(m => m.TargetDateTime == dt && m.Name == name);
+        Assert.NotNull(toRemove);
+        appDataService.Data.LongTimers.Remove(toRemove);
+        appDataService.Save();
+        // Перезагружаем данные
+        appDataService.Data.LongTimers.Clear();
+        appDataService.Load();
+        Assert.Empty(appDataService.Data.LongTimers);
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении длинного таймера он появляется в persist-модели и сохраняется после перезапуска.
+    /// </summary>
+    [Fact]
+    public void AddLongTimer_ShouldAppearInPersist_AndAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        var soundService = new Mock<ISoundService>().Object;
+        var longTimersVM = new LongTimersViewModel(appDataService, soundService);
+        var dt = DateTime.Now.AddHours(2);
+        var name = "PersistTest";
+        var persistModel = new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name };
+        longTimersVM.LongTimerModels.Add(persistModel);
+        Assert.Single(appDataService.Data.LongTimers);
+        appDataService.Save();
+        appDataService.Data.LongTimers.Clear();
+        appDataService.Load();
+        Assert.Single(appDataService.Data.LongTimers);
+        Assert.Equal(name, appDataService.Data.LongTimers[0].Name);
+        Assert.Equal(dt, appDataService.Data.LongTimers[0].TargetDateTime, TimeSpan.FromSeconds(1));
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении длинного таймера он активен (IsRunning == true) сразу после создания.
+    /// </summary>
+    [Fact]
+    public void AddLongTimer_ShouldBeInactiveAfterCreate()
+    {
+        var appDataService = new AppDataService("settings.json", "timers.json", new InMemoryFileSystemService());
+        var soundService = new Mock<ISoundService>().Object;
+        var longTimersVM = new LongTimersViewModel(appDataService, soundService);
+        var dt = DateTime.Now.AddMinutes(30);
+        var name = "TestInactive";
+        var persistModel = new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name };
+        longTimersVM.LongTimerModels.Add(persistModel);
+        Assert.Single(longTimersVM.LongTimers);
+        Assert.True(longTimersVM.LongTimers[0].Remaining > TimeSpan.Zero);
+    }
+
+    /// <summary>
+    /// Проверяет, что после создания длинный таймер сразу начинает отсчёт времени (Remaining > 0).
+    /// </summary>
+    [Fact]
+    public void AddLongTimer_ShouldStartImmediately()
+    {
+        var appDataService = new AppDataService("settings.json", "timers.json", new InMemoryFileSystemService());
+        var soundService = new Mock<ISoundService>().Object;
+        var longTimersVM = new LongTimersViewModel(appDataService, soundService);
+        var dt = DateTime.Now.AddMinutes(30);
+        var name = "TestActive";
+        var persistModel = new ClockWidgetApp.Models.LongTimerPersistModel { TargetDateTime = dt, Name = name };
+        longTimersVM.LongTimerModels.Add(persistModel);
+        Assert.Single(longTimersVM.LongTimers);
+        Assert.True(longTimersVM.LongTimers[0].Remaining > TimeSpan.Zero);
     }
 } 

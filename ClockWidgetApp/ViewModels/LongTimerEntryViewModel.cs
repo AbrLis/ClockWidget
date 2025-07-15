@@ -197,11 +197,7 @@ public sealed class LongTimerEntryViewModel : INotifyPropertyChanged, IDisposabl
             Serilog.Log.Warning($"[LongTimerEntryViewModel] Не удалось определить базовую директорию для long.mp3: {name} ({targetDateTime:dd.MM.yyyy HH:mm:ss})");
         }
         var description = $"{(string.IsNullOrWhiteSpace(name) ? "(Без имени)" : name)}\n{targetDateTime:dd.MM.yyyy HH:mm:ss}";
-        var notification = TimerNotificationWindow.CreateWithCloseCallback(soundHandle, description);
-        if (onClosed != null)
-        {
-            notification.Closed += (_, e) => onClosed();
-        }
+        var notification = TimerNotificationWindow.CreateWithCloseCallback(soundHandle, description, "timer", onClosed);
         notification.Show();
         notification.Topmost = true;
         return notification;

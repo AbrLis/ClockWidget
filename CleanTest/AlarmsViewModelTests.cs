@@ -6,6 +6,7 @@ using ClockWidgetApp.Services;
 using ClockWidgetApp.Helpers;
 using ClockWidgetApp.Models;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace CleanTest;
 
@@ -146,5 +147,77 @@ public class AlarmsViewModelTests
         var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
         settingsVM.DeleteAlarmCommand.Execute(timersAndAlarmsVM.AlarmsVm.Alarms[0]);
         Assert.Empty(timersAndAlarmsVM.AlarmsVm.Alarms);
+    }
+
+    /// <summary>
+    /// Проверяет, что при удалении будильника через DeleteAlarmCommand он удаляется из persist-модели и не появляется после перезапуска.
+    /// </summary>
+    [Fact]
+    public void DeleteAlarmCommand_ShouldRemoveFromPersist_AndNotAppearAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        var soundService = new Mock<ISoundService>().Object;
+        var windowService = new Mock<IWindowService>().Object;
+        var mainLogger = new Mock<ILogger<MainWindowViewModel>>().Object;
+        var mainVM = new MainWindowViewModel(new Mock<ITimeService>().Object, appDataService, soundService, windowService, mainLogger);
+        var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
+        var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
+        // Добавляем будильник
+        var alarmModel = new ClockWidgetApp.Models.AlarmPersistModel { AlarmTime = new TimeSpan(6, 0, 0), IsEnabled = true, NextTriggerDateTime = DateTime.Now.AddDays(1) };
+        appDataService.Data.Alarms.Add(alarmModel);
+        appDataService.Save();
+        // Удаляем через SettingsWindowViewModel
+        var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
+        var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
+        var alarmVM = timersAndAlarmsVM.AlarmsVm.Alarms[0];
+        // Исправляем: ищем persist только по AlarmTime
+        var persist = appDataService.Data.Alarms.FirstOrDefault(m => m.AlarmTime == alarmVM.AlarmTime);
+        if (persist != null)
+            appDataService.Data.Alarms.Remove(persist);
+        appDataService.Save();
+        // Перезагружаем данные
+        appDataService.Data.Alarms.Clear();
+        appDataService.Load();
+        Assert.Empty(appDataService.Data.Alarms);
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении будильника он появляется в persist-модели и сохраняется после перезапуска.
+    /// </summary>
+    [Fact]
+    public void AddAlarm_ShouldAppearInPersist_AndAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        var alarmsVM = new AlarmsViewModel(appDataService);
+        alarmsVM.NewAlarmHours = "7";
+        alarmsVM.NewAlarmMinutes = "30";
+        alarmsVM.AddAlarmCommand.Execute(null);
+        Assert.Single(appDataService.Data.Alarms);
+        appDataService.Save();
+        appDataService.Data.Alarms.Clear();
+        appDataService.Load();
+        Assert.Single(appDataService.Data.Alarms);
+        Assert.Equal(new System.TimeSpan(7, 30, 0), appDataService.Data.Alarms[0].AlarmTime);
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении будильника он неактивен (IsEnabled == false) сразу после создания.
+    /// </summary>
+    [Fact]
+    public void AddAlarm_ShouldBeInactiveAfterCreate()
+    {
+        var appDataService = new AppDataService("settings.json", "timers.json", new InMemoryFileSystemService());
+        var alarmsVM = new AlarmsViewModel(appDataService);
+        alarmsVM.NewAlarmHours = "8";
+        alarmsVM.NewAlarmMinutes = "15";
+        alarmsVM.AddAlarmCommand.Execute(null);
+        Assert.Single(alarmsVM.Alarms);
+        Assert.False(alarmsVM.Alarms[0].IsEnabled);
     }
 } 

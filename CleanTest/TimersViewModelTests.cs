@@ -116,4 +116,75 @@ public class TimersViewModelTests
         settingsVM.DeleteTimerCommand.Execute(timersAndAlarmsVM.TimersVm.TimerEntries[0]);
         Assert.Empty(timersAndAlarmsVM.TimersVm.Timers);
     }
+
+    /// <summary>
+    /// Проверяет, что при удалении таймера через DeleteTimerCommand он удаляется из persist-модели и не появляется после перезапуска.
+    /// </summary>
+    [Fact]
+    public void DeleteTimerCommand_ShouldRemoveFromPersist_AndNotAppearAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        var soundService = new Mock<ISoundService>().Object;
+        var windowService = new Mock<IWindowService>().Object;
+        var mainLogger = new Mock<ILogger<MainWindowViewModel>>().Object;
+        var mainVM = new MainWindowViewModel(new Mock<ITimeService>().Object, appDataService, soundService, windowService, mainLogger);
+        var trayIconManager = new Mock<TrayIconManager>(MockBehavior.Loose, new object[] { }).Object;
+        var timersAndAlarmsVM = new TimersAndAlarmsViewModel(appDataService, soundService, trayIconManager);
+        // Добавляем таймер
+        var timerModel = new ClockWidgetApp.Models.TimerPersistModel { Duration = TimeSpan.FromSeconds(42) };
+        appDataService.Data.Timers.Add(timerModel);
+        appDataService.Save();
+        // Удаляем через SettingsWindowViewModel
+        var logger = new Mock<ILogger<SettingsWindowViewModel>>().Object;
+        var settingsVM = new SettingsWindowViewModel(mainVM, appDataService, timersAndAlarmsVM, logger);
+        var timerVM = timersAndAlarmsVM.TimersVm.TimerEntries[0];
+        settingsVM.DeleteTimerCommand.Execute(timerVM);
+        appDataService.Save();
+        // Перезагружаем данные
+        appDataService.Data.Timers.Clear();
+        appDataService.Load();
+        Assert.Empty(appDataService.Data.Timers);
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении таймера он появляется в persist-модели и сохраняется после перезапуска.
+    /// </summary>
+    [Fact]
+    public void AddTimer_ShouldAppearInPersist_AndAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        var timersVM = new TimersViewModel(appDataService);
+        timersVM.NewTimerHours = "0";
+        timersVM.NewTimerMinutes = "1";
+        timersVM.NewTimerSeconds = "5";
+        timersVM.AddTimerCommand.Execute(null);
+        Assert.Single(appDataService.Data.Timers);
+        appDataService.Save();
+        appDataService.Data.Timers.Clear();
+        appDataService.Load();
+        Assert.Single(appDataService.Data.Timers);
+        Assert.Equal(new System.TimeSpan(0, 1, 5), appDataService.Data.Timers[0].Duration);
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении таймера он неактивен (IsRunning == false) сразу после создания.
+    /// </summary>
+    [Fact]
+    public void AddTimer_ShouldBeInactiveAfterCreate()
+    {
+        var appDataService = new AppDataService("settings.json", "timers.json", new InMemoryFileSystemService());
+        var timersVM = new TimersViewModel(appDataService);
+        timersVM.NewTimerHours = "0";
+        timersVM.NewTimerMinutes = "2";
+        timersVM.NewTimerSeconds = "0";
+        timersVM.AddTimerCommand.Execute(null);
+        Assert.Single(timersVM.TimerEntries);
+        Assert.False(timersVM.TimerEntries[0].IsRunning);
+    }
 } 

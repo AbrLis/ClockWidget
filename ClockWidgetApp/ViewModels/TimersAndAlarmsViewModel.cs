@@ -243,10 +243,25 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            RemoveLongTimerTray(timer);
-            LongTimersVm.LongTimers.Remove(timer);
-            Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён после истечения: {timer.Name} ({timer.TargetDateTime})");
+            _ = RemoveAndPersistLongTimerAsync(timer);
         });
+    }
+
+    /// <summary>
+    /// Асинхронно удаляет длинный таймер из всех коллекций и сохраняет изменения.
+    /// </summary>
+    private async Task RemoveAndPersistLongTimerAsync(LongTimerEntryViewModel timer)
+    {
+        RemoveLongTimerTray(timer);
+        LongTimersVm.LongTimers.Remove(timer);
+        // Удаляем из persist-модели
+        var persist = LongTimersVm.LongTimerModels.FirstOrDefault(m => m.TargetDateTime == timer.TargetDateTime && m.Name == timer.Name);
+        if (persist != null)
+            LongTimersVm.LongTimerModels.Remove(persist);
+        // Сохраняем изменения
+        if (_appDataService != null)
+            await _appDataService.SaveAsync();
+        Serilog.Log.Information($"[TimersAndAlarmsViewModel] Длинный таймер удалён после истечения: {timer.Name} ({timer.TargetDateTime})");
     }
 
     #endregion

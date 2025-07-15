@@ -13,11 +13,6 @@ namespace ClockWidgetApp.Models
         public DateTime TargetDateTime { get; set; }
 
         /// <summary>
-        /// Длительность длинного таймера.
-        /// </summary>
-        public TimeSpan Duration { get; set; }
-
-        /// <summary>
         /// Название длинного таймера.
         /// </summary>
         public string Name { get; set; } = string.Empty;

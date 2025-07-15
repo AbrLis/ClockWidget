@@ -55,6 +55,7 @@
                 Height="32"
                 HorizontalAlignment="Center"
                 Margin="0,10,0,0"
-                Command="{Binding StopCommand}"/>
+                Command="{Binding StopCommand}"
+                Click="StopButton_Click"/>
     </Grid>
 </Window> 

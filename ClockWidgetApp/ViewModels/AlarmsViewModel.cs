@@ -148,13 +148,13 @@ public class AlarmsViewModel : INotifyPropertyChanged
             TryParseOrZero(NewAlarmMinutes, out int m);
             var ts = new TimeSpan(h, m, 0);
             // Проверка на дублирующийся будильник
-            if (Alarms.Any(a => a.AlarmTime == ts))
+            if (AlarmModels.Any(a => a.AlarmTime == ts))
             {
                 ShowDuplicateAlarmNotification();
                 return;
             }
-            var alarm = new AlarmEntryViewModel(ts);
-            Alarms.Insert(0, alarm);
+            var persistModel = new AlarmPersistModel { AlarmTime = ts, IsEnabled = false };
+            AlarmModels.Insert(0, persistModel);
             IsAlarmInputVisible = false;
             NewAlarmHours = "";
             NewAlarmMinutes = "";
