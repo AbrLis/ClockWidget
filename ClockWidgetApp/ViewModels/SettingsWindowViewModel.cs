@@ -214,6 +214,19 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+    /// <summary>
+    /// Прозрачность текста главного окна. Связывает значение из MainWindowViewModel с UI окна настроек.
+    /// </summary>
+    public double TextOpacity
+    {
+        get => _mainViewModel.TextOpacity;
+        set
+        {
+            if (AreClose(_mainViewModel.TextOpacity, value)) return;
+            _mainViewModel.TextOpacity = value;
+            OnPropertyChanged();
+        }
+    }
     public string Language
     {
         get => LocalizationManager.CurrentLanguage;
