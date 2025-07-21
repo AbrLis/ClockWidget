@@ -6,6 +6,7 @@ using ClockWidgetApp.Services;
 using ClockWidgetApp.Models;
 using ClockWidgetApp.Helpers;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace CleanTest;
 
@@ -186,5 +187,72 @@ public class TimersViewModelTests
         timersVM.AddTimerCommand.Execute(null);
         Assert.Single(timersVM.TimerEntries);
         Assert.False(timersVM.TimerEntries[0].IsRunning);
+    }
+
+    /// <summary>
+    /// Проверяет, что при запуске таймера он перемещается наверх списка.
+    /// </summary>
+    [Fact]
+    public void StartTimer_ShouldMoveToTop()
+    {
+        var vm = CreateTimersViewModelWithMockData();
+        // Добавляем три таймера
+        vm.NewTimerHours = "0"; vm.NewTimerMinutes = "0"; vm.NewTimerSeconds = "10"; vm.AddTimerCommand.Execute(null);
+        vm.NewTimerHours = "0"; vm.NewTimerMinutes = "0"; vm.NewTimerSeconds = "20"; vm.AddTimerCommand.Execute(null);
+        vm.NewTimerHours = "0"; vm.NewTimerMinutes = "0"; vm.NewTimerSeconds = "30"; vm.AddTimerCommand.Execute(null);
+        // Запускаем второй таймер (индекс 1)
+        var timerToStart = vm.TimerEntries[1];
+        timerToStart.StartCommand.Execute(null);
+        // Проверяем, что он теперь первый
+        Assert.Equal(timerToStart, vm.TimerEntries[0]);
+    }
+
+    /// <summary>
+    /// Проверяет, что при добавлении нового таймера он появляется после всех запущенных.
+    /// </summary>
+    [Fact]
+    public void AddTimer_ShouldAppearAfterRunningTimers()
+    {
+        var vm = CreateTimersViewModelWithMockData();
+        // Добавляем и запускаем два таймера
+        vm.NewTimerHours = "0"; vm.NewTimerMinutes = "0"; vm.NewTimerSeconds = "10"; vm.AddTimerCommand.Execute(null);
+        vm.NewTimerHours = "0"; vm.NewTimerMinutes = "0"; vm.NewTimerSeconds = "20"; vm.AddTimerCommand.Execute(null);
+        vm.TimerEntries[0].StartCommand.Execute(null);
+        vm.TimerEntries[1].StartCommand.Execute(null);
+        // Добавляем новый таймер
+        vm.NewTimerHours = "0"; vm.NewTimerMinutes = "0"; vm.NewTimerSeconds = "30"; vm.AddTimerCommand.Execute(null);
+        // Новый таймер должен быть после двух запущенных
+        Assert.Equal(new TimeSpan(0,0,30), vm.TimerEntries[2].Duration);
+    }
+
+    /// <summary>
+    /// Проверяет, что порядок таймеров сохраняется после перезапуска (сериализация/десериализация).
+    /// </summary>
+    [Fact]
+    public void TimersOrder_ShouldPersistAfterReload()
+    {
+        var fs = new InMemoryFileSystemService();
+        var settingsFile = "settings.json";
+        var timersFile = "timers.json";
+        var appDataService = new AppDataService(settingsFile, timersFile, fs);
+        var timersVM = new TimersViewModel(appDataService);
+        // Добавляем три таймера
+        timersVM.NewTimerHours = "0"; timersVM.NewTimerMinutes = "0"; timersVM.NewTimerSeconds = "10"; timersVM.AddTimerCommand.Execute(null);
+        timersVM.NewTimerHours = "0"; timersVM.NewTimerMinutes = "0"; timersVM.NewTimerSeconds = "20"; timersVM.AddTimerCommand.Execute(null);
+        timersVM.NewTimerHours = "0"; timersVM.NewTimerMinutes = "0"; timersVM.NewTimerSeconds = "30"; timersVM.AddTimerCommand.Execute(null);
+        // Запускаем последний таймер (он переместится наверх)
+        timersVM.TimerEntries[2].StartCommand.Execute(null);
+        // Добавляем ещё один таймер (он будет после всех запущенных)
+        timersVM.NewTimerHours = "0"; timersVM.NewTimerMinutes = "0"; timersVM.NewTimerSeconds = "40"; timersVM.AddTimerCommand.Execute(null);
+        // Сохраняем текущий порядок
+        var expectedOrder = timersVM.TimerEntries.Select(t => t.Duration).ToList();
+        // Сохраняем и перезагружаем
+        appDataService.Save();
+        appDataService.Data.Timers.Clear();
+        appDataService.Load();
+        var timersVM2 = new TimersViewModel(appDataService);
+        // Проверяем, что порядок после загрузки совпадает с сохранённым
+        var actualOrder = timersVM2.TimerEntries.Select(t => t.Duration).ToList();
+        Assert.Equal(expectedOrder, actualOrder);
     }
 } 

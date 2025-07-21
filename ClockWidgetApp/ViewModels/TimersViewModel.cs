@@ -63,12 +63,7 @@ public class TimersViewModel : INotifyPropertyChanged
         CancelTimerInputCommand = new RelayCommand(_ => CancelTimerInput());
         ApplyEditTimerCommand = new RelayCommand(_ => ApplyEditTimer(), _ => IsEditingTimer && IsNewTimerValid);
 
-        // Сортируем Timers по LastStartedUtc (null — в конец)
-        var sorted = Timers.OrderByDescending(t => t.LastStartedUtc ?? DateTime.MinValue).ToList();
-        Timers.Clear();
-        foreach (var t in sorted)
-            Timers.Add(t);
-
+        // НЕ сортируем Timers при инициализации — используем порядок из persist-модели
         TimerEntries.Clear();
         foreach (var model in Timers)
         {

@@ -195,7 +195,8 @@ public partial class SettingsWindow : Window
     // Прокрутка ScrollViewer таймеров наверх
     private void ScrollTimersToTop()
     {
-        TimersScrollViewer?.ScrollToTop();
+        if (FindName("TimersScrollViewer") is System.Windows.Controls.ScrollViewer scroll)
+            scroll.ScrollToTop();
     }
 
     // Обработчик для прокрутки ScrollViewer наверх после добавления таймера
