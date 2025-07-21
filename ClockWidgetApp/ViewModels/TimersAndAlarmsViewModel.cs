@@ -139,6 +139,9 @@ public class TimersAndAlarmsViewModel : INotifyPropertyChanged
     /// </summary>
     private void Timers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        // Не логируем и не трогаем иконки при перемещении (Move)
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+            return;
         if (e.NewItems != null)
             foreach (TimerEntryViewModel t in e.NewItems)
             {

@@ -22,6 +22,11 @@ namespace ClockWidgetApp.Models
             set { if (_duration != value) { _duration = value; OnPropertyChanged(); } }
         }
 
+        /// <summary>
+        /// Время последнего запуска таймера (UTC). Если null — таймер ни разу не запускался.
+        /// </summary>
+        public DateTime? LastStartedUtc { get; set; }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

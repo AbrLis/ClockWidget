@@ -34,6 +34,11 @@ namespace ClockWidgetApp.Services
         event EventHandler LongTimersChanged;
 
         /// <summary>
+        /// Планирует автосохранение timers/alarms с debounce.
+        /// </summary>
+        void ScheduleTimersAndAlarmsSave();
+
+        /// <summary>
         /// Уведомляет об изменении настроек.
         /// </summary>
         void NotifySettingsChanged();

@@ -41,6 +41,8 @@ public partial class SettingsWindow : Window
             };
             Closing += SettingsWindow_Closing;
             _logger.LogDebug("[SettingsWindow] Settings window initialized");
+            // Добавляю обработчик для прокрутки ScrollViewer наверх после добавления таймера
+            _timersAndAlarmsViewModel.TimersVm.Timers.CollectionChanged += Timers_CollectionChanged_ScrollToTop;
         }
         catch (Exception ex)
         {
@@ -187,6 +189,22 @@ public partial class SettingsWindow : Window
             // Получаем позицию мыши в экранных координатах
             var point = border.PointToScreen(e.GetPosition(border));
             _timersAndAlarmsViewModel.LongTimersVm.EditLongTimer(timer, point);
+        }
+    }
+
+    // Прокрутка ScrollViewer таймеров наверх
+    private void ScrollTimersToTop()
+    {
+        TimersScrollViewer?.ScrollToTop();
+    }
+
+    // Обработчик для прокрутки ScrollViewer наверх после добавления таймера
+    private void Timers_CollectionChanged_ScrollToTop(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
+            e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+        {
+            ScrollTimersToTop();
         }
     }
 

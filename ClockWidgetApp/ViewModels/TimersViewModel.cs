@@ -63,7 +63,12 @@ public class TimersViewModel : INotifyPropertyChanged
         CancelTimerInputCommand = new RelayCommand(_ => CancelTimerInput());
         ApplyEditTimerCommand = new RelayCommand(_ => ApplyEditTimer(), _ => IsEditingTimer && IsNewTimerValid);
 
-        // Синхронизируем TimerEntries с Timers
+        // Сортируем Timers по LastStartedUtc (null — в конец)
+        var sorted = Timers.OrderByDescending(t => t.LastStartedUtc ?? DateTime.MinValue).ToList();
+        Timers.Clear();
+        foreach (var t in sorted)
+            Timers.Add(t);
+
         TimerEntries.Clear();
         foreach (var model in Timers)
         {
@@ -237,6 +242,8 @@ public class TimersViewModel : INotifyPropertyChanged
                     break;
             }
         };
+        // Подписка на запуск таймера
+        vm.Started += MoveTimerToTop;
         return vm;
     }
 
@@ -245,6 +252,22 @@ public class TimersViewModel : INotifyPropertyChanged
     /// </summary>
     private void Timers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+        {
+            // Синхронизируем порядок в TimerEntries
+            if (e.NewItems?.Count > 0 && e.NewItems[0] is TimerPersistModel model)
+            {
+                var vm = TimerEntries.FirstOrDefault(x => x.Model == model);
+                if (vm != null)
+                {
+                    int oldIndex = e.OldStartingIndex;
+                    int newIndex = e.NewStartingIndex;
+                    if (oldIndex != newIndex)
+                        TimerEntries.Move(oldIndex, newIndex);
+                }
+            }
+            return;
+        }
         if (e.NewItems != null)
         {
             foreach (TimerPersistModel model in e.NewItems)
@@ -266,7 +289,7 @@ public class TimersViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Добавляет новый таймер после валидации времени.
+    /// Добавляет новый таймер после валидации времени и сортирует коллекцию через Move: запущенные таймеры вверху, новый — после них.
     /// </summary>
     private void AddTimer()
     {
@@ -276,7 +299,13 @@ public class TimersViewModel : INotifyPropertyChanged
         _ = TryParseOrZero(NewTimerSeconds, out int s);
         var ts = new TimeSpan(h, m, s);
         var model = new TimerPersistModel { Duration = ts };
-        Timers.Insert(0, model); // вызовет добавление в TimerEntries через CollectionChanged
+        Timers.Add(model); // Добавляем в конец
+        // Находим все запущенные таймеры
+        var running = Timers.Where(t => TimerEntries.FirstOrDefault(vm => vm.Model == t)?.IsRunning == true).ToList();
+        int targetIndex = running.Count; // Новый таймер должен быть после всех запущенных
+        int currentIndex = Timers.IndexOf(model);
+        if (currentIndex != targetIndex)
+            Timers.Move(currentIndex, targetIndex);
         IsTimerInputVisible = false;
         NewTimerHours = string.Empty;
         NewTimerMinutes = string.Empty;
@@ -326,6 +355,23 @@ public class TimersViewModel : INotifyPropertyChanged
         NewTimerMinutes = string.Empty;
         NewTimerSeconds = string.Empty;
         _logger?.LogInformation("Ввод таймера отменён.");
+    }
+
+    /// <summary>
+    /// Перемещает указанный таймер и его persist-модель наверх коллекций и сохраняет порядок.
+    /// </summary>
+    /// <param name="timerVm">ViewModel таймера.</param>
+    private void MoveTimerToTop(TimerEntryViewModel timerVm)
+    {
+        var model = timerVm.Model;
+        int oldIndex = Timers.IndexOf(model);
+        if (oldIndex > 0)
+        {
+            Timers.Move(oldIndex, 0);
+            TimerEntries.Move(TimerEntries.IndexOf(timerVm), 0);
+            // Сохраняем только timers/alarms, не настройки виджета
+            _appDataService.ScheduleTimersAndAlarmsSave();
+        }
     }
     #endregion
 

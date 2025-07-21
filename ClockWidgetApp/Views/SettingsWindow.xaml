@@ -271,7 +271,7 @@
                         </StackPanel>
                         <!-- Список таймеров с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если таймеров ≤ 5 — область растёт по содержимому. -->
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="240">
+                        <ScrollViewer x:Name="TimersScrollViewer" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="240">
                             <!-- MaxHeight = 5 * (высота одного таймера + отступы). Здесь 240px выбрано исходя из текущего дизайна. -->
                             <ItemsControl x:Name="TimersList" Margin="0,10,0,0" ItemsSource="{Binding TimersVm.TimerEntries}">
                                 <ItemsControl.ItemTemplate>

@@ -136,6 +136,10 @@ namespace ClockWidgetApp.ViewModels
         /// Событие запроса деактивации таймера.
         /// </summary>
         public event Action<TimerEntryViewModel>? RequestDeactivate;
+        /// <summary>
+        /// Событие, возникающее при запуске таймера.
+        /// </summary>
+        public event Action<TimerEntryViewModel>? Started;
         #endregion
 
         #region Public methods
@@ -148,6 +152,8 @@ namespace ClockWidgetApp.ViewModels
             if (Remaining <= TimeSpan.Zero) return;
             IsActive = true;
             IsRunning = true;
+            // Обновляем время последнего запуска
+            Model.LastStartedUtc = DateTime.UtcNow;
             OnPropertyChanged(nameof(IsStartAvailable));
             OnPropertyChanged(nameof(IsStopAvailable));
             if (_timer == null)
@@ -157,6 +163,8 @@ namespace ClockWidgetApp.ViewModels
                 _timer.AutoReset = true;
             }
             _timer.Start();
+            // Оповещаем подписчиков о запуске
+            Started?.Invoke(this);
         }
 
         /// <summary>
