@@ -6,7 +6,7 @@ namespace ClockWidgetApp
     public static class SingleInstance
     {
         private static Mutex? _mutex;
-        private const string MutexName = "Global\\ClockWidgetApp_SingleInstance_Mutex";
+        private const string MUTEX_NAME = "Global\\ClockWidgetApp_SingleInstance_Mutex";
 
         /// <summary>
         /// Пытается создать Mutex. Возвращает true, если это первый экземпляр.
@@ -14,7 +14,7 @@ namespace ClockWidgetApp
         public static bool Start()
         {
             bool createdNew;
-            _mutex = new Mutex(true, MutexName, out createdNew);
+            _mutex = new Mutex(true, MUTEX_NAME, out createdNew);
             if (!createdNew)
             {
                 _mutex = null;
@@ -36,4 +36,4 @@ namespace ClockWidgetApp
             }
         }
     }
-} 
+}

@@ -11,10 +11,10 @@ namespace ClockWidgetApp.Models;
 /// </summary>
 public class WidgetSettings : INotifyPropertyChanged
 {
-    private double _backgroundOpacity = Constants.WindowSettings.DEFAULT_WINDOW_OPACITY;
+    private double _backgroundOpacity = Constants.WindowSettings.DefaultWindowOpacity;
     /// <summary>
     /// Получает или устанавливает прозрачность фона виджета.
-    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_OPACITY"/>.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DefaultWindowOpacity"/>.
     /// </summary>
     [JsonPropertyName("backgroundOpacity")]
     public double BackgroundOpacity
@@ -27,10 +27,10 @@ public class WidgetSettings : INotifyPropertyChanged
         }
     }
 
-    private double _textOpacity = Constants.TextSettings.DEFAULT_TEXT_OPACITY;
+    private double _textOpacity = Constants.TextSettings.DefaultTextOpacity;
     /// <summary>
     /// Получает или устанавливает прозрачность текста виджета.
-    /// Значение по умолчанию: <see cref="Constants.TextSettings.DEFAULT_TEXT_OPACITY"/>.
+    /// Значение по умолчанию: <see cref="Constants.TextSettings.DefaultTextOpacity"/>.
     /// </summary>
     [JsonPropertyName("textOpacity")]
     public double TextOpacity
@@ -39,10 +39,10 @@ public class WidgetSettings : INotifyPropertyChanged
         set { if (!DoubleEquals(_textOpacity, value)) { _textOpacity = value; OnPropertyChanged(); } }
     }
 
-    private double _fontSize = Constants.TextSettings.DEFAULT_FONT_SIZE;
+    private double _fontSize = Constants.TextSettings.DefaultFontSize;
     /// <summary>
     /// Получает или устанавливает размер шрифта текста.
-    /// Значение по умолчанию: <see cref="Constants.TextSettings.DEFAULT_FONT_SIZE"/>.
+    /// Значение по умолчанию: <see cref="Constants.TextSettings.DefaultFontSize"/>.
     /// </summary>
     [JsonPropertyName("fontSize")]
     public double FontSize
@@ -55,10 +55,10 @@ public class WidgetSettings : INotifyPropertyChanged
         }
     }
 
-    private bool _showSeconds = Constants.DisplaySettings.DEFAULT_SHOW_SECONDS;
+    private bool _showSeconds = Constants.DisplaySettings.DefaultShowSeconds;
     /// <summary>
     /// Получает или устанавливает флаг отображения секунд.
-    /// Значение по умолчанию: <see cref="Constants.DisplaySettings.DEFAULT_SHOW_SECONDS"/>.
+    /// Значение по умолчанию: <see cref="Constants.DisplaySettings.DefaultShowSeconds"/>.
     /// </summary>
     [JsonPropertyName("showSeconds")]
     public bool ShowSeconds
@@ -67,10 +67,10 @@ public class WidgetSettings : INotifyPropertyChanged
         set { if (_showSeconds != value) { _showSeconds = value; OnPropertyChanged(); } }
     }
 
-    private double? _windowLeft = Constants.WindowSettings.DEFAULT_WINDOW_LEFT;
+    private double? _windowLeft = Constants.WindowSettings.DefaultWindowLeft;
     /// <summary>
     /// Получает или устанавливает позицию окна по горизонтали.
-    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_LEFT"/>.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DefaultWindowLeft"/>.
     /// </summary>
     [JsonPropertyName("windowLeft")]
     public double? WindowLeft
@@ -84,10 +84,10 @@ public class WidgetSettings : INotifyPropertyChanged
         }
     }
 
-    private double? _windowTop = Constants.WindowSettings.DEFAULT_WINDOW_TOP;
+    private double? _windowTop = Constants.WindowSettings.DefaultWindowTop;
     /// <summary>
     /// Получает или устанавливает позицию окна по вертикали.
-    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_WINDOW_TOP"/>.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DefaultWindowTop"/>.
     /// </summary>
     [JsonPropertyName("windowTop")]
     public double? WindowTop
@@ -100,10 +100,10 @@ public class WidgetSettings : INotifyPropertyChanged
         }
     }
 
-    private double? _analogClockLeft = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT;
+    private double? _analogClockLeft = Constants.WindowSettings.DefaultAnalogClockLeft;
     /// <summary>
     /// Получает или устанавливает позицию окна аналоговых часов по горизонтали.
-    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT"/>.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DefaultAnalogClockLeft"/>.
     /// </summary>
     [JsonPropertyName("analogClockLeft")]
     public double? AnalogClockLeft
@@ -116,10 +116,10 @@ public class WidgetSettings : INotifyPropertyChanged
         }
     }
 
-    private double? _analogClockTop = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP;
+    private double? _analogClockTop = Constants.WindowSettings.DefaultAnalogClockTop;
     /// <summary>
     /// Получает или устанавливает позицию окна аналоговых часов по вертикали.
-    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP"/>.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DefaultAnalogClockTop"/>.
     /// </summary>
     [JsonPropertyName("analogClockTop")]
     public double? AnalogClockTop
@@ -132,10 +132,10 @@ public class WidgetSettings : INotifyPropertyChanged
         }
     }
 
-    private double _analogClockSize = Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
+    private double _analogClockSize = Constants.WindowSettings.DefaultAnalogClockSize;
     /// <summary>
     /// Получает или устанавливает размер окна аналоговых часов.
-    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE"/>.
+    /// Значение по умолчанию: <see cref="Constants.WindowSettings.DefaultAnalogClockSize"/>.
     /// </summary>
     [JsonPropertyName("analogClockSize")]
     public double AnalogClockSize
@@ -194,10 +194,10 @@ public class WidgetSettings : INotifyPropertyChanged
         set { if (_digitalClockTopmost != value) { _digitalClockTopmost = value; OnPropertyChanged(); } }
     }
 
-    private bool _cuckooEveryHour = Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR;
+    private bool _cuckooEveryHour = Constants.CuckooSettings.DefaultCuckooEveryHour;
     /// <summary>
     /// Воспроизводить звук кукушки каждый час.
-    /// Значение по умолчанию: <see cref="Constants.CuckooSettings.DEFAULT_CUCKOO_EVERY_HOUR"/>.
+    /// Значение по умолчанию: <see cref="Constants.CuckooSettings.DefaultCuckooEveryHour"/>.
     /// </summary>
     [JsonPropertyName("cuckooEveryHour")]
     public bool CuckooEveryHour
@@ -241,28 +241,28 @@ public class WidgetSettings : INotifyPropertyChanged
     public static WidgetSettings ValidateSettings(WidgetSettings settings)
     {
         // Валидация прозрачности фона
-        settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity, 
-            Constants.WindowSettings.MIN_WINDOW_OPACITY, 
-            Constants.WindowSettings.MAX_WINDOW_OPACITY, 
-            Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
-        
+        settings.BackgroundOpacity = ValidateOpacity(settings.BackgroundOpacity,
+            Constants.WindowSettings.MinWindowOpacity,
+            Constants.WindowSettings.MaxWindowOpacity,
+            Constants.WindowSettings.DefaultWindowOpacity);
+
         // Валидация прозрачности текста
-        settings.TextOpacity = ValidateOpacity(settings.TextOpacity, 
-            Constants.TextSettings.MIN_TEXT_OPACITY, 
-            Constants.TextSettings.MAX_TEXT_OPACITY, 
-            Constants.TextSettings.DEFAULT_TEXT_OPACITY);
-        
+        settings.TextOpacity = ValidateOpacity(settings.TextOpacity,
+            Constants.TextSettings.MinTextOpacity,
+            Constants.TextSettings.MaxTextOpacity,
+            Constants.TextSettings.DefaultTextOpacity);
+
         // Валидация размера шрифта
         settings.FontSize = ValidateFontSize(settings.FontSize);
-        
+
         // Валидация размера аналоговых часов
         settings.AnalogClockSize = ValidateAnalogClockSize(settings.AnalogClockSize);
-        
+
         // Позиции окон не валидируются, так как могут быть null
-        
+
         // Валидация языка
         settings.Language = ValidateLanguage(settings.Language);
-        
+
         return settings;
     }
 
@@ -280,7 +280,7 @@ public class WidgetSettings : INotifyPropertyChanged
         {
             return defaultValue;
         }
-        return Math.Round(value / Constants.WindowSettings.OPACITY_STEP) * Constants.WindowSettings.OPACITY_STEP;
+        return Math.Round(value / Constants.WindowSettings.OpacityStep) * Constants.WindowSettings.OpacityStep;
     }
 
     /// <summary>
@@ -290,11 +290,11 @@ public class WidgetSettings : INotifyPropertyChanged
     /// <returns>Скорректированное значение размера шрифта.</returns>
     public static double ValidateFontSize(double value)
     {
-        if (value < Constants.TextSettings.MIN_FONT_SIZE || value > Constants.TextSettings.MAX_FONT_SIZE)
+        if (value < Constants.TextSettings.MinFontSize || value > Constants.TextSettings.MaxFontSize)
         {
-            return Constants.TextSettings.DEFAULT_FONT_SIZE;
+            return Constants.TextSettings.DefaultFontSize;
         }
-        return Math.Round(value / Constants.TextSettings.FONT_SIZE_STEP) * Constants.TextSettings.FONT_SIZE_STEP;
+        return Math.Round(value / Constants.TextSettings.FontSizeStep) * Constants.TextSettings.FontSizeStep;
     }
 
     /// <summary>
@@ -304,13 +304,13 @@ public class WidgetSettings : INotifyPropertyChanged
     /// <returns>Скорректированное значение размера окна.</returns>
     public static double ValidateAnalogClockSize(double value)
     {
-        if (value < Constants.WindowSettings.MIN_ANALOG_CLOCK_SIZE || 
-            value > Constants.WindowSettings.MAX_ANALOG_CLOCK_SIZE)
+        if (value < Constants.WindowSettings.MinAnalogClockSize ||
+            value > Constants.WindowSettings.MaxAnalogClockSize)
         {
-            return Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_SIZE;
+            return Constants.WindowSettings.DefaultAnalogClockSize;
         }
-        return Math.Round(value / Constants.WindowSettings.ANALOG_CLOCK_SIZE_STEP) * 
-               Constants.WindowSettings.ANALOG_CLOCK_SIZE_STEP;
+        return Math.Round(value / Constants.WindowSettings.AnalogClockSizeStep) *
+               Constants.WindowSettings.AnalogClockSizeStep;
     }
 
     /// <summary>
@@ -332,4 +332,4 @@ public class WidgetSettings : INotifyPropertyChanged
     /// <returns>True, если значения равны с учетом точности, иначе false.</returns>
     private static bool DoubleEquals(double a, double b, double epsilon = 1e-6)
         => Math.Abs(a - b) < epsilon;
-} 
+}

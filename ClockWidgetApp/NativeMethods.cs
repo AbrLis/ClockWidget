@@ -11,4 +11,4 @@ namespace ClockWidgetApp
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetForegroundWindow(IntPtr hWnd);
     }
-} 
+}

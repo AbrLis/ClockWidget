@@ -78,4 +78,4 @@ namespace ClockWidgetApp.Helpers
             return services.BuildServiceProvider();
         }
     }
-} 
+}

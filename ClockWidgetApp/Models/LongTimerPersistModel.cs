@@ -21,4 +21,4 @@ namespace ClockWidgetApp.Models
         /// </summary>
         public string Name { get; set; } = string.Empty;
     }
-} 
+}

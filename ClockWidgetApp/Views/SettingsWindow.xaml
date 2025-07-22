@@ -34,10 +34,10 @@
     </Window.Resources>
     <TabControl x:Name="MainTabControl" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
         <!-- Вкладка настроек -->
-        <TabItem Header="{Binding Localized.SettingsWindow_CommonSettings}">
+        <TabItem Header="{Binding Localized.SettingsWindowCommonSettings}">
             <StackPanel Margin="10">
                 <!-- Общие настройки -->
-                <GroupBox Header="{Binding Localized.SettingsWindow_CommonSettings}"
+                <GroupBox Header="{Binding Localized.SettingsWindowCommonSettings}"
                           Margin="0,0,0,10">
                     <StackPanel Margin="5">
                         <!-- Язык интерфейса -->
@@ -57,14 +57,14 @@
                         </StackPanel>
 
                         <!-- Видимость фона -->
-                        <TextBlock Text="{Binding Localized.SettingsWindow_BackgroundOpacity}"
+                        <TextBlock Text="{Binding Localized.SettingsWindowBackgroundOpacity}"
                                    Margin="0,0,0,5"/>
 
                         <Slider x:Name="BackgroundOpacitySlider"
-                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_WINDOW_OPACITY}}"
-                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_WINDOW_OPACITY}}"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MinWindowOpacity}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MaxWindowOpacity}}"
                                 Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.OpacityStep}}"
                                 IsSnapToTickEnabled="True"
                                 IsMoveToPointEnabled="True"
                                 ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
@@ -75,14 +75,14 @@
                                    Margin="0,0,0,10"/>
 
                         <!-- Видимость текста -->
-                        <TextBlock Text="{Binding Localized.SettingsWindow_TextOpacity}"
+                        <TextBlock Text="{Binding Localized.SettingsWindowTextOpacity}"
                                    Margin="0,0,0,5"/>
 
                         <Slider x:Name="TextOpacitySlider"
-                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_TEXT_OPACITY}}"
-                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_TEXT_OPACITY}}"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MinTextOpacity}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MaxTextOpacity}}"
                                 Value="{Binding TextOpacity, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="{Binding Source={x:Static helpers:Constants.OPACITY_STEP}}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.OpacityStep}}"
                                 IsSnapToTickEnabled="True"
                                 IsMoveToPointEnabled="True"
                                 ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=P0}"/>
@@ -93,11 +93,11 @@
                                    Margin="0,0,0,10"/>
 
                         <!-- Чекбокс кукушки -->
-                        <CheckBox Content="{Binding Localized.SettingsWindow_CuckooEveryHour}"
+                        <CheckBox Content="{Binding Localized.SettingsWindowCuckooEveryHour}"
                                   IsChecked="{Binding CuckooEveryHour, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,0,0,10"/>
 
-                        <CheckBox Content="{Binding Localized.SettingsWindow_HalfHourChimeEnabled}"
+                        <CheckBox Content="{Binding Localized.SettingsWindowHalfHourChimeEnabled}"
                                   IsChecked="{Binding HalfHourChimeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,0,0,10"/>
 
@@ -105,25 +105,25 @@
                 </GroupBox>
 
                 <!-- Настройки аналоговых часов -->
-                <GroupBox Header="{Binding Localized.SettingsWindow_AnalogSettings}"
+                <GroupBox Header="{Binding Localized.SettingsWindowAnalogSettings}"
                           Margin="0,0,0,10">
                     <StackPanel Margin="5">
-                        <CheckBox Content="{Binding Localized.SettingsWindow_ShowAnalogClock}"
+                        <CheckBox Content="{Binding Localized.SettingsWindowShowAnalogClock}"
                                   IsChecked="{Binding ShowAnalogClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,5"/>
-                        <CheckBox Content="{Binding Localized.SettingsWindow_AnalogClockTopmost}"
+                        <CheckBox Content="{Binding Localized.SettingsWindowAnalogClockTopmost}"
                                   IsChecked="{Binding AnalogClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,0,0,5"/>
 
                         <!-- Размер аналоговых часов -->
-                        <TextBlock Text="{Binding Localized.SettingsWindow_AnalogClockSize}"
+                        <TextBlock Text="{Binding Localized.SettingsWindowAnalogClockSize}"
                                    Margin="0,10,0,5"/>
 
                         <Slider x:Name="AnalogClockSizeSlider"
-                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_ANALOG_CLOCK_SIZE}}"
-                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_ANALOG_CLOCK_SIZE}}"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MinAnalogClockSize}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MaxAnalogClockSize}}"
                                 Value="{Binding AnalogClockSize, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="{Binding Source={x:Static helpers:Constants.ANALOG_CLOCK_SIZE_STEP}}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.AnalogClockSizeStep}}"
                                 IsSnapToTickEnabled="True"
                                 IsMoveToPointEnabled="True"
                                 ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
@@ -137,32 +137,32 @@
                 </GroupBox>
 
                 <!-- Настройки цифровых часов -->
-                <GroupBox Header="{Binding Localized.SettingsWindow_DigitalSettings}"
+                <GroupBox Header="{Binding Localized.SettingsWindowDigitalSettings}"
                           Margin="0,0,0,10">
                     <StackPanel Margin="5">
-                        <CheckBox Content="{Binding Localized.SettingsWindow_ShowDigitalClock}"
+                        <CheckBox Content="{Binding Localized.SettingsWindowShowDigitalClock}"
                                   IsChecked="{Binding ShowDigitalClock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,5"/>
 
                         <!-- Чекбокс отображения секунд -->
                         <CheckBox x:Name="ShowSecondsCheckBox"
-                                  Content="{Binding Localized.SettingsWindow_ShowSeconds}"
+                                  Content="{Binding Localized.SettingsWindowShowSeconds}"
                                   IsChecked="{Binding ShowSeconds, Mode=TwoWay}"
                                   Margin="0,0,0,5"/>
 
-                        <CheckBox Content="{Binding Localized.SettingsWindow_DigitalClockTopmost}"
+                        <CheckBox Content="{Binding Localized.SettingsWindowDigitalClockTopmost}"
                                   IsChecked="{Binding DigitalClockTopmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,0,0,5"/>
 
                         <!-- Размер шрифта -->
-                        <TextBlock Text="{Binding Localized.SettingsWindow_FontSize}"
+                        <TextBlock Text="{Binding Localized.SettingsWindowFontSize}"
                                    Margin="0,10,0,5"/>
 
                         <Slider x:Name="FontSizeSlider"
-                                Minimum="{Binding Source={x:Static helpers:Constants.MIN_FONT_SIZE}}"
-                                Maximum="{Binding Source={x:Static helpers:Constants.MAX_FONT_SIZE}}"
+                                Minimum="{Binding Source={x:Static helpers:Constants.MinFontSize}}"
+                                Maximum="{Binding Source={x:Static helpers:Constants.MaxFontSize}}"
                                 Value="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="{Binding Source={x:Static helpers:Constants.FONT_SIZE_STEP}}"
+                                TickFrequency="{Binding Source={x:Static helpers:Constants.FontSizeStep}}"
                                 IsSnapToTickEnabled="True"
                                 IsMoveToPointEnabled="True"
                                 ToolTip="{Binding Value, RelativeSource={RelativeSource Self}, StringFormat=N0}"
@@ -184,7 +184,7 @@
                         <!-- 36px кнопка + 5px отступ -->
                     </Grid.ColumnDefinitions>
                     <Button x:Name="CloseWidgetButton"
-                            Content="{Binding Localized.SettingsWindow_CloseWidgetButton}"
+                            Content="{Binding Localized.SettingsWindowCloseWidgetButton}"
                             Padding="10,5"
                             Background="#FFE0E0"
                             Click="CloseWidgetButton_Click"
@@ -192,7 +192,7 @@
                             VerticalAlignment="Center"
                             Grid.Column="0"/>
                     <Button x:Name="ShowLogsButton"
-                            Content="{Binding Localized.SettingsWindow_Logs}"
+                            Content="{Binding Localized.SettingsWindowLogs}"
                             Width="36"
                             Height="24"
                             FontSize="12"
@@ -206,7 +206,7 @@
             </StackPanel>
         </TabItem>
         <!-- Пустая вкладка -->
-        <TabItem Header="{Binding Localized.TimersAndAlarms_Tab}">
+        <TabItem Header="{Binding Localized.TimersAndAlarmsTab}">
             <Grid Margin="10" x:Name="TimersAlarmsGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" /> <!-- Таймеры -->
@@ -216,9 +216,9 @@
                 </Grid.RowDefinitions>
 
                 <!-- === Таймеры === -->
-                <GroupBox Header="{Binding Localized.Timers_Title}" Grid.Row="0" Margin="0,0,0,10">
+                <GroupBox Header="{Binding Localized.TimersTitle}" Grid.Row="0" Margin="0,0,0,10">
                     <StackPanel>
-                        <TextBlock Text="{Binding Localized.Timers_Time}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding Localized.TimersTime}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                         <!-- Поле ввода таймера с анимацией и раздельными полями -->
                         <Border Margin="0,8,0,0" Background="#FFFDE9" CornerRadius="6" Padding="6" Visibility="{Binding TimersVm.IsTimerInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Border.Triggers>
@@ -232,11 +232,11 @@
                             </Border.Triggers>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBox Width="32" Text="{Binding TimersVm.NewTimerHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
-                                <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Localized.TimerHours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
                                 <TextBox Width="32" Text="{Binding TimersVm.NewTimerMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
-                                <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Localized.TimerMinutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
                                 <TextBox Width="32" Text="{Binding TimersVm.NewTimerSeconds, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="TimerTimeBox_LostFocus"/>
-                                <TextBlock Text="{Binding Localized.Timer_Seconds}" Margin="2,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Localized.TimerSeconds}" Margin="2,0,8,0" VerticalAlignment="Center"/>
                                 <!-- Кнопка OK для добавления -->
                                 <Button Content="OK" Command="{Binding TimersVm.AddTimerCommand}" IsEnabled="{Binding TimersVm.IsNewTimerValid}">
                                     <Button.Style>
@@ -267,7 +267,7 @@
                             </StackPanel>
                         </Border>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" Visibility="{Binding TimersVm.IsTimerInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                            <Button Content="+" Width="20" Height="20" ToolTip="{Binding Localized.Timers_Add}" Command="{Binding TimersVm.ShowTimerInputCommand}"/>
+                            <Button Content="+" Width="20" Height="20" ToolTip="{Binding Localized.TimersAdd}" Command="{Binding TimersVm.ShowTimerInputCommand}"/>
                         </StackPanel>
                         <!-- Список таймеров с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если таймеров ≤ 5 — область растёт по содержимому. -->
@@ -301,7 +301,7 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Timers_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+                                                <TextBlock Text="{Binding DisplayTime}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.TimersTime, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
                                                     <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}">
                                                         <Button.Style>
@@ -332,9 +332,9 @@
                 <Separator Grid.Row="1" Margin="0,0,0,0"/>
 
                 <!-- === Будильники === -->
-                <GroupBox Header="{Binding Localized.Alarms_Title}" Grid.Row="2" Margin="0,10,0,10">
+                <GroupBox Header="{Binding Localized.AlarmsTitle}" Grid.Row="2" Margin="0,10,0,10">
                     <StackPanel>
-                        <TextBlock Text="{Binding Localized.Alarms_Time}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding Localized.AlarmsTime}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                         <!-- Поле ввода будильника с анимацией и раздельными полями -->
                         <Border Margin="0,8,0,0" Background="#F0F8FF" CornerRadius="6" Padding="6" Visibility="{Binding AlarmsVm.IsAlarmInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Border.Triggers>
@@ -349,9 +349,9 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBox Width="32" Text="{Binding AlarmsVm.NewAlarmHours, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
-                                    <TextBlock Text="{Binding Localized.Timer_Hours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Localized.TimerHours}" Margin="2,0,6,0" VerticalAlignment="Center"/>
                                     <TextBox Width="32" Text="{Binding AlarmsVm.NewAlarmMinutes, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" MaxLength="2" HorizontalContentAlignment="Center" LostFocus="AlarmTimeBox_LostFocus"/>
-                                    <TextBlock Text="{Binding Localized.Timer_Minutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Localized.TimerMinutes}" Margin="2,0,6,0" VerticalAlignment="Center"/>
                                     <Button Content="OK" Command="{Binding AlarmsVm.AddAlarmCommand}" IsEnabled="{Binding AlarmsVm.IsNewAlarmValid}">
                                         <Button.Style>
                                             <Style TargetType="Button">
@@ -384,7 +384,7 @@
                             </StackPanel>
                         </Border>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" Visibility="{Binding AlarmsVm.IsAlarmInputVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                            <Button Content="+" Width="20" Height="20" ToolTip="{Binding Localized.Alarms_Add}" Command="{Binding AlarmsVm.ShowAlarmInputCommand}"/>
+                            <Button Content="+" Width="20" Height="20" ToolTip="{Binding Localized.AlarmsAdd}" Command="{Binding AlarmsVm.ShowAlarmInputCommand}"/>
                         </StackPanel>
                         <!-- Список будильников с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области будильников, чтобы при превышении 5 элементов появлялся скроллбар. Если будильников ≤ 5 — область растёт по содержимому. -->
@@ -418,7 +418,7 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding AlarmTime, StringFormat='{}{0:hh\\:mm}'}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.Alarms_Time, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+                                                <TextBlock Text="{Binding AlarmTime, StringFormat='{}{0:hh\\:mm}'}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="{Binding DataContext.Localized.AlarmsTime, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
                                                     <Button x:Name="StartButton" Content="▶️" Width="28" Height="28" Margin="4,0" Command="{Binding StartCommand}" Opacity="{Binding IsStartAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
                                                     <Button Content="⏸️" Width="28" Height="28" Margin="4,0" Command="{Binding StopCommand}" Opacity="{Binding IsStopAvailable, Converter={StaticResource BooleanToOpacityConverter}}"/>
@@ -436,11 +436,11 @@
                 <!-- === Разделитель === -->
                 <Separator Grid.Row="1" Margin="0,0,0,0"/>
                 <!-- === Длинные таймеры === -->
-                <GroupBox Header="{Binding Localized.LongTimers_Title}" Grid.Row="3" Margin="0,10,0,10">
+                <GroupBox Header="{Binding Localized.LongTimersTitle}" Grid.Row="3" Margin="0,10,0,10">
                     <StackPanel>
-                        <TextBlock Text="{Binding Localized.LongTimers_TriggerDateTime}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding Localized.LongTimersTriggerDateTime}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0">
-                            <Button x:Name="LongTimerAddButton" Content="+" Width="20" Height="20" ToolTip="{Binding Localized.LongTimers_Add}" Click="LongTimerAddButton_Click"/>
+                            <Button x:Name="LongTimerAddButton" Content="+" Width="20" Height="20" ToolTip="{Binding Localized.LongTimersAdd}" Click="LongTimerAddButton_Click"/>
                         </StackPanel>
                         <!-- Список длинных таймеров с авторазмером и скроллом при превышении 5 -->
                         <!-- MaxHeight ограничивает высоту области длинных таймеров, чтобы при превышении 5 элементов появлялся скроллбар. Если длинных таймеров ≤ 5 — область растёт по содержимому. -->

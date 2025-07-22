@@ -47,4 +47,4 @@ namespace ClockWidgetApp.Services
         void SetMainWindowTop(double value);
         #endregion
     }
-} 
+}

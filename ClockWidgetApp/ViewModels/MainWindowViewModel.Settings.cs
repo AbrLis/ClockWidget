@@ -23,7 +23,7 @@ public partial class MainWindowViewModel
         {
             return defaultValue;
         }
-        return Math.Round(value / Constants.WindowSettings.OPACITY_STEP) * Constants.WindowSettings.OPACITY_STEP;
+        return Math.Round(value / Constants.WindowSettings.OpacityStep) * Constants.WindowSettings.OpacityStep;
     }
 
     /// <summary>
@@ -33,11 +33,11 @@ public partial class MainWindowViewModel
     /// <returns>Скорректированное значение размера шрифта.</returns>
     private double ValidateFontSize(double value)
     {
-        if (value < Constants.TextSettings.MIN_FONT_SIZE || value > Constants.TextSettings.MAX_FONT_SIZE)
+        if (value < Constants.TextSettings.MinFontSize || value > Constants.TextSettings.MaxFontSize)
         {
-            return Constants.TextSettings.DEFAULT_FONT_SIZE;
+            return Constants.TextSettings.DefaultFontSize;
         }
-        return Math.Round(value / Constants.TextSettings.FONT_SIZE_STEP) * Constants.TextSettings.FONT_SIZE_STEP;
+        return Math.Round(value / Constants.TextSettings.FontSizeStep) * Constants.TextSettings.FontSizeStep;
     }
 
     /// <summary>
@@ -47,9 +47,9 @@ public partial class MainWindowViewModel
     /// <param name="time">Новое время.</param>
     private void OnTimeUpdated(object? sender, DateTime time)
     {
-        TimeText = time.ToString(_showSeconds ? 
-            Constants.DisplaySettings.TIME_FORMAT_WITH_SECONDS : 
-            Constants.DisplaySettings.TIME_FORMAT_WITHOUT_SECONDS);
+        TimeText = time.ToString(_showSeconds ?
+            Constants.DisplaySettings.TimeFormatWithSeconds :
+            Constants.DisplaySettings.TimeFormatWithoutSeconds);
 
         // Логика кукушки
         try

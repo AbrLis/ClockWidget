@@ -36,4 +36,4 @@ namespace ClockWidgetApp.Services
             logger?.LogInformation("[App] GracefulShutdownAsync завершён: все сервисы остановлены");
         }
     }
-} 
+}

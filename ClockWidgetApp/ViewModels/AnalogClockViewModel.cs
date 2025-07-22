@@ -136,14 +136,14 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
         for (int minute = 0; minute < 60; minute++)
         {
             double angleInRadians = (minute * 6 - 90) * Math.PI / 180;
-            double tickLength = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HOUR_TICK_LENGTH : AnalogClockConstants.TickSizes.MINUTE_TICK_LENGTH;
-            double tickThickness = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HOUR_TICK_THICKNESS : AnalogClockConstants.TickSizes.MINUTE_TICK_THICKNESS;
-            double startRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS - tickLength;
-            const double endRadius = AnalogClockConstants.Positioning.CLOCK_RADIUS;
-            double startX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + (startRadius * Math.Cos(angleInRadians));
-            double startY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + (startRadius * Math.Sin(angleInRadians));
-            double endX = AnalogClockConstants.Positioning.CLOCK_CENTER_X + (endRadius * Math.Cos(angleInRadians));
-            double endY = AnalogClockConstants.Positioning.CLOCK_CENTER_Y + (endRadius * Math.Sin(angleInRadians));
+            double tickLength = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HourTickLength : AnalogClockConstants.TickSizes.MinuteTickLength;
+            double tickThickness = (minute % 5 == 0) ? AnalogClockConstants.TickSizes.HourTickThickness : AnalogClockConstants.TickSizes.MinuteTickThickness;
+            double startRadius = AnalogClockConstants.Positioning.ClockRadius - tickLength;
+            const double endRadius = AnalogClockConstants.Positioning.ClockRadius;
+            double startX = AnalogClockConstants.Positioning.ClockCenterX + (startRadius * Math.Cos(angleInRadians));
+            double startY = AnalogClockConstants.Positioning.ClockCenterY + (startRadius * Math.Sin(angleInRadians));
+            double endX = AnalogClockConstants.Positioning.ClockCenterX + (endRadius * Math.Cos(angleInRadians));
+            double endY = AnalogClockConstants.Positioning.ClockCenterY + (endRadius * Math.Sin(angleInRadians));
             ticks.Add(new ClockTick(startX, startY, endX, endY, tickThickness));
         }
         ClockTicks = ticks;
@@ -167,15 +167,15 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
                 if (_hourHandTransform.Children.Count > 0 && _hourHandTransform.Children[0] is RotateTransform hourRotate)
                     hourRotate.Angle = hourAngle;
                 else
-                    HourHandTransform = new TransformGroup { Children = { new RotateTransform(hourAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
+                    HourHandTransform = new TransformGroup { Children = { new RotateTransform(hourAngle, AnalogClockConstants.Positioning.ClockCenterX, AnalogClockConstants.Positioning.ClockCenterY) } };
                 if (_minuteHandTransform.Children.Count > 0 && _minuteHandTransform.Children[0] is RotateTransform minuteRotate)
                     minuteRotate.Angle = minuteAngle;
                 else
-                    MinuteHandTransform = new TransformGroup { Children = { new RotateTransform(minuteAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
+                    MinuteHandTransform = new TransformGroup { Children = { new RotateTransform(minuteAngle, AnalogClockConstants.Positioning.ClockCenterX, AnalogClockConstants.Positioning.ClockCenterY) } };
                 if (_secondHandTransform.Children.Count > 0 && _secondHandTransform.Children[0] is RotateTransform secondRotate)
                     secondRotate.Angle = secondAngle;
                 else
-                    SecondHandTransform = new TransformGroup { Children = { new RotateTransform(secondAngle, AnalogClockConstants.Positioning.CLOCK_CENTER_X, AnalogClockConstants.Positioning.CLOCK_CENTER_Y) } };
+                    SecondHandTransform = new TransformGroup { Children = { new RotateTransform(secondAngle, AnalogClockConstants.Positioning.ClockCenterX, AnalogClockConstants.Positioning.ClockCenterY) } };
             });
     }
 

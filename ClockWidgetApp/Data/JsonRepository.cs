@@ -27,8 +27,8 @@ namespace ClockWidgetApp.Data
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
             _backupPath = Path.ChangeExtension(filePath, ".bak");
-            
-            _serializerOptions = new JsonSerializerOptions 
+
+            _serializerOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 PropertyNameCaseInsensitive = true

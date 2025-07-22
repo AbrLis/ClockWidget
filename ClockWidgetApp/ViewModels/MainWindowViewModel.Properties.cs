@@ -42,9 +42,9 @@ public partial class MainWindowViewModel
         set
         {
             var validatedValue = ValidateOpacity(value,
-                Constants.WindowSettings.MIN_WINDOW_OPACITY,
-                Constants.WindowSettings.MAX_WINDOW_OPACITY,
-                Constants.WindowSettings.DEFAULT_WINDOW_OPACITY);
+                Constants.WindowSettings.MinWindowOpacity,
+                Constants.WindowSettings.MaxWindowOpacity,
+                Constants.WindowSettings.DefaultWindowOpacity);
             if (AreClose(_appDataService.Data.WidgetSettings.BackgroundOpacity, validatedValue)) return;
             _logger.LogInformation($"[BackgroundOpacity] Changed: {validatedValue}");
             _appDataService.Data.WidgetSettings.BackgroundOpacity = validatedValue;
@@ -61,9 +61,9 @@ public partial class MainWindowViewModel
         set
         {
             var validatedValue = ValidateOpacity(value,
-                Constants.TextSettings.MIN_TEXT_OPACITY,
-                Constants.TextSettings.MAX_TEXT_OPACITY,
-                Constants.TextSettings.DEFAULT_TEXT_OPACITY);
+                Constants.TextSettings.MinTextOpacity,
+                Constants.TextSettings.MaxTextOpacity,
+                Constants.TextSettings.DefaultTextOpacity);
             if (AreClose(_appDataService.Data.WidgetSettings.TextOpacity, validatedValue)) return;
             _logger.LogInformation($"[TextOpacity] Changed: {validatedValue}");
             _appDataService.Data.WidgetSettings.TextOpacity = validatedValue;

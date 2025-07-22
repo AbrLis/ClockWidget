@@ -14,4 +14,4 @@ namespace ClockWidgetApp.Models
         /// <summary>Коллекция длинных таймеров.</summary>
         public List<LongTimerPersistModel> LongTimers { get; set; } = new();
     }
-} 
+}

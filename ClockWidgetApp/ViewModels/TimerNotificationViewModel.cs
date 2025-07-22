@@ -46,7 +46,7 @@ namespace ClockWidgetApp.ViewModels
         /// <summary>
         /// Локализованный заголовок окна.
         /// </summary>
-        public string TitleText => NotificationType == "alarm" ? Localized.AlarmNotification_Title : Localized.TimerNotification_Title;
+        public string TitleText => NotificationType == "alarm" ? Localized.AlarmNotificationTitle : Localized.TimerNotificationTitle;
 
         /// <summary>
         /// Текст времени для отображения в окне.

@@ -81,7 +81,7 @@ namespace ClockWidgetApp.Views
         {
             if (SelectedDateTime <= DateTime.Now)
             {
-                ErrorText = Localized.LongTimerInput_ErrorInPast;
+                ErrorText = Localized.LongTimerInputErrorInPast;
                 ErrorVisible = true;
                 _errorTimer?.Stop();
                 _errorTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(Helpers.Constants.LongTimerInputErrorDurationMs) };

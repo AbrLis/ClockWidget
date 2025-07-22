@@ -56,4 +56,4 @@ namespace ClockWidgetApp.Helpers
                 .CreateLogger();
         }
     }
-} 
+}

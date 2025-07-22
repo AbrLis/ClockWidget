@@ -27,4 +27,4 @@ namespace ClockWidgetApp.Models
         /// </summary>
         public ObservableCollection<LongTimerPersistModel> LongTimers { get; set; } = new ObservableCollection<LongTimerPersistModel>();
     }
-} 
+}

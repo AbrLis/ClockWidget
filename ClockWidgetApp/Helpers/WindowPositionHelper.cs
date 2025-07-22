@@ -19,15 +19,15 @@ public static class WindowPositionHelper
         if (isAnalogClock)
         {
             return (
-                settings.AnalogClockLeft ?? Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_LEFT,
-                settings.AnalogClockTop ?? Constants.WindowSettings.DEFAULT_ANALOG_CLOCK_TOP
+                settings.AnalogClockLeft ?? Constants.WindowSettings.DefaultAnalogClockLeft,
+                settings.AnalogClockTop ?? Constants.WindowSettings.DefaultAnalogClockTop
             );
         }
         else
         {
             return (
-                settings.WindowLeft ?? Constants.WindowSettings.DEFAULT_WINDOW_LEFT,
-                settings.WindowTop ?? Constants.WindowSettings.DEFAULT_WINDOW_TOP
+                settings.WindowLeft ?? Constants.WindowSettings.DefaultWindowLeft,
+                settings.WindowTop ?? Constants.WindowSettings.DefaultWindowTop
             );
         }
     }
@@ -64,4 +64,4 @@ public static class WindowPositionHelper
     /// </summary>
     public static void SaveWindowPosition(IAppDataService appDataService, double left, double top, bool isAnalogClock)
         => SaveWindowPosition(appDataService.Data.WidgetSettings, left, top, isAnalogClock);
-} 
+}

@@ -26,24 +26,24 @@ public class ClockTick
     /// X-координата начальной точки риски.
     /// </summary>
     public double X1 { get; set; }
-    
+
     /// <summary>
     /// Y-координата начальной точки риски.
     /// </summary>
     public double Y1 { get; set; }
-    
+
     /// <summary>
     /// X-координата конечной точки риски.
     /// </summary>
     public double X2 { get; set; }
-    
+
     /// <summary>
     /// Y-координата конечной точки риски.
     /// </summary>
     public double Y2 { get; set; }
-    
+
     /// <summary>
     /// Толщина риски.
     /// </summary>
     public double Thickness { get; set; }
-} 
+}

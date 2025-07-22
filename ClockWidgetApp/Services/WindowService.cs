@@ -158,7 +158,7 @@ namespace ClockWidgetApp.Services
             if (_settingsWindow != null)
             {
                 var vm = _settingsWindow.ViewModel;
-                vm.SelectedTabIndex = selectTimersTab ? Constants.SETTINGS_TAB_INDEX_TIMERS : Constants.SETTINGS_TAB_INDEX_GENERAL;
+                vm.SelectedTabIndex = selectTimersTab ? Constants.SettingsTabIndexTimers : Constants.SettingsTabIndexGeneral;
             }
         }
 
@@ -184,4 +184,4 @@ namespace ClockWidgetApp.Services
         public void SetMainWindowTop(double value) { if (_mainWindow != null) _mainWindow.Top = value; }
         #endregion
     }
-} 
+}

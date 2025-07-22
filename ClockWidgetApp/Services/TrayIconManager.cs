@@ -338,4 +338,4 @@ namespace ClockWidgetApp.Services
             return tooltip;
         }
     }
-} 
+}

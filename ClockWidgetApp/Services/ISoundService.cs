@@ -57,4 +57,4 @@ public class NullSoundHandle : ISoundHandle
     /// Не выполняет никаких действий.
     /// </summary>
     public void Stop() { /* ничего не делаем */ }
-} 
+}

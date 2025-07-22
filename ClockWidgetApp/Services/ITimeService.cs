@@ -19,4 +19,4 @@ public interface ITimeService : IDisposable
     /// Останавливает сервис обновления времени.
     /// </summary>
     void Stop();
-} 
+}

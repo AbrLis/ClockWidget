@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:ClockWidgetApp.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="{Binding Localized.MainWindow_Title}" 
+        Title="{Binding Localized.MainWindowTitle}" 
         Height="450" 
         Width="800"
         Icon="/Resources/Icons/app.ico"

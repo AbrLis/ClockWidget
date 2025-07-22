@@ -58,75 +58,75 @@ public class LocalizedStrings
 {
     private readonly string _lang;
     public LocalizedStrings(string lang) { _lang = lang; }
-    public string SettingsWindow_CommonSettings => LocalizationManager.GetString("SettingsWindow_CommonSettings", _lang);
-    public string SettingsWindow_BackgroundOpacity => LocalizationManager.GetString("SettingsWindow_BackgroundOpacity", _lang);
-    public string SettingsWindow_TextOpacity => LocalizationManager.GetString("SettingsWindow_TextOpacity", _lang);
-    public string SettingsWindow_CuckooEveryHour => LocalizationManager.GetString("SettingsWindow_CuckooEveryHour", _lang);
-    public string SettingsWindow_HalfHourChimeEnabled => LocalizationManager.GetString("SettingsWindow_HalfHourChime", _lang);
-    public string SettingsWindow_AnalogSettings => LocalizationManager.GetString("SettingsWindow_AnalogSettings", _lang);
-    public string SettingsWindow_ShowAnalogClock => LocalizationManager.GetString("SettingsWindow_ShowAnalog", _lang);
-    public string SettingsWindow_AnalogClockTopmost => LocalizationManager.GetString("SettingsWindow_AnalogTopmost", _lang);
-    public string SettingsWindow_AnalogClockSize => LocalizationManager.GetString("SettingsWindow_AnalogSize", _lang);
-    public string SettingsWindow_DigitalSettings => LocalizationManager.GetString("SettingsWindow_DigitalSettings", _lang);
-    public string SettingsWindow_ShowDigitalClock => LocalizationManager.GetString("SettingsWindow_ShowDigital", _lang);
-    public string SettingsWindow_DigitalClockTopmost => LocalizationManager.GetString("SettingsWindow_DigitalTopmost", _lang);
-    public string SettingsWindow_ShowSeconds => LocalizationManager.GetString("SettingsWindow_ShowSeconds", _lang);
-    public string SettingsWindow_FontSize => LocalizationManager.GetString("SettingsWindow_FontSize", _lang);
-    public string SettingsWindow_CloseWidgetButton => LocalizationManager.GetString("SettingsWindow_CloseWidget", _lang);
-    public string SettingsWindow_Logs => LocalizationManager.GetString("SettingsWindow_Logs", _lang);
-    public string SettingsWindow_LogsNotFound => LocalizationManager.GetString("SettingsWindow_LogsNotFound", _lang);
+    public string SettingsWindowCommonSettings => LocalizationManager.GetString("SettingsWindow_CommonSettings", _lang);
+    public string SettingsWindowBackgroundOpacity => LocalizationManager.GetString("SettingsWindow_BackgroundOpacity", _lang);
+    public string SettingsWindowTextOpacity => LocalizationManager.GetString("SettingsWindow_TextOpacity", _lang);
+    public string SettingsWindowCuckooEveryHour => LocalizationManager.GetString("SettingsWindow_CuckooEveryHour", _lang);
+    public string SettingsWindowHalfHourChimeEnabled => LocalizationManager.GetString("SettingsWindow_HalfHourChime", _lang);
+    public string SettingsWindowAnalogSettings => LocalizationManager.GetString("SettingsWindow_AnalogSettings", _lang);
+    public string SettingsWindowShowAnalogClock => LocalizationManager.GetString("SettingsWindow_ShowAnalog", _lang);
+    public string SettingsWindowAnalogClockTopmost => LocalizationManager.GetString("SettingsWindow_AnalogTopmost", _lang);
+    public string SettingsWindowAnalogClockSize => LocalizationManager.GetString("SettingsWindow_AnalogSize", _lang);
+    public string SettingsWindowDigitalSettings => LocalizationManager.GetString("SettingsWindow_DigitalSettings", _lang);
+    public string SettingsWindowShowDigitalClock => LocalizationManager.GetString("SettingsWindow_ShowDigital", _lang);
+    public string SettingsWindowDigitalClockTopmost => LocalizationManager.GetString("SettingsWindow_DigitalTopmost", _lang);
+    public string SettingsWindowShowSeconds => LocalizationManager.GetString("SettingsWindow_ShowSeconds", _lang);
+    public string SettingsWindowFontSize => LocalizationManager.GetString("SettingsWindow_FontSize", _lang);
+    public string SettingsWindowCloseWidgetButton => LocalizationManager.GetString("SettingsWindow_CloseWidget", _lang);
+    public string SettingsWindowLogs => LocalizationManager.GetString("SettingsWindow_Logs", _lang);
+    public string SettingsWindowLogsNotFound => LocalizationManager.GetString("SettingsWindow_LogsNotFound", _lang);
     public string LanguageLabel => LocalizationManager.GetString("Language_Label", _lang);
-    public string MainWindow_Title => LocalizationManager.GetString("MainWindow_Title", _lang);
-    public string AnalogClockWindow_Title => LocalizationManager.GetString("AnalogClockWindow_Title", _lang);
-    public string TimersAndAlarms_Tab => LocalizationManager.GetString("TimersAndAlarms_Tab", _lang);
-    public string Timers_Title => LocalizationManager.GetString("Timers_Title", _lang);
-    public string Timers_Add => LocalizationManager.GetString("Timers_Add", _lang);
-    public string Timers_DisableAll => LocalizationManager.GetString("Timers_DisableAll", _lang);
-    public string Timers_DeleteAll => LocalizationManager.GetString("Timers_DeleteAll", _lang);
-    public string Timers_ActivateAll => LocalizationManager.GetString("Timers_ActivateAll", _lang);
-    public string Timers_Delete => LocalizationManager.GetString("Timers_Delete", _lang);
-    public string Timers_Status => LocalizationManager.GetString("Timers_Status", _lang);
-    public string Timers_Disable => LocalizationManager.GetString("Timers_Disable", _lang);
-    public string Timers_Time => LocalizationManager.GetString("Timers_Time", _lang);
-    public string Timers_Active => LocalizationManager.GetString("Timers_Active", _lang);
-    public string Timers_Inactive => LocalizationManager.GetString("Timers_Inactive", _lang);
-    public string Alarms_Title => LocalizationManager.GetString("Alarms_Title", _lang);
-    public string Alarms_Add => LocalizationManager.GetString("Alarms_Add", _lang);
-    public string Alarms_Delete => LocalizationManager.GetString("Alarms_Delete", _lang);
-    public string Alarms_Status => LocalizationManager.GetString("Alarms_Status", _lang);
-    public string Alarms_Enable => LocalizationManager.GetString("Alarms_Enable", _lang);
-    public string Alarms_Time => LocalizationManager.GetString("Alarms_Time", _lang);
-    public string WidgetSettings_Title => LocalizationManager.GetString("WidgetSettings_Title", _lang);
-    public string WidgetSettings_Size => LocalizationManager.GetString("WidgetSettings_Size", _lang);
-    public string WidgetSettings_SizeTooltip => LocalizationManager.GetString("WidgetSettings_SizeTooltip", _lang);
-    public string WidgetSettings_Topmost => LocalizationManager.GetString("WidgetSettings_Topmost", _lang);
-    public string WidgetSettings_TopmostTooltip => LocalizationManager.GetString("WidgetSettings_TopmostTooltip", _lang);
-    public string Timer_Hours => LocalizationManager.GetString("Timer_Hours", _lang);
-    public string Timer_Minutes => LocalizationManager.GetString("Timer_Minutes", _lang);
-    public string Timer_Seconds => LocalizationManager.GetString("Timer_Seconds", _lang);
-    public string TimerNotification_Title => LocalizationManager.GetString("TimerNotification_Title", _lang);
-    public string TimerNotification_StopButton => LocalizationManager.GetString("TimerNotification_StopButton", _lang);
-    public string AlarmNotification_Title => LocalizationManager.GetString("AlarmNotification_Title", _lang);
+    public string MainWindowTitle => LocalizationManager.GetString("MainWindow_Title", _lang);
+    public string AnalogClockWindowTitle => LocalizationManager.GetString("AnalogClockWindow_Title", _lang);
+    public string TimersAndAlarmsTab => LocalizationManager.GetString("TimersAndAlarms_Tab", _lang);
+    public string TimersTitle => LocalizationManager.GetString("Timers_Title", _lang);
+    public string TimersAdd => LocalizationManager.GetString("Timers_Add", _lang);
+    public string TimersDisableAll => LocalizationManager.GetString("Timers_DisableAll", _lang);
+    public string TimersDeleteAll => LocalizationManager.GetString("Timers_DeleteAll", _lang);
+    public string TimersActivateAll => LocalizationManager.GetString("Timers_ActivateAll", _lang);
+    public string TimersDelete => LocalizationManager.GetString("Timers_Delete", _lang);
+    public string TimersStatus => LocalizationManager.GetString("Timers_Status", _lang);
+    public string TimersDisable => LocalizationManager.GetString("Timers_Disable", _lang);
+    public string TimersTime => LocalizationManager.GetString("Timers_Time", _lang);
+    public string TimersActive => LocalizationManager.GetString("Timers_Active", _lang);
+    public string TimersInactive => LocalizationManager.GetString("Timers_Inactive", _lang);
+    public string AlarmsTitle => LocalizationManager.GetString("Alarms_Title", _lang);
+    public string AlarmsAdd => LocalizationManager.GetString("Alarms_Add", _lang);
+    public string AlarmsDelete => LocalizationManager.GetString("Alarms_Delete", _lang);
+    public string AlarmsStatus => LocalizationManager.GetString("Alarms_Status", _lang);
+    public string AlarmsEnable => LocalizationManager.GetString("Alarms_Enable", _lang);
+    public string AlarmsTime => LocalizationManager.GetString("Alarms_Time", _lang);
+    public string WidgetSettingsTitle => LocalizationManager.GetString("WidgetSettings_Title", _lang);
+    public string WidgetSettingsSize => LocalizationManager.GetString("WidgetSettings_Size", _lang);
+    public string WidgetSettingsSizeTooltip => LocalizationManager.GetString("WidgetSettings_SizeTooltip", _lang);
+    public string WidgetSettingsTopmost => LocalizationManager.GetString("WidgetSettings_Topmost", _lang);
+    public string WidgetSettingsTopmostTooltip => LocalizationManager.GetString("WidgetSettings_TopmostTooltip", _lang);
+    public string TimerHours => LocalizationManager.GetString("Timer_Hours", _lang);
+    public string TimerMinutes => LocalizationManager.GetString("Timer_Minutes", _lang);
+    public string TimerSeconds => LocalizationManager.GetString("Timer_Seconds", _lang);
+    public string TimerNotificationTitle => LocalizationManager.GetString("TimerNotification_Title", _lang);
+    public string TimerNotificationStopButton => LocalizationManager.GetString("TimerNotification_StopButton", _lang);
+    public string AlarmNotificationTitle => LocalizationManager.GetString("AlarmNotification_Title", _lang);
     /// <summary>
     /// Локализованная строка для пункта меню трея 'Настройка таймера/будильника'.
     /// </summary>
-    public string Tray_TimerAlarmSettings => LocalizationManager.GetString("Tray_TimerAlarmSettings", _lang);
+    public string TrayTimerAlarmSettings => LocalizationManager.GetString("Tray_TimerAlarmSettings", _lang);
     /// <summary>
     /// Локализованная строка для пункта меню трея 'Стоп'.
     /// </summary>
-    public string Tray_Stop => LocalizationManager.GetString("Tray_Stop", _lang);
-    public string Alarms_DuplicateNotification => LocalizationManager.GetString("Alarms_DuplicateNotification", _lang);
-    public string LongTimerInput_Title => LocalizationManager.GetString("LongTimerInput_Title", _lang);
-    public string LongTimerInput_SelectDate => LocalizationManager.GetString("LongTimerInput_SelectDate", _lang);
-    public string LongTimerInput_Time => LocalizationManager.GetString("LongTimerInput_Time", _lang);
-    public string LongTimerInput_Name => LocalizationManager.GetString("LongTimerInput_Name", _lang);
-    public string LongTimerInput_Ok => LocalizationManager.GetString("LongTimerInput_Ok", _lang);
-    public string LongTimerInput_Cancel => LocalizationManager.GetString("LongTimerInput_Cancel", _lang);
-    public string LongTimers_Title => LocalizationManager.GetString("LongTimers_Title", _lang);
-    public string LongTimers_Add => LocalizationManager.GetString("LongTimers_Add", _lang);
-    public string LongTimers_TriggerDateTime => LocalizationManager.GetString("LongTimers_TriggerDateTime", _lang);
+    public string TrayStop => LocalizationManager.GetString("Tray_Stop", _lang);
+    public string AlarmsDuplicateNotification => LocalizationManager.GetString("Alarms_DuplicateNotification", _lang);
+    public string LongTimerInputTitle => LocalizationManager.GetString("LongTimerInput_Title", _lang);
+    public string LongTimerInputSelectDate => LocalizationManager.GetString("LongTimerInput_SelectDate", _lang);
+    public string LongTimerInputTime => LocalizationManager.GetString("LongTimerInput_Time", _lang);
+    public string LongTimerInputName => LocalizationManager.GetString("LongTimerInput_Name", _lang);
+    public string LongTimerInputOk => LocalizationManager.GetString("LongTimerInput_Ok", _lang);
+    public string LongTimerInputCancel => LocalizationManager.GetString("LongTimerInput_Cancel", _lang);
+    public string LongTimersTitle => LocalizationManager.GetString("LongTimers_Title", _lang);
+    public string LongTimersAdd => LocalizationManager.GetString("LongTimers_Add", _lang);
+    public string LongTimersTriggerDateTime => LocalizationManager.GetString("LongTimers_TriggerDateTime", _lang);
     /// <summary>
     /// Ошибка: выбранное время в прошлом (используется в LongTimerInputWindow).
     /// </summary>
-    public string LongTimerInput_ErrorInPast => LocalizationManager.GetString("LongTimerInput_ErrorInPast", _lang);
-} 
+    public string LongTimerInputErrorInPast => LocalizationManager.GetString("LongTimerInput_ErrorInPast", _lang);
+}

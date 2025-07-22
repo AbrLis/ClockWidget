@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:LongTimerInputWindow, IsDesignTimeCreatable=True}"
-    Title="{Binding Localized.LongTimerInput_Title}"
+    Title="{Binding Localized.LongTimerInputTitle}"
     Width="320"
     WindowStartupLocation="CenterOwner"
     ResizeMode="NoResize"
@@ -20,9 +20,9 @@
     </Window.Resources>
     <!-- Окно для выбора даты и времени длинного таймера (всегда поверх всех окон) -->
     <StackPanel Margin="16">
-        <TextBlock Text="{Binding Localized.LongTimerInput_SelectDate}" FontWeight="Bold" Margin="0,0,0,8"/>
+        <TextBlock Text="{Binding Localized.LongTimerInputSelectDate}" FontWeight="Bold" Margin="0,0,0,8"/>
         <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}" Margin="0,0,0,12"/>
-        <TextBlock Text="{Binding Localized.LongTimerInput_Time}" FontWeight="Bold" Margin="0,0,0,4"/>
+        <TextBlock Text="{Binding Localized.LongTimerInputTime}" FontWeight="Bold" Margin="0,0,0,4"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBox Width="32" Text="{Binding SelectedHour, Mode=TwoWay}" MaxLength="2" Margin="0,0,4,0" HorizontalContentAlignment="Center" LostFocus="TimeBox_LostFocus" Tag="Hour"/>
             <TextBlock Text=":" VerticalAlignment="Center"/>
@@ -31,11 +31,11 @@
             <TextBox Width="32" Text="{Binding SelectedSecond, Mode=TwoWay}" MaxLength="2" Margin="4,0,0,0" HorizontalContentAlignment="Center" LostFocus="TimeBox_LostFocus" Tag="Second"/>
         </StackPanel>
         <TextBlock Text="{Binding ErrorText}" Foreground="Red" FontSize="12" Margin="0,4,0,0" Visibility="{Binding ErrorVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <TextBlock Text="{Binding Localized.LongTimerInput_Name}" FontWeight="Bold" Margin="0,12,0,4"/>
+        <TextBlock Text="{Binding Localized.LongTimerInputName}" FontWeight="Bold" Margin="0,12,0,4"/>
         <TextBox Text="{Binding TimerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="{x:Static helpers:Constants.LongTimerNameMaxLength}" PreviewTextInput="TimerNameBox_PreviewTextInput"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button Content="{Binding Localized.LongTimerInput_Ok}" Width="60" Margin="0,0,8,0" IsDefault="True" Click="OkButton_Click"/>
-            <Button Content="{Binding Localized.LongTimerInput_Cancel}" Width="60" IsCancel="True"/>
+            <Button Content="{Binding Localized.LongTimerInputOk}" Width="60" Margin="0,0,8,0" IsDefault="True" Click="OkButton_Click"/>
+            <Button Content="{Binding Localized.LongTimerInputCancel}" Width="60" IsCancel="True"/>
         </StackPanel>
     </StackPanel>
 </Window> 

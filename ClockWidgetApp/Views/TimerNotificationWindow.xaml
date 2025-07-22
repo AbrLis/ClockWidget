@@ -50,7 +50,7 @@
         <!-- Кнопка Stop -->
         <Button x:Name="StopButton"
                 Grid.Row="3"
-                Content="{Binding Localized.TimerNotification_StopButton}"
+                Content="{Binding Localized.TimerNotificationStopButton}"
                 Width="100"
                 Height="32"
                 HorizontalAlignment="Center"

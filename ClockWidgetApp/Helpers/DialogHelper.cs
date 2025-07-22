@@ -19,4 +19,4 @@ namespace ClockWidgetApp.Helpers
             return result == System.Windows.MessageBoxResult.Yes;
         };
     }
-} 
+}

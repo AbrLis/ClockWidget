@@ -342,13 +342,13 @@ public sealed class SettingsWindowViewModel : INotifyPropertyChanged
                 "logs");
             if (!System.IO.Directory.Exists(logsDir))
             {
-                System.Windows.MessageBox.Show(Localized.SettingsWindow_LogsNotFound, Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show(Localized.SettingsWindowLogsNotFound, Localized.SettingsWindowLogs, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var logFiles = System.IO.Directory.GetFiles(logsDir, "clock-widget-*.log");
             if (logFiles.Length == 0)
             {
-                System.Windows.MessageBox.Show(Localized.SettingsWindow_LogsNotFound, Localized.SettingsWindow_Logs, MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show(Localized.SettingsWindowLogsNotFound, Localized.SettingsWindowLogs, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var lastLog = logFiles

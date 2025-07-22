@@ -11,7 +11,7 @@
     xmlns:viewModels="clr-namespace:ClockWidgetApp.ViewModels"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=viewModels:AnalogClockViewModel, IsDesignTimeCreatable=True}"
-    Title="{Binding Localized.AnalogClockWindow_Title}"
+    Title="{Binding Localized.AnalogClockWindowTitle}"
     WindowStyle="None"
     AllowsTransparency="True"
     Background="Transparent"
@@ -27,19 +27,19 @@
             <Grid>
                 <!-- Круглый фон часов -->
                 <Ellipse
-                    Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
-                    Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
+                    Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasSize}}"
+                    Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasSize}}"
                     Fill="Black"
                     Opacity="{Binding BackgroundOpacity}"/>
                 <!-- Основной Canvas для размещения элементов часов -->
                 <Canvas x:Name="ClockCanvas" 
-                        Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
-                        Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
-                        Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_MARGIN}}">
+                        Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasSize}}"
+                        Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasSize}}"
+                        Margin="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasMargin}}">
                     
                     <!-- Контур циферблата -->
-                    <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
-                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CANVAS_SIZE}}"
+                    <Ellipse Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasSize}}"
+                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CanvasSize}}"
                              Stroke="White" 
                              StrokeThickness="2"
                              Opacity="{Binding TextOpacity}"/>
@@ -63,10 +63,10 @@
                     </ItemsControl>
                     
                     <!-- Центральная точка часов -->
-                    <Ellipse Canvas.Left="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_X}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
-                             Canvas.Top="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.CLOCK_CENTER_Y}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
-                             Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
-                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CENTER_DOT_SIZE}}" 
+                    <Ellipse Canvas.Left="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.ClockCenterX}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
+                             Canvas.Top="{Binding Source={x:Static helpers:AnalogClockConstants+Positioning.ClockCenterY}, Converter={x:Static converters:CenterDotPositionConverter.Instance}}" 
+                             Width="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CenterDotSize}}" 
+                             Height="{Binding Source={x:Static helpers:AnalogClockConstants+ClockDimensions.CenterDotSize}}" 
                              Fill="White"
                              Opacity="{Binding TextOpacity}"/>
                     

@@ -237,7 +237,7 @@ public class AlarmsViewModel : INotifyPropertyChanged
 
     private async void ShowDuplicateAlarmNotification(string? message = null)
     {
-        DuplicateAlarmNotification = message ?? LocalizationManager.GetLocalizedStrings().Alarms_DuplicateNotification;
+        DuplicateAlarmNotification = message ?? LocalizationManager.GetLocalizedStrings().AlarmsDuplicateNotification;
         await Task.Delay(Constants.DuplicateAlarmNotificationDurationMs);
         DuplicateAlarmNotification = string.Empty;
     }

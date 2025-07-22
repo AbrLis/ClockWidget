@@ -145,12 +145,12 @@ public class TimeService : IDisposable, ITimeService
             }
 
             _currentTime = DateTime.Now;
-            
+
             // Проверяем, изменилась ли секунда с последнего обновления
             if (_currentTime.Second != _lastSecondUpdate.Second)
             {
                 _lastSecondUpdate = _currentTime;
-                
+
                 var handler = TimeUpdated;
                 if (handler != null)
                 {
@@ -164,4 +164,4 @@ public class TimeService : IDisposable, ITimeService
         }
     }
     #endregion
-} 
+}

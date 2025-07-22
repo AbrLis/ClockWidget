@@ -6,18 +6,18 @@ namespace ClockWidgetApp.Helpers;
 public static class Constants
 {
     // Свойства для доступа из XAML
-    public static double MIN_WINDOW_OPACITY => WindowSettings.MIN_WINDOW_OPACITY;
-    public static double MAX_WINDOW_OPACITY => WindowSettings.MAX_WINDOW_OPACITY;
-    public static double OPACITY_STEP => WindowSettings.OPACITY_STEP;
-    public static double MIN_ANALOG_CLOCK_SIZE => WindowSettings.MIN_ANALOG_CLOCK_SIZE;
-    public static double MAX_ANALOG_CLOCK_SIZE => WindowSettings.MAX_ANALOG_CLOCK_SIZE;
-    public static double ANALOG_CLOCK_SIZE_STEP => WindowSettings.ANALOG_CLOCK_SIZE_STEP;
+    public static double MinWindowOpacity => WindowSettings.MinWindowOpacity;
+    public static double MaxWindowOpacity => WindowSettings.MaxWindowOpacity;
+    public static double OpacityStep => WindowSettings.OpacityStep;
+    public static double MinAnalogClockSize => WindowSettings.MinAnalogClockSize;
+    public static double MaxAnalogClockSize => WindowSettings.MaxAnalogClockSize;
+    public static double AnalogClockSizeStep => WindowSettings.AnalogClockSizeStep;
 
-    public static double MIN_TEXT_OPACITY => TextSettings.MIN_TEXT_OPACITY;
-    public static double MAX_TEXT_OPACITY => TextSettings.MAX_TEXT_OPACITY;
-    public static double MIN_FONT_SIZE => TextSettings.MIN_FONT_SIZE;
-    public static double MAX_FONT_SIZE => TextSettings.MAX_FONT_SIZE;
-    public static double FONT_SIZE_STEP => TextSettings.FONT_SIZE_STEP;
+    public static double MinTextOpacity => TextSettings.MinTextOpacity;
+    public static double MaxTextOpacity => TextSettings.MaxTextOpacity;
+    public static double MinFontSize => TextSettings.MinFontSize;
+    public static double MaxFontSize => TextSettings.MaxFontSize;
+    public static double FontSizeStep => TextSettings.FontSizeStep;
 
     /// <summary>
     /// Максимальная длина названия длинного таймера.
@@ -32,11 +32,11 @@ public static class Constants
     /// <summary>
     /// Индекс вкладки 'Общие настройки' в окне настроек.
     /// </summary>
-    public const int SETTINGS_TAB_INDEX_GENERAL = 0;
+    public const int SettingsTabIndexGeneral = 0;
     /// <summary>
     /// Индекс вкладки 'Будильники и таймеры' в окне настроек.
     /// </summary>
-    public const int SETTINGS_TAB_INDEX_TIMERS = 1;
+    public const int SettingsTabIndexTimers = 1;
 
     /// <summary>
     /// Время отображения уведомления о дублирующемся будильнике (мс).
@@ -56,62 +56,62 @@ public static class Constants
         /// <summary>
         /// Значение прозрачности окна по умолчанию (90%).
         /// </summary>
-        public const double DEFAULT_WINDOW_OPACITY = 0.6;
+        public const double DefaultWindowOpacity = 0.6;
 
         /// <summary>
         /// Минимальное значение прозрачности окна (10%).
         /// </summary>
-        public const double MIN_WINDOW_OPACITY = 0.1;
+        public const double MinWindowOpacity = 0.1;
 
         /// <summary>
         /// Максимальное значение прозрачности окна (100%).
         /// </summary>
-        public const double MAX_WINDOW_OPACITY = 1.0;
+        public const double MaxWindowOpacity = 1.0;
 
         /// <summary>
         /// Шаг изменения прозрачности (10%).
         /// </summary>
-        public const double OPACITY_STEP = 0.1;
+        public const double OpacityStep = 0.1;
 
         /// <summary>
         /// Позиция окна по горизонтали по умолчанию.
         /// </summary>
-        public const double DEFAULT_WINDOW_LEFT = 100.0;
+        public const double DefaultWindowLeft = 100.0;
 
         /// <summary>
         /// Позиция окна по вертикали по умолчанию.
         /// </summary>
-        public const double DEFAULT_WINDOW_TOP = 100.0;
+        public const double DefaultWindowTop = 100.0;
 
         /// <summary>
         /// Позиция окна аналоговых часов по горизонтали по умолчанию.
         /// </summary>
-        public const double DEFAULT_ANALOG_CLOCK_LEFT = 100.0;
+        public const double DefaultAnalogClockLeft = 100.0;
 
         /// <summary>
         /// Позиция окна аналоговых часов по вертикали по умолчанию.
         /// </summary>
-        public const double DEFAULT_ANALOG_CLOCK_TOP = 100.0;
+        public const double DefaultAnalogClockTop = 100.0;
 
         /// <summary>
         /// Размер окна аналоговых часов по умолчанию.
         /// </summary>
-        public const double DEFAULT_ANALOG_CLOCK_SIZE = 300.0;
+        public const double DefaultAnalogClockSize = 300.0;
 
         /// <summary>
         /// Минимальный размер окна аналоговых часов.
         /// </summary>
-        public const double MIN_ANALOG_CLOCK_SIZE = 100.0;
+        public const double MinAnalogClockSize = 100.0;
 
         /// <summary>
         /// Максимальный размер окна аналоговых часов.
         /// </summary>
-        public const double MAX_ANALOG_CLOCK_SIZE = 500.0;
+        public const double MaxAnalogClockSize = 500.0;
 
         /// <summary>
         /// Шаг изменения размера окна аналоговых часов.
         /// </summary>
-        public const double ANALOG_CLOCK_SIZE_STEP = 10.0;
+        public const double AnalogClockSizeStep = 10.0;
     }
 
     /// <summary>
@@ -122,37 +122,37 @@ public static class Constants
         /// <summary>
         /// Значение прозрачности текста по умолчанию (100%).
         /// </summary>
-        public const double DEFAULT_TEXT_OPACITY = 1.0;
+        public const double DefaultTextOpacity = 1.0;
 
         /// <summary>
         /// Минимальное значение прозрачности текста (10%).
         /// </summary>
-        public const double MIN_TEXT_OPACITY = 0.1;
+        public const double MinTextOpacity = 0.1;
 
         /// <summary>
         /// Максимальное значение прозрачности текста (100%).
         /// </summary>
-        public const double MAX_TEXT_OPACITY = 1.0;
+        public const double MaxTextOpacity = 1.0;
 
         /// <summary>
         /// Размер шрифта по умолчанию.
         /// </summary>
-        public const double DEFAULT_FONT_SIZE = 48.0;
+        public const double DefaultFontSize = 48.0;
 
         /// <summary>
         /// Минимальный размер шрифта.
         /// </summary>
-        public const double MIN_FONT_SIZE = 24.0;
+        public const double MinFontSize = 24.0;
 
         /// <summary>
         /// Максимальный размер шрифта.
         /// </summary>
-        public const double MAX_FONT_SIZE = 96.0;
+        public const double MaxFontSize = 96.0;
 
         /// <summary>
         /// Шаг изменения размера шрифта.
         /// </summary>
-        public const double FONT_SIZE_STEP = 4.0;
+        public const double FontSizeStep = 4.0;
     }
 
     /// <summary>
@@ -163,17 +163,17 @@ public static class Constants
         /// <summary>
         /// Флаг отображения секунд по умолчанию.
         /// </summary>
-        public const bool DEFAULT_SHOW_SECONDS = true;
+        public const bool DefaultShowSeconds = true;
 
         /// <summary>
         /// Формат времени с отображением секунд.
         /// </summary>
-        public const string TIME_FORMAT_WITH_SECONDS = "HH:mm:ss";
+        public const string TimeFormatWithSeconds = "HH:mm:ss";
 
         /// <summary>
         /// Формат времени без отображения секунд.
         /// </summary>
-        public const string TIME_FORMAT_WITHOUT_SECONDS = "HH:mm";
+        public const string TimeFormatWithoutSeconds = "HH:mm";
     }
     /// <summary>
     /// Настройки кукушки.
@@ -183,6 +183,6 @@ public static class Constants
         /// <summary>
         /// Воспроизводить звук кукушки каждый час по умолчанию (false).
         /// </summary>
-        public const bool DEFAULT_CUCKOO_EVERY_HOUR = false;
+        public const bool DefaultCuckooEveryHour = false;
     }
-} 
+}

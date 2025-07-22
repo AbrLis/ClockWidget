@@ -32,7 +32,7 @@ public class CenterDotPositionConverter : IValueConverter
         if (value is double centerCoordinate)
         {
             // Вычитаем половину размера центральной точки для правильного позиционирования
-            return centerCoordinate - AnalogClockConstants.ClockDimensions.CENTER_DOT_SIZE / 2;
+            return centerCoordinate - AnalogClockConstants.ClockDimensions.CenterDotSize / 2;
         }
         return value;
     }
