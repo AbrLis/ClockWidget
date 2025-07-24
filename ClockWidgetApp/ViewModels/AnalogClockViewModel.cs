@@ -185,12 +185,12 @@ public class AnalogClockViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Освобождает ресурсы, используемые экземпляром класса <see cref="AnalogClockViewModel"/>.</summary>
     public void Dispose()
     {
-        if (!_disposed)
-        {
-            _timeService.TimeUpdated -= OnTimeUpdated;
-            _mainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
-            _disposed = true;
-        }
+        if (_disposed) return;
+        _timeService.TimeUpdated -= OnTimeUpdated;
+        _mainViewModel.PropertyChanged -= MainViewModel_PropertyChanged;
+        _disposed = true;
+
+        GC.SuppressFinalize(this);
     }
     #endregion
 }
