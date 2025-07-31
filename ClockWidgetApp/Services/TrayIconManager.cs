@@ -234,11 +234,15 @@ namespace ClockWidgetApp.Services
                     ? Helpers.LocalizationManager.GetString("Tray_Stop")
                     : Helpers.LocalizationManager.GetString("Tray_StopTimer");
                 var stopItem = new ToolStripMenuItem(stopText);
-                stopItem.Click += (_, _) => {
-                    if (id.StartsWith("longtimer_")) {
+                stopItem.Click += (_, _) =>
+                {
+                    if (id.StartsWith("longtimer_"))
+                    {
                         if (Helpers.DialogHelper.ConfirmLongTimerDelete())
                             StopRequested?.Invoke(id);
-                    } else {
+                    }
+                    else
+                    {
                         StopRequested?.Invoke(id);
                     }
                 };

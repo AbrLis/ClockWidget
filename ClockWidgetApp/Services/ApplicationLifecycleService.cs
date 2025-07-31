@@ -30,7 +30,7 @@ namespace ClockWidgetApp.Services
             try
             {
                 logger?.LogInformation("[App] Starting graceful shutdown");
-                
+
                 if (timeService != null)
                 {
                     timeService.Stop();

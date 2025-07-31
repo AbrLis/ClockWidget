@@ -74,24 +74,24 @@ namespace ClockWidgetApp.Data
             try
             {
                 Log.Debug("Начало сохранения в {FilePath}", _filePath);
-                
+
                 var dir = Path.GetDirectoryName(_filePath);
                 if (!string.IsNullOrEmpty(dir))
                     _fileSystem.CreateDirectory(dir);
-                
+
                 // Создаём резервную копию, если файл существует
                 if (_fileSystem.FileExists(_filePath))
                 {
                     Log.Debug("Создание резервной копии для {FilePath}", _filePath);
                     await _fileSystem.CreateBackupAsync(_filePath, _backupPath);
                 }
-                
+
                 Log.Debug("Сериализация объекта для {FilePath}", _filePath);
                 var json = JsonSerializer.Serialize(obj, _serializerOptions);
-                
+
                 Log.Debug("Запись JSON в {FilePath}", _filePath);
                 await _fileSystem.WriteAllTextAsync(_filePath, json);
-                
+
                 Log.Debug("Сохранение завершено для {FilePath}", _filePath);
             }
             catch (Exception ex)

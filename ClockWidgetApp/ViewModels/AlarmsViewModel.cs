@@ -118,7 +118,8 @@ public class AlarmsViewModel : INotifyPropertyChanged
             }
         };
         // Делегат автосохранения состояния
-        vm.OnStateChanged = () => {
+        vm.OnStateChanged = () =>
+        {
             if (_appDataService is AppDataService concreteService)
                 concreteService.ScheduleTimersAndAlarmsSave();
         };

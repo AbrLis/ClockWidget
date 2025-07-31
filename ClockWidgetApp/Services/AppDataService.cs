@@ -179,14 +179,14 @@ namespace ClockWidgetApp.Services
             try
             {
                 Serilog.Log.Information("[AppDataService] Принудительное синхронное сохранение при закрытии приложения");
-                
+
                 // Отменяем отложенные сохранения
                 _settingsSaveDebounceCts?.Cancel();
                 _timersSaveDebounceCts?.Cancel();
-                
+
                 // Выполняем сохранение синхронно
                 Save();
-                
+
                 Serilog.Log.Information("[AppDataService] Принудительное сохранение завершено");
             }
             catch (Exception ex)
@@ -378,8 +378,8 @@ namespace ClockWidgetApp.Services
             {
                 var timersModel = new TimersAndAlarmsPersistModel
                 {
-                    Timers = [..Data.Timers],
-                    Alarms = [..Data.Alarms],
+                    Timers = [.. Data.Timers],
+                    Alarms = [.. Data.Alarms],
                     LongTimers = new List<LongTimerPersistModel>(Data.LongTimers)
                 };
                 // Простой синхронный вызов без Task.Run
@@ -401,8 +401,8 @@ namespace ClockWidgetApp.Services
             {
                 var timersModel = new TimersAndAlarmsPersistModel
                 {
-                    Timers = [..Data.Timers],
-                    Alarms = [..Data.Alarms],
+                    Timers = [.. Data.Timers],
+                    Alarms = [.. Data.Alarms],
                     LongTimers = new List<LongTimerPersistModel>(Data.LongTimers)
                 };
                 await _timersRepository.SaveAsync(timersModel);
