@@ -207,7 +207,7 @@ public partial class App : System.Windows.Application
     }
 
     /// <summary>
-    /// Обработчик завершения приложения (синхронный, блокирующий).
+    /// Обработчик завершения приложения (синхронный, но с сохранением в отдельном потоке).
     /// </summary>
     protected override void OnExit(ExitEventArgs e)
     {
@@ -216,12 +216,14 @@ public partial class App : System.Windows.Application
         {
             _logger?.LogInformation("[App] Application shutting down (DI)");
             
-            // Принудительное сохранение всех данных перед закрытием
+            // Принудительное сохранение всех данных перед закрытием в отдельном потоке
             var appDataService = _serviceProvider?.GetService(typeof(IAppDataService)) as IAppDataService;
             if (appDataService != null)
             {
                 _logger?.LogInformation("[App] Принудительное сохранение данных при закрытии");
-                appDataService.FlushPendingSaves();
+                
+                // Выполняем синхронное сохранение в отдельном потоке
+                Task.Run(() => appDataService.FlushPendingSaves()).Wait();
                 _logger?.LogInformation("[App] Данные успешно сохранены");
             }
             
