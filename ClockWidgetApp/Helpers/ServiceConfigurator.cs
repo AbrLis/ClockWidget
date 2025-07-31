@@ -50,7 +50,8 @@ namespace ClockWidgetApp.Helpers
                 )
             );
             services.AddSingleton<ApplicationLifecycleService>(sp =>
-                new ApplicationLifecycleService(sp.GetRequiredService<ILogger<ApplicationLifecycleService>>(),
+                new ApplicationLifecycleService(
+                    sp.GetRequiredService<ILogger<ApplicationLifecycleService>>(),
                     sp.GetRequiredService<ITimeService>()
                 )
             );

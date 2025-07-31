@@ -169,6 +169,26 @@ namespace ClockWidgetApp.Services
             await _timersSaveDebounceCts?.CancelAsync()!;
             await SaveAsync();
         }
+
+        /// <summary>
+        /// Синхронно отменяет все отложенные автосохранения и немедленно сохраняет все данные приложения.
+        /// Используется при закрытии приложения для гарантированного сохранения.
+        /// </summary>
+        public void FlushPendingSaves()
+        {
+            try
+            {
+                Serilog.Log.Information("[AppDataService] Принудительное синхронное сохранение при закрытии приложения");
+                _settingsSaveDebounceCts?.Cancel();
+                _timersSaveDebounceCts?.Cancel();
+                Save();
+                Serilog.Log.Information("[AppDataService] Принудительное сохранение завершено");
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "[AppDataService] Ошибка при принудительном сохранении");
+            }
+        }
         #endregion
 
         #region Private Methods

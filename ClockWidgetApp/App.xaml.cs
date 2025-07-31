@@ -215,6 +215,16 @@ public partial class App : System.Windows.Application
         try
         {
             _logger?.LogInformation("[App] Application shutting down (DI)");
+            
+            // Принудительное сохранение всех данных перед закрытием
+            var appDataService = _serviceProvider?.GetService(typeof(IAppDataService)) as IAppDataService;
+            if (appDataService != null)
+            {
+                _logger?.LogInformation("[App] Принудительное сохранение данных при закрытии");
+                appDataService.FlushPendingSaves();
+                _logger?.LogInformation("[App] Данные успешно сохранены");
+            }
+            
             _lifecycleService?.GracefulShutdown();
             base.OnExit(e);
             _logger?.LogInformation("[App] Application shutdown completed (DI)");

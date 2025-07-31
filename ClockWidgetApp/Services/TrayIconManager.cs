@@ -101,7 +101,19 @@ namespace ClockWidgetApp.Services
                 else
                     ws?.OpenSettingsWindow();
             };
-            _exitItem.Click += (_, _) => System.Windows.Application.Current.Shutdown();
+            _exitItem.Click += (_, _) =>
+            {
+                try
+                {
+                    _logger?.LogInformation("[TrayIconManager] Exit requested from tray menu");
+                    System.Windows.Application.Current.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "[TrayIconManager] Error during application shutdown from tray");
+                    System.Windows.Application.Current.Shutdown();
+                }
+            };
             _mainTrayMenu.Items.Add(_showDigitalItem);
             _mainTrayMenu.Items.Add(_showAnalogItem);
             _mainTrayMenu.Items.Add(separator2);

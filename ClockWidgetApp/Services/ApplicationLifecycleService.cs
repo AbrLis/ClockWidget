@@ -23,17 +23,26 @@ namespace ClockWidgetApp.Services
         }
 
         /// <summary>
-        /// Выполняет graceful shutdown: останавливает сервисы (без сохранения данных).
+        /// Выполняет graceful shutdown: останавливает сервисы.
         /// </summary>
         public void GracefulShutdown()
         {
-            if (timeService != null)
+            try
             {
-                timeService.Stop();
-                timeService.Dispose();
-                logger?.LogInformation("[App] Time service disposed");
+                logger?.LogInformation("[App] Starting graceful shutdown");
+                
+                if (timeService != null)
+                {
+                    timeService.Stop();
+                    timeService.Dispose();
+                    logger?.LogInformation("[App] Time service disposed");
+                }
+                logger?.LogInformation("[App] GracefulShutdown завершён: все сервисы остановлены");
             }
-            logger?.LogInformation("[App] GracefulShutdownAsync завершён: все сервисы остановлены");
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "[App] Error during graceful shutdown");
+            }
         }
     }
 }
