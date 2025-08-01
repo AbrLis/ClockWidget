@@ -49,8 +49,6 @@ namespace ClockWidgetApp.Services
             _timersFilePath = timersFilePath;
             _settingsRepository = new Data.SingleObjectJsonRepository<WidgetSettings>(fileSystemService, settingsFilePath);
             _timersRepository = new Data.SingleObjectJsonRepository<TimersAndAlarmsPersistModel>(fileSystemService, timersFilePath);
-            SubscribeToCollections();
-            // Удаляю метод StartAutoSaveTimer
         }
         #endregion
 
@@ -75,7 +73,6 @@ namespace ClockWidgetApp.Services
             if (settings != null)
             {
                 Data.WidgetSettings = settings;
-                SubscribeToWidgetSettings();
                 Serilog.Log.Information("[AppDataService] Настройки успешно загружены (репозиторий)");
             }
             else
@@ -101,6 +98,9 @@ namespace ClockWidgetApp.Services
             {
                 Serilog.Log.Error(ex, "[AppDataService] Ошибка загрузки timers/alarms из репозитория");
             }
+
+            // Устанавливаем подписки на события после загрузки всех данных
+            SubscribeToCollections();
         }
 
         /// <inheritdoc/>
@@ -111,7 +111,6 @@ namespace ClockWidgetApp.Services
             if (settings != null)
             {
                 Data.WidgetSettings = settings;
-                SubscribeToWidgetSettings();
                 Serilog.Log.Information("[AppDataService] Настройки успешно загружены (репозиторий)");
             }
             else
@@ -137,6 +136,9 @@ namespace ClockWidgetApp.Services
             {
                 Serilog.Log.Error(ex, "[AppDataService] Ошибка загрузки timers/alarms из репозитория");
             }
+
+            // Устанавливаем подписки на события после загрузки всех данных
+            SubscribeToCollections();
         }
 
         /// <inheritdoc/>
