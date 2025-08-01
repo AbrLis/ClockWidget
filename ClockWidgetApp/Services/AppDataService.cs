@@ -101,8 +101,6 @@ namespace ClockWidgetApp.Services
             {
                 Serilog.Log.Error(ex, "[AppDataService] Ошибка загрузки timers/alarms из репозитория");
             }
-
-            SubscribeToCollections();
         }
 
         /// <inheritdoc/>
@@ -139,8 +137,6 @@ namespace ClockWidgetApp.Services
             {
                 Serilog.Log.Error(ex, "[AppDataService] Ошибка загрузки timers/alarms из репозитория");
             }
-
-            SubscribeToCollections();
         }
 
         /// <inheritdoc/>
